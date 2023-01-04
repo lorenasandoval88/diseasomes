@@ -108,8 +108,10 @@ PGS23.loadPGS = async(i=4)=>{
 
 PGS23.load23 = async()=>{
     let div = PGS23.div23
-    div.innerHTML = `<hr><b style="color:maroon">B)</b> Load your 23andMe data file: <input type="file" id="file23andMeInput">
-	<br><span hidden=true id="my23hidden" style="font-size:small">
+    div.innerHTML = 
+    `<hr><b style="color:maroon">B)</b> Load!! your 23andMe data file: <input type="file" id="file23andMeInput">
+	<b>Or download test file</b>
+    <br><span hidden=true id="my23hidden" style="font-size:small">
 		 <span style="color:maroon" id="my23Info"></span> (<span id="my23variants"></span> variants) [<a href='#' id="json23">JSON</a>].
 	</span>
 	<p><textarea id="my23TextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`
@@ -381,7 +383,6 @@ function ui(targetDiv=document.body) {
     <p>
 	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targetted by the PGS entry.
     </p>
-    <img src="PRS_workflow_img.PNG" alt="prs workflow" width="400" height="100">
     <hr>
     `
     // recall that PGS23 is only global to the module, it is not exported
