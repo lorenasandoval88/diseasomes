@@ -275,10 +275,9 @@ PGS23.Match2 = function(data, progressReport) {
     let i = 0
 	let j = 0 //index of last match, the nex can match will have to be beyond this point since both pgs and 23and me are sorted by chr/position
     //let matchFloor=0 // to advance the earliest match as it advances
-    console.log("hiii",dtMatch)
-
 	function funMatch(i=0,matchFloor=0) {
         if (i < n) {
+            console.log("if (i < n) {")
 			let r = data.pgs.dt[i]
 			if (dtMatch.length > 0){
 				matchFloor=dtMatch.at(-1)[0][4]
@@ -328,8 +327,7 @@ PGS23.Match2 = function(data, progressReport) {
                     }
                     //debugger
                 }
-            }
-            )
+            })
             data.aleles = aleles
 			data.calcRiskScore = calcRiskScore
 			if(calcRiskScore.reduce((a,b)=>Math.min(a,b))==0){//&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
@@ -355,16 +353,8 @@ PGS23.Match2 = function(data, progressReport) {
 			document.querySelector('#buttonCalculateRisk').disabled = false
 			document.querySelector('#buttonCalculateRisk').style.color = 'blue'
         }
-        console.log("hiii",dtMatch)
     }
     funMatch()
-    /*data.pgs.dt.forEach((r,i)=>{
-		let dtMatch_i=data.my23.dt.filter(myr=>(myr[2]==r[indPos])).filter(myr=>(myr[1]==r[indChr]))
-		if(dtMatch_i.length>0){
-			dtMatch.push(dtMatch_i.concat([r]))
-		}
-		//console.log(i/n)
-	})*/
 }
 
 function ui(targetDiv=document.body) {
