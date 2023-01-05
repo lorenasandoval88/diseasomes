@@ -110,10 +110,11 @@ PGS23.load23 = async()=>{
     let div = PGS23.div23
     div.innerHTML = 
     `<hr><b style="color:maroon">B)</b> Load your 23andMe data file: <input type="file" id="file23andMeInput">
+    Or use test <a href= "23andMe_test_data.txt" download="23andMe_test_data.txt">file</a>
+
     <br><span hidden=true id="my23hidden" style="font-size:small">
 		 <span style="color:maroon" id="my23Info"></span> (<span id="my23variants"></span> variants) [<a href='#' id="json23">JSON</a>].
 	</span>
-    Or download test <a href= "23andMe_test_data.txt" download="23andMe_test_data.txt">file</a>
 	<p><textarea id="my23TextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`
     div.querySelector('#file23andMeInput').onchange = evt=>{
         function UI23(my23) {
@@ -146,11 +147,9 @@ PGS23.load23 = async()=>{
                 zip.file(fnametxt).async('string').then(txt=>{
                     div.querySelector("#my23TextArea").value = txt.slice(0, 10000).replace(/[^\r\n]+$/, '') + '\n\n .................. \n\n' + txt.slice(-300).replace(/^[^\r\n]+/, '')
                     UI23(parse23(txt, evt.target.files[0].name))
-                }
-                )
+                })
                 //debugger
-            }
-            )
+            })
             //debugger
             //await ev.arrayBuffer(x=>{
             //	debugger
@@ -260,6 +259,7 @@ PGS23.Match = function (data,progressReport){
 	//debugger
 }
 */
+console.log("hiii",dtMatch)
 
 PGS23.Match2 = function(data, progressReport) {
     // extract harmonized data from PGS entry first
@@ -275,6 +275,8 @@ PGS23.Match2 = function(data, progressReport) {
     let i = 0
 	let j = 0 //index of last match, the nex can match will have to be beyond this point since both pgs and 23and me are sorted by chr/position
     //let matchFloor=0 // to advance the earliest match as it advances
+    console.log("hiii",dtMatch)
+
 	function funMatch(i=0,matchFloor=0) {
         if (i < n) {
 			let r = data.pgs.dt[i]
@@ -353,20 +355,16 @@ PGS23.Match2 = function(data, progressReport) {
 			document.querySelector('#buttonCalculateRisk').disabled = false
 			document.querySelector('#buttonCalculateRisk').style.color = 'blue'
         }
-
+        console.log("hiii",dtMatch)
     }
     funMatch()
-
-    /*
-	data.pgs.dt.forEach((r,i)=>{
+    /*data.pgs.dt.forEach((r,i)=>{
 		let dtMatch_i=data.my23.dt.filter(myr=>(myr[2]==r[indPos])).filter(myr=>(myr[1]==r[indChr]))
 		if(dtMatch_i.length>0){
 			dtMatch.push(dtMatch_i.concat([r]))
 		}
 		//console.log(i/n)
-	})
-	 */
-
+	})*/
 }
 
 function ui(targetDiv=document.body) {
