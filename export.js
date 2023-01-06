@@ -201,8 +201,7 @@ PGS23.loadCalc = async () => {
         }
         if ((!!data.my23) & (!!data.pgs)) {
             my23CalcTextArea.value = `... looking for matches amongst ${data.my23.dt.length} genomic positions 
-                                    mapped to the ${data.pgs.dt.length} PGS#${data.pgs.id} 
-                                    ${data.pgs.meta.trait_mapped} risk loci. \n...`
+                            mapped to ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} risk loci (PGS#${data.pgs.id}). \n...`
             document.querySelector('#buttonCalculateRisk').disabled = true
             document.querySelector('#buttonCalculateRisk').style.color = 'silver'
             data.pgsMatchMy23 = []
