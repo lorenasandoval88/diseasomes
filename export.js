@@ -232,12 +232,15 @@ PGS23.Match2 = function (data, progressReport) {
 
             if (dtMatch.length > 0) {
                 matchFloor = dtMatch.at(-1)[0][4]
-                //console.log(data.pgs.dt[i]," i",i)
-                //console.log("dtMatch",dtMatch)
-                //console.log("dtMatch.at(-1)[0][4]",dtMatch.at(-1)[0])
             }
+            // MATCH ONE 23andme ALLELE TO PGS EFFECT ALLELE *******
             //let dtMatch_i = data.my23.dt.filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
+            console.log("matchFloor",matchFloor)
+
             let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr => (myr[2] == r[indPos])).filter(myr => (myr[1] == r[indChr]))
+            console.log("dtMatch_i",dtMatch_i)
+            console.log("-----------------------------------------------")
+
             if (dtMatch_i.length > 0) {
                 dtMatch.push(dtMatch_i.concat([r]))
             }
@@ -246,7 +249,9 @@ PGS23.Match2 = function (data, progressReport) {
                 funMatch(i + 1)
             }, 0)
         } else {
-            console.log(i)
+            console.log("i",i)  // checking matches!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            console.log("dtMatch",dtMatch)
+
             data.pgsMatchMy23 = dtMatch
             let calcRiskScore = []
             let aleles = []
