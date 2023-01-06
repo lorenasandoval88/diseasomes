@@ -200,7 +200,9 @@ PGS23.loadCalc = async () => {
             my23CalcTextArea.value += '\n... no 23andme report provided, please do that in B.'
         }
         if ((!!data.my23) & (!!data.pgs)) {
-            my23CalcTextArea.value = `... looking for matches amongst the ${data.my23.dt.length} 23andMe genomic positions, to the ${data.pgs.dt.length} single nucleotide polymorphisms (SNPs) reported in PGS#${data.pgs.id}, associated with ${data.pgs.meta.trait_mapped}. \n...`
+            my23CalcTextArea.value = `... looking for matches amongst ${data.my23.dt.length} genomic positions 
+                                    mapped to the ${data.pgs.dt.length} PGS#${data.pgs.id} 
+                                    ${data.pgs.meta.trait_mapped} risk loci. \n...`
             document.querySelector('#buttonCalculateRisk').disabled = true
             document.querySelector('#buttonCalculateRisk').style.color = 'silver'
             data.pgsMatchMy23 = []
