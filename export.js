@@ -44,7 +44,7 @@ PGS23.loadPGS = async (i = 4) => {
             div.querySelector('#btLoadPgs').click()
         }
     })
-   
+
     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
     div.querySelector('#btLoadPgs').onclick = async (evt) => {
         document.querySelector('#summarySpan').hidden = true
@@ -96,7 +96,6 @@ PGS23.loadPGS = async (i = 4) => {
             cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
             delete cleanObj.txt
             PGS23.data.pgs = cleanObj
-            console.log(PGS23.data.pgs.dt) // defined
             div.querySelector('#summarySpan').hidden = false
         }
     };
@@ -109,87 +108,82 @@ PGS23.loadPGS = async (i = 4) => {
     }
 
 
-// pgs plot-----------------------------------
-//PGS23.divPGSPlot
+    // pgs plot-----------------------------------
+    //PGS23.divPGSPlot
 
-// map our commands to the classList methods
-const fnmap = {
-    'toggle': 'toggle',
-      'show': 'add',
-      'hide': 'remove'
-  };
-  const collapse = (selector, cmd) => {
-    const targets = Array.from(document.querySelectorAll(selector));
-    targets.forEach(target => {
-      target.classList[fnmap[cmd]]('show');
+    // map our commands to the classList methods
+    const fnmap = {
+        'toggle': 'toggle',
+        'show': 'add',
+        'hide': 'remove'
+    };
+    const collapse = (selector, cmd) => {
+        const targets = Array.from(document.querySelectorAll(selector));
+        targets.forEach(target => {
+            target.classList[fnmap[cmd]]('show');
+        });
+    }
+
+    // Grab all the trigger elements on the page
+    const triggers = Array.from(document.querySelectorAll('[data-toggle="collapse2"]'));
+    // Listen for click events, but only on our triggers
+    document.getElementById("btLoadPgsPlot").addEventListener("click", (ev) => {
+        var div = PGS23.divPGSPlot
+        if (div.style.display !== 'none') {
+            div.style.display = 'none';
+        } else {
+            div.style.display = 'block';
+        }
+
+        let textContent = ev.target.textContent;
+        if (textContent == `plot polygenic risk scores`) {
+            pgsPlot(PGS23.data.pgs.cols, PGS23.data.pgs.dt, PGS23.divPGSPlot)
+            ev.target.textContent = `hide scores`;
+        } else {
+            ev.target.textContent = `plot polygenic risk scores`;
+        }
+
+        const elm = ev.target;
+        if (triggers.includes(elm)) {
+            const selector = elm.getAttribute('data-target');
+            collapse(selector, 'toggle');
+        }
     });
-  }
-  
-  // Grab all the trigger elements on the page
-  const triggers = Array.from(document.querySelectorAll('[data-toggle="collapse2"]'));
-  // Listen for click events, but only on our triggers
-  document.getElementById("btLoadPgsPlot").addEventListener("click", (ev) => {
-    var div = PGS23.divPGSPlot
-    if (div.style.display !== 'none') {
-        div.style.display = 'none';
-    }
-    else {
-        div.style.display = 'block';
-    }
+
+    //   document.getElementById("btLoadPgsPlot").addEventListener("click", (e) => {
 
 
-      let textContent = ev.target.textContent;
-      if (textContent == `plot polygenic risk scores`) {
-        pgsPlot(PGS23.data.pgs.dt, PGS23.divPGSPlot)
-          ev.target.textContent = `hide scores`;
-       }
-       else {
-         ev.target.textContent = `plot polygenic risk scores`;
-       }
+    //     var div = PGS23.divPGSPlot
+    //     if (div.style.display !== 'none') {
+    //         div.style.display = 'none';
+    //     }
+    //     else {
+    //         div.style.display = 'block';
+    //     }
 
 
-
-    const elm = ev.target;
-    if (triggers.includes(elm)) {
-      const selector = elm.getAttribute('data-target');
-      collapse(selector, 'toggle');
-    }
-  } );
-  
-//   document.getElementById("btLoadPgsPlot").addEventListener("click", (e) => {
-
-
-//     var div = PGS23.divPGSPlot
-//     if (div.style.display !== 'none') {
-//         div.style.display = 'none';
-//     }
-//     else {
-//         div.style.display = 'block';
-//     }
-
-
-//       let textContent = e.target.textContent;
-//       if (textContent == `plot polygenic risk scores`) {
-//         pgsPlot(PGS23.data.pgs.dt, PGS23.divPGSPlot)
-//           e.target.textContent = `hide scores`;
-//        }
-//        else {
-//          e.target.textContent = `plot polygenic risk scores`;
-//        }
-//    });
+    //       let textContent = e.target.textContent;
+    //       if (textContent == `plot polygenic risk scores`) {
+    //         pgsPlot(PGS23.data.pgs.dt, PGS23.divPGSPlot)
+    //           e.target.textContent = `hide scores`;
+    //        }
+    //        else {
+    //          e.target.textContent = `plot polygenic risk scores`;
+    //        }
+    //    });
 
 
 
-     // hide pgs plot
-//   document.getElementById("btLoadPgsPlot").onclick = function() {
-//     var div = PGS23.divPGSPlot
-//     if (div.style.display !== 'none') {
-//         div.style.display = 'none';
-//     }
-//     else {
-//         div.style.display = 'block';
-//     }
-// };
+    // hide pgs plot
+    //   document.getElementById("btLoadPgsPlot").onclick = function() {
+    //     var div = PGS23.divPGSPlot
+    //     if (div.style.display !== 'none') {
+    //         div.style.display = 'none';
+    //     }
+    //     else {
+    //         div.style.display = 'block';
+    //     }
+    // };
 }
 
 
@@ -315,14 +309,14 @@ PGS23.Match2 = function (data, progressReport) {
     //let matchFloor=0 // to advance the earliest match as it advances
     function funMatch(i = 0, matchFloor = 0) {
         if (i < n) {
-            let r = data.pgs.dt[i]  //  PGS data to be matched
+            let r = data.pgs.dt[i] //  PGS data to be matched
 
             if (dtMatch.length > 0) {
                 matchFloor = dtMatch.at(-1)[0][4]
             }
             // MATCH 23andme chromosome and position TO PGS chromosome and position *******
-            let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos])).filter(myr => (myr[1] == r[indChr]))
-  
+            let dtMatch_i = data.my23.dt.filter(myr => (myr[10] == r[indPos])).filter(myr => (myr[9] == r[indChr]))
+            console.log()
             if (dtMatch_i.length > 0) {
                 dtMatch.push(dtMatch_i.concat([r]))
             }
@@ -389,7 +383,7 @@ PGS23.Match2 = function (data, progressReport) {
             }
             document.querySelector('#buttonCalculateRisk').disabled = false
             document.querySelector('#buttonCalculateRisk').style.color = 'blue'
-        }     
+        }
     }
     funMatch()
 }
