@@ -33,7 +33,8 @@ let PGS23 = {
 PGS23.loadPGS = async (i = 4) => {
     // startng with a default pgs
     let div = PGS23.divPGS
-    div.innerHTML = `<b style="color:maroon">A)</b> PGS # <input id="pgsID" value=${i} size=5> <button id='btLoadPgs'>load</button><span id="showLargeFile" hidden=true><input id="checkLargeFile"type="checkbox">large file (under development)</span> 
+    div.innerHTML = `<b style="color:maroon">A)</b> PGS # <input id="pgsID" value=${i} size=5> <button id='btLoadPgs'>load</button><span id="showLargeFile" hidden=true><input id="checkLargeFile"type="checkbox">large file (under development)</span><button id='btLoadPgsPlot' class="btn btn-primary btn__first" data-toggle="collapse2" data-target=".collapse.first"
+    data-text="Collapse">plot polygenic risk scores</button>
     <span id="summarySpan" hidden=true>[<a id="urlPGS" href='' target="_blank">FTP</a>][<a id="catalogEntry" href="https://www.pgscatalog.org/score/${"PGS000000".slice(0, -JSON.stringify(i).length) + JSON.stringify(i)}" target="_blank">catalog</a>]<span id="largeFile"></span><br><span id="trait_mapped">...</span>, <span id="dataRows">...</span> variants, [<a id="pubDOI" target="_blank">Reference</a>], [<a href="#" id="objJSON">JSON</a>].</span>
     <p><textarea id="pgsTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`;
     div.querySelector('#pgsID').onkeyup = (evt => {
@@ -41,6 +42,7 @@ PGS23.loadPGS = async (i = 4) => {
             div.querySelector('#btLoadPgs').click()
         }
     })
+   
     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
     div.querySelector('#btLoadPgs').onclick = async (evt) => {
         document.querySelector('#summarySpan').hidden = true
@@ -92,6 +94,7 @@ PGS23.loadPGS = async (i = 4) => {
             cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
             delete cleanObj.txt
             PGS23.data.pgs = cleanObj
+            console.log(PGS23.data.pgs.dt) // defined
             div.querySelector('#summarySpan').hidden = false
         }
     };
@@ -102,6 +105,51 @@ PGS23.loadPGS = async (i = 4) => {
         delete cleanObj.txt
         saveFile(JSON.stringify(cleanObj), cleanObj.meta.pgs_id + '.json')
     }
+
+
+    // pgs plot-----------------------------------
+    PGS23.divPGSPlot.innerHTML = `<b style="color:maroon">plot pgs</b>`
+
+    // map our commands to the classList methods
+const fnmap = {
+    'toggle': 'toggle',
+      'show': 'add',
+      'hide': 'remove'
+  };
+  const collapse = (selector, cmd) => {
+    const targets = Array.from(document.querySelectorAll(selector));
+    targets.forEach(target => {
+      target.classList[fnmap[cmd]]('show');
+    });
+  }
+  
+  // Grab all the trigger elements on the page
+  const triggers = Array.from(document.querySelectorAll('[data-toggle="collapse2"]'));
+  // Listen for click events, but only on our triggers
+  document.getElementById("btLoadPgsPlot").addEventListener("click", (ev) => {
+    const elm = ev.target;
+  
+    if (triggers.includes(elm)) {
+      const selector = elm.getAttribute('data-target');
+      collapse(selector, 'toggle');
+    }
+  } );
+  
+  document.getElementById("btLoadPgsPlot").addEventListener("click", (e) => {
+      let textContent = e.target.textContent;
+      if (textContent == `plot polygenic risk scores`) {
+        pgsPlot(PGS23.data.pgs.dt, PGS23.divPGSPlot)
+          e.target.textContent = `hide scores`;
+       }
+       else {
+         e.target.textContent = `plot polygenic risk scores`;
+  
+       }
+   });
+    // div.querySelector('#btLoadPgsPlot').onclick = async (evt) => {
+    //     pgsPlot(PGS23.data.pgs.dt, PGS23.divPGSPlot)
+    //     console.log("PGS data plottes!",PGS23.data.pgs.cols)
+    // }
 }
 
 PGS23.load23 = async () => {
@@ -324,6 +372,8 @@ function ui(targetDiv = document.body) {
     // recall that PGS23 is only global to the module, it is not exported
     PGS23.divPGS = document.createElement('div');
     div.appendChild(PGS23.divPGS)
+    PGS23.divPGSPlot = document.createElement('div');
+    div.appendChild(PGS23.divPGSPlot)
     PGS23.div23 = document.createElement('div');
     div.appendChild(PGS23.div23)
     PGS23.divCalc = document.createElement('div');
