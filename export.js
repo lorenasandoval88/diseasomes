@@ -107,7 +107,7 @@ PGS23.loadPGS = async (i = 4) => {
 PGS23.load23 = async () => {
     let div = PGS23.div23
     div.innerHTML =
-        `<hr><b style="color:maroon">B)</b> Load test <a href= "23andMe_test_data.txt" download="23andMe_test_data.txt">data</a> or your 23andMe raw data file<input type="file" id="file23andMeInput">
+        `<hr><b style="color:maroon">B)</b> Load test <a href= "23andMe_test_data.txt" download="23andMe_test_data.txt">data</a> or your 23andMe raw data file <input type="file" id="file23andMeInput">
 
     <br><span hidden=true id="my23hidden" style="font-size:small">
 		 <span style="color:maroon" id="my23Info"></span> (<span id="my23variants"></span> variants) [<a href='#' id="json23">JSON</a>].
@@ -201,7 +201,7 @@ PGS23.loadCalc = async () => {
         }
         if ((!!data.my23) & (!!data.pgs)) {
             my23CalcTextArea.value = `... looking for matches amongst ${data.my23.dt.length} genomic positions 
-                            mapped to ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} risk loci (PGS#${data.pgs.id}). \n...`
+                mapped to ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} risk loci (PGS#${data.pgs.id}). \n...`
             document.querySelector('#buttonCalculateRisk').disabled = true
             document.querySelector('#buttonCalculateRisk').style.color = 'silver'
             data.pgsMatchMy23 = []
