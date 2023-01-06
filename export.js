@@ -203,7 +203,7 @@ PGS23.loadCalc = async()=>{
             my23CalcTextArea.value += '\n... no 23andme report provided, please do that in B.'
         }
         if ((!!data.my23) & (!!data.pgs)) {
-            my23CalcTextArea.value = `... looking for matches amongst the ${data.my23.dt.length} mutations targeted by 23andMe, for the reference ${data.pgs.dt.length} mutations reported in PGS#${data.pgs.id}, putatively associated with ${data.pgs.meta.trait_mapped}. \n...`
+            my23CalcTextArea.value = `... looking for matches amongst the ${data.my23.dt.length} 23andMe genomic positions, to the ${data.pgs.dt.length} single nucleotide polymorphisms (SNPs) reported in PGS#${data.pgs.id}, associated with ${data.pgs.meta.trait_mapped}. \n...`
             document.querySelector('#buttonCalculateRisk').disabled = true
             document.querySelector('#buttonCalculateRisk').style.color = 'silver'
             data.pgsMatchMy23 = []
@@ -259,7 +259,6 @@ PGS23.Match = function (data,progressReport){
 	//debugger
 }
 */
-console.log("haloooo")
 
 PGS23.Match2 = function(data, progressReport) {
     // extract harmonized data from PGS entry first
@@ -277,7 +276,7 @@ PGS23.Match2 = function(data, progressReport) {
     //let matchFloor=0 // to advance the earliest match as it advances
 	function funMatch(i=0,matchFloor=0) {
         if (i < n) {
-            console.log("if (i < n) {")
+            console.log("if (i < n)",data.pgs.dt[i])
 			let r = data.pgs.dt[i]
 			if (dtMatch.length > 0){
 				matchFloor=dtMatch.at(-1)[0][4]
