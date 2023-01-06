@@ -107,8 +107,7 @@ PGS23.loadPGS = async (i = 4) => {
 PGS23.load23 = async () => {
     let div = PGS23.div23
     div.innerHTML =
-        `<hr><b style="color:maroon">B)</b> Load your 23andMe data file: <input type="file" id="file23andMeInput">
-    Or use test <a href= "23andMe_test_data.txt" download="23andMe_test_data.txt">file</a>
+        `<hr><b style="color:maroon">B)</b> Load test <a href= "23andMe_test_data.txt" download="23andMe_test_data.txt">data</a> or your 23andMe data<input type="file" id="file23andMeInput">
 
     <br><span hidden=true id="my23hidden" style="font-size:small">
 		 <span style="color:maroon" id="my23Info"></span> (<span id="my23variants"></span> variants) [<a href='#' id="json23">JSON</a>].
@@ -226,21 +225,14 @@ PGS23.Match2 = function (data, progressReport) {
     //let matchFloor=0 // to advance the earliest match as it advances
     function funMatch(i = 0, matchFloor = 0) {
         if (i < n) {
-            console.log("i",i)
-            let r = data.pgs.dt[i]
-            console.log("r",r)
+            let r = data.pgs.dt[i]  //  PGS data to be matched
 
             if (dtMatch.length > 0) {
                 matchFloor = dtMatch.at(-1)[0][4]
             }
-            // MATCH ONE 23andme ALLELE TO PGS EFFECT ALLELE *******
-            //let dtMatch_i = data.my23.dt.filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
-            console.log("matchFloor",matchFloor)
-
-            let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr => (myr[2] == r[indPos])).filter(myr => (myr[1] == r[indChr]))
-            console.log("dtMatch_i",dtMatch_i)
-            console.log("-----------------------------------------------")
-
+            // MATCH 23andme chromosome and position TO PGS chromosome and position *******
+            let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos])).filter(myr => (myr[1] == r[indChr]))
+  
             if (dtMatch_i.length > 0) {
                 dtMatch.push(dtMatch_i.concat([r]))
             }
@@ -249,9 +241,6 @@ PGS23.Match2 = function (data, progressReport) {
                 funMatch(i + 1)
             }, 0)
         } else {
-            console.log("i",i)  // checking matches!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            console.log("dtMatch",dtMatch)
-
             data.pgsMatchMy23 = dtMatch
             let calcRiskScore = []
             let aleles = []
