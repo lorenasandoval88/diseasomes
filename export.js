@@ -290,7 +290,7 @@ PGS23.loadCalc = async () => {
         }
         if ((!!data.my23) & (!!data.pgs)) {
             my23CalcTextArea.value = `... looking for matches amongst ${data.my23.dt.length} genomic positions 
-                mapped to ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} risk loci (PGS#${data.pgs.id}). \n...`
+            and ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants (PGS#${data.pgs.id}). \n...`
             document.querySelector('#buttonCalculateRisk').disabled = true
             document.querySelector('#buttonCalculateRisk').style.color = 'silver'
             data.pgsMatchMy23 = []
@@ -379,7 +379,7 @@ PGS23.Match2 = function (data, progressReport) {
                 plotAllMatchByEffect()
             } else {
                 data.PRS = Math.exp(calcRiskScore.reduce((a, b) => a + b))
-                document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score, PRS=${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
+                document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score (PRS) = ${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.pgsMatchMy23.length}/${data.pgs.dt.length} matches.`
                 //my23CalcTextArea.value+=` ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
                 document.getElementById('plotRiskDiv').hidden = false
                 document.getElementById('hidenCalc').hidden = false
