@@ -41,12 +41,33 @@ PGS23.loadPGS = async (i = 4) => {
     <p><textarea id="pgsTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`;
     div.querySelector('#pgsID').onkeyup = (evt => {
         if (evt.keyCode == 13) {
-            div.querySelector('#btLoadPgs').click()
+            // on key up reload pgs data
+            div.querySelector('#btLoadPgs').click() 
+            // on key up hide/reset pgs plot
+            if (document.getElementById("btLoadPgsPlot").textContent = `plot polygenic risk scores`){
+            var divHide = PGS23.divPGSPlot
+                if (divHide.style.display !== 'none') {
+                    divHide.style.display = 'none';
+                } else {
+                    divHide.style.display = 'block';
+                        }
+                    }
+            // hide plot when pgs is updated
+            const elm = evt.target;
+            if (triggers.includes(elm)) {
+                const selector = elm.getAttribute('data-target');
+                collapse(selector, 'toggle');
+            }
         }
     })
    
     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
     div.querySelector('#btLoadPgs').onclick = async (evt) => {
+        // reset plot onclick pgs load Lorena! TODO
+        // if (triggers.includes(evt.target)) {
+        //     const selector = evt.target.getAttribute('data-target');
+        //     collapse(selector, 'toggle');
+        // }
         document.querySelector('#summarySpan').hidden = true
         PGS23.pgsTextArea.value = '... loading'
         i = parseInt(div.querySelector('#pgsID').value)
@@ -140,7 +161,7 @@ const fnmap = {
 
       let textContent = ev.target.textContent;
       if (textContent == `plot polygenic risk scores`) {
-        pgsPlot(PGS23.data.pgs.dt, PGS23.divPGSPlot)
+        pgsPlot(PGS23.data.pgs.cols,PGS23.data.pgs.dt, PGS23.divPGSPlot)
           ev.target.textContent = `hide scores`;
        }
        else {
@@ -157,8 +178,6 @@ const fnmap = {
   } );
   
 //   document.getElementById("btLoadPgsPlot").addEventListener("click", (e) => {
-
-
 //     var div = PGS23.divPGSPlot
 //     if (div.style.display !== 'none') {
 //         div.style.display = 'none';
@@ -166,8 +185,6 @@ const fnmap = {
 //     else {
 //         div.style.display = 'block';
 //     }
-
-
 //       let textContent = e.target.textContent;
 //       if (textContent == `plot polygenic risk scores`) {
 //         pgsPlot(PGS23.data.pgs.dt, PGS23.divPGSPlot)
