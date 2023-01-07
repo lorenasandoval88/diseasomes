@@ -4,14 +4,17 @@ const pgsPlot = async (cols, dt, div) => {
 
     // display pgs scores as beta or odds ratio with rsids or chr and position on the x axis
     oddsRatio = {};
-    const chr_idx = cols.indexOf('hm_rsID')
-    console.log(cols,chr_idx)
-    if (dt[chr_idx][0] == '' || dt[chr_idx][0] ==  undefined){
+    const rs_idx = cols.indexOf('hm_rsID')
+    console.log(rs_idx,"dt[rs_idx][0]",dt[0][rs_idx])
+    if (dt[0][rs_idx] == '' || dt[0][rs_idx] ==  undefined){
         dt.forEach((row)=>{
-            oddsRatio["chr_"+row[0]+"_pos_"+ row[1]] = row[4];
+            oddsRatio["chr_"+row[8]+"_pos_"+ row[9]] = row[4];
         })
     } else {
-        
+        dt.forEach((row)=>{
+            oddsRatio[row[0]] = row[4];
+            //console.log("missing rsids",row[4])
+        })
     }
   //sort or/beta object
     oddsRatioSorted = Object.entries(oddsRatio)
