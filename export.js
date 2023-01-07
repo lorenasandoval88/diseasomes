@@ -29,7 +29,6 @@ let PGS23 = {
 }
 
 // in case someone wants to see it in the console
-
 PGS23.loadPGS = async (i = 4) => {
     // startng with a default pgs
     let div = PGS23.divPGS
@@ -150,42 +149,30 @@ PGS23.loadPGS = async (i = 4) => {
         }
     });
 
-    //   document.getElementById("btLoadPgsPlot").addEventListener("click", (e) => {
+// reset pgs scores and then plot again----->
+// Grab all the trigger elements on the page
+//https://medium.com/dailyjs/mimicking-bootstraps-collapse-with-vanilla-javascript-b3bb389040e7
+const triggers2 = Array.from(document.querySelectorAll('[data-toggle="collapse1"]'));
+// Listen for click events, but only on our triggers
+window.addEventListener('click', (ev) => {
+  const elm = ev.target;
 
+  if (triggers2.includes(elm)) {
+    const selector = elm.getAttribute('data-target');
+    collapse(selector, 'hide');
+  }
+} );
 
-    //     var div = PGS23.divPGSPlot
-    //     if (div.style.display !== 'none') {
-    //         div.style.display = 'none';
-    //     }
-    //     else {
-    //         div.style.display = 'block';
-    //     }
-
-
-    //       let textContent = e.target.textContent;
-    //       if (textContent == `plot polygenic risk scores`) {
-    //         pgsPlot(PGS23.data.pgs.dt, PGS23.divPGSPlot)
-    //           e.target.textContent = `hide scores`;
-    //        }
-    //        else {
-    //          e.target.textContent = `plot polygenic risk scores`;
-    //        }
-    //    });
-
-
-
-    // hide pgs plot
-    //   document.getElementById("btLoadPgsPlot").onclick = function() {
-    //     var div = PGS23.divPGSPlot
-    //     if (div.style.display !== 'none') {
-    //         div.style.display = 'none';
-    //     }
-    //     else {
-    //         div.style.display = 'block';
-    //     }
-    // };
+document.getElementById("btLoadPgs").addEventListener("click", (e) => {
+    let textContent = document.getElementById("btLoadPgsPlot").innerHTML;
+    if (textContent == `hide scores`) {
+        document.getElementById("btLoadPgsPlot").innerHTML = `plot scores`;
+     }
+     else {
+        document.getElementById("btLoadPgsPlot").innerHTML = `plot scores`;
+     }
+ });
 }
-
 
 PGS23.load23 = async () => {
     let div = PGS23.div23
