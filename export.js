@@ -37,41 +37,32 @@ PGS23.loadPGS = async (i = 4) => {
     <button id='btLoadPgs' class="btn btn-primary btn__first" data-toggle="collapse1" data-target=".collapse.first">load</button>
     <span id="showLargeFile" hidden=true><input id="checkLargeFile"type="checkbox">large file (under development)</span>
     
-    <button id='btLoadPgsPlot' class="btn btn-primary btn__first" data-toggle="collapse2" data-target=".collapse.first" data-text="Collapse">plot scores</button>
+    <button id='btLoadPgsPlot' class="btn btn-primary btn__first" data-toggle="collapse2" data-target=".collapse.first" data-text="Collapse">plot risk scores</button>
     <span id="summarySpan" hidden=true>[<a id="urlPGS" href='' target="_blank">FTP</a>][<a id="catalogEntry" href="https://www.pgscatalog.org/score/${"PGS000000".slice(0, -JSON.stringify(i).length) + JSON.stringify(i)}" target="_blank">catalog</a>]<span id="largeFile"></span><br><span id="trait_mapped">...</span>, <span id="dataRows">...</span> variants, [<a id="pubDOI" target="_blank">Reference</a>], [<a href="#" id="objJSON">JSON</a>].</span>
     <p><textarea id="pgsTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`;
     div.querySelector('#pgsID').onkeyup = (evt => {
         if (evt.keyCode == 13) {
             // on key up reload pgs data
-            div.querySelector('#btLoadPgs').click() 
+            div.querySelector('#btLoadPgs').click()
 
         }
     })
+    // hide pgs plot
+    document.getElementById('btLoadPgsPlot').addEventListener("click", (e) => {
+        pgsPlot()
+        var div2 = document.getElementById('divPGSPlot');
+        if (div2.style.display !== 'block') {
+            div2.style.display = 'block';
+            e.target.textContent = `hide scores`;
+        } else if (div2.style.display == 'block') {
+            div2.style.display = 'none';
+            e.target.textContent = `plot risk scores`
 
-             // hide pgs plot
-             console.log("btLoadPgsPlot').onclick")
-             document.getElementById('btLoadPgsPlot').addEventListener("click", (e) => {
-            let textContent = e.target.textContent;
-            console.log("clivk pgs plot")
-            pgsPlot()
-
-                  var div2 = document.getElementById('divPGSPlot');
-                  if (div2.style.display !== 'block') {
-                      div2.style.display = 'block';
-                      e.target.textContent = `hide scores`;
-                  } else if (div2.style.display == 'block'){
-                      div2.style.display = 'none';
-                      e.target.textContent = `plot scores`
-
-                  }
-             })
- 
+        }
+    })
     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
     div.querySelector('#btLoadPgs').onclick = async (evt) => {
 
-
-        //reset plot on click "load" button
-        //PGS23.toggle_pgs_button('btLoadPgs','btLoadPgsPlot')
         // fill in pgs textarea
         document.querySelector('#summarySpan').hidden = true
         PGS23.pgsTextArea.value = '... loading'
@@ -122,9 +113,9 @@ PGS23.loadPGS = async (i = 4) => {
             cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
             delete cleanObj.txt
             PGS23.data.pgs = cleanObj
-           //console.log(PGS23.data.pgs.dt) // defined
+            //console.log(PGS23.data.pgs.dt) // defined
             div.querySelector('#summarySpan').hidden = false
-           
+
         }
 
     };
@@ -135,140 +126,7 @@ PGS23.loadPGS = async (i = 4) => {
         delete cleanObj.txt
         saveFile(JSON.stringify(cleanObj), cleanObj.meta.pgs_id + '.json')
     }
-
-    }
-
-// odds ratio plot for pgs scores (parse and convert betas to odds ratio)-------------------------------------------------
-function pgsPlot(dt =(document.getElementById("PGS23calc")).PGS23data.pgs['dt'], cols = PGS23.data.pgs.cols, div = divPGSPlot) {
-
-    // display pgs scores as beta or odds ratio with rsids or chr and position on the x axis
-    let oddsRatio = {};
-    const rs_idx = cols.indexOf('hm_rsID')
-    console.log("pgsPlot")
-
-    if (dt[0][rs_idx] == '' || dt[0][rs_idx] == undefined) {
-        dt.forEach((row) => {
-            oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = math.exp(row[4]);
-        })
-    } else {
-        dt.forEach((row) => {
-            oddsRatio[row[0]] = row[4];
-        })
-    }
-//sort pgs variants by beta
-    let oddsRatioSorted = Object.entries(oddsRatio)
-        .sort(([, a], [, b]) => a - b)
-        .reduce((r, [k, v]) => ({
-            ...r,
-            [k]: v
-        }), {});
-
-// use plotly to make odds ratio chart----
-    var trace1 = {
-        type: 'scatter',
-        x: Object.values(oddsRatioSorted), // odds ratios
-        y: Object.keys(oddsRatioSorted), // rsids
-        mode: 'markers', name: 'legend1',
-        marker: {
-            color: 'rgba(156, 165, 196, 0.95)',
-            line: {color: 'rgba(156, 165, 196, 1.0)',  width: 1,},
-            symbol: 'circle',  size: 5
-        }
-    };
-    var data = [trace1];
-    var layout = {
-        title: `Odds Ratios for PGS Variants`,
-
-        xaxis: {
-            showgrid: false,  showline: true,  linecolor: 'rgb(102, 102, 102)',
-            titlefont: {
-                font: {size: 10,  color: 'rgb(204, 204, 204)'
-                }
-            },
-            tickfont: {
-                font: {  size: 10, color: 'rgb(102, 102, 102)'        }
-            },
-            autotick: true,
-            dtick: 10, ticks: 'outside', tickcolor: 'rgb(102, 102, 102)'
-        },
-        margin: {
-            l: 140,r: 40,b: 50,t: 80
-        },
-        legend: {
-            font: {size: 10,    },
-            yanchor: 'middle',   xanchor: 'right'    },
-        shapes: [{
-            type: 'line',
-            x0: 1,  y0: 0,  x1: 1,
-            y1: Object.values(oddsRatio).length,
-            line: {color: 'grey',  width: 1.5, dash: 'dot'  }
-        }],
-        width: 600, height: 600,
-        hovermode: 'closest' //plot_bgcolor: 'rgb(254, 247, 234)', 
-    };
-    Plotly.newPlot(div, data, layout)
 }
-
-// pgs odds ratio toggle-----------------------------------
-// PGS23.toggle_pgs_button = (button1, button2) => {
-// const fnmap = {
-//     'toggle': 'toggle',
-//       'show': 'add',
-//       'hide': 'remove'
-//   };
-//   const collapse = (selector, cmd) => {
-//     const targets = Array.from(document.querySelectorAll(selector));
-//     targets.forEach(target => {
-//       target.classList[fnmap[cmd]]('show');
-//     });
-//   }
-//   // Grab all the trigger elements on the page
-//   const triggers = Array.from(document.querySelectorAll('[data-toggle="collapse2"]'));
-//   // Listen for click events, but only on our triggers
-//   window.addEventListener('click', (ev) => {
-//     const elm = ev.target;
-  
-//     if (triggers.includes(elm)) {
-//       const selector = elm.getAttribute('data-target');
-//       collapse(selector, 'toggle');
-//       console.log("toggle_pgs_button")
-//       //pgsPlot() //**************************************** */
-//     }
-//   } );
-//   document.getElementById(button2).addEventListener("click", (e) => {
-//       let textContent = e.target.textContent;
-//       if (textContent == `plot scores`) {
-//           e.target.textContent = `hide scores`;
-//        }
-//        else {
-//          e.target.textContent = `plot scores`;
-//        }
-//    });
-
-//   //when scores are updated, plot button should reset---Grab all the trigger elements on the page
-//   //https://medium.com/dailyjs/mimicking-bootstraps-collapse-with-vanilla-javascript-b3bb389040e7
-//   const triggers2 = Array.from(document.querySelectorAll('[data-toggle="collapse1"]'));
-//   // Listen for click events, but only on our triggers
-//   window.addEventListener('click', (ev) => {
-//     const elm = ev.target;
-  
-//     if (triggers2.includes(elm)) {
-//       const selector = elm.getAttribute('data-target');
-//       collapse(selector, 'hide');
-//     }
-//   } );
-  
-//   //document.getElementById(button1).addEventListener("click", (e) => {
-//       let textContent = document.getElementById(button2).innerHTML;
-//       if (textContent == `hide scores`) {
-//           document.getElementById(button2).innerHTML = `plot scores`;
-//        }
-//        else {
-//           document.getElementById(button2).innerHTML = `plot scores`;
-  
-//        }
-//    //});
-// }
 //------------------------------------------------
 PGS23.load23 = async () => {
     let div = PGS23.div23
@@ -392,14 +250,14 @@ PGS23.Match2 = function (data, progressReport) {
     //let matchFloor=0 // to advance the earliest match as it advances
     function funMatch(i = 0, matchFloor = 0) {
         if (i < n) {
-            let r = data.pgs.dt[i]  //  PGS data to be matched
+            let r = data.pgs.dt[i] //  PGS data to be matched
 
             if (dtMatch.length > 0) {
                 matchFloor = dtMatch.at(-1)[0][4]
             }
             // MATCH 23andme chromosome and position TO PGS chromosome and position *******
             let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos])).filter(myr => (myr[1] == r[indChr]))
-  
+
             if (dtMatch_i.length > 0) {
                 dtMatch.push(dtMatch_i.concat([r]))
             }
@@ -466,7 +324,7 @@ PGS23.Match2 = function (data, progressReport) {
             }
             document.querySelector('#buttonCalculateRisk').disabled = false
             document.querySelector('#buttonCalculateRisk').style.color = 'blue'
-        }     
+        }
     }
     funMatch()
 }
