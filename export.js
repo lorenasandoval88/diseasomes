@@ -44,17 +44,34 @@ PGS23.loadPGS = async (i = 4) => {
         if (evt.keyCode == 13) {
             // on key up reload pgs data
             div.querySelector('#btLoadPgs').click() 
-            //reset plot on keyup "load" button
-            PGS23.toggle_pgs_button('btLoadPgs','btLoadPgsPlot')        
+
         }
     })
+
+             // hide pgs plot
+             console.log("btLoadPgsPlot').onclick")
+             document.getElementById('btLoadPgsPlot').addEventListener("click", (e) => {
+            let textContent = e.target.textContent;
+            console.log("clivk pgs plot")
+            pgsPlot()
+
+                  var div2 = document.getElementById('divPGSPlot');
+                  if (div2.style.display !== 'block') {
+                      div2.style.display = 'block';
+                      e.target.textContent = `hide scores`;
+                  } else if (div2.style.display == 'block'){
+                      div2.style.display = 'none';
+                      e.target.textContent = `plot scores`
+
+                  }
+             })
  
     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
     div.querySelector('#btLoadPgs').onclick = async (evt) => {
 
 
         //reset plot on click "load" button
-        PGS23.toggle_pgs_button('btLoadPgs','btLoadPgsPlot')
+        //PGS23.toggle_pgs_button('btLoadPgs','btLoadPgsPlot')
         // fill in pgs textarea
         document.querySelector('#summarySpan').hidden = true
         PGS23.pgsTextArea.value = '... loading'
@@ -107,10 +124,9 @@ PGS23.loadPGS = async (i = 4) => {
             PGS23.data.pgs = cleanObj
            //console.log(PGS23.data.pgs.dt) // defined
             div.querySelector('#summarySpan').hidden = false
-
-
            
         }
+
     };
 
     div.querySelector("#objJSON").onclick = evt => {
@@ -119,22 +135,7 @@ PGS23.loadPGS = async (i = 4) => {
         delete cleanObj.txt
         saveFile(JSON.stringify(cleanObj), cleanObj.meta.pgs_id + '.json')
     }
-    // plot ors
-    div.querySelector("#btLoadPgsPlot").onclick = evt => {
 
-        document.getElementById('btLoadPgsPlot').addEventListener('click', pgsPlot())
-        // hide pgs plot
-        var pgsPlotButton = document.getElementById('btLoadPgsPlot'); // Assumes element with id='button'
-
-        pgsPlotButton.onclick = function () {
-            var div = document.getElementById('divPGSPlot');
-            if (div.style.display !== 'none') {
-                div.style.display = 'none';
-            } else {
-                div.style.display = 'block';
-            }
-        };
-    }
     }
 
 // odds ratio plot for pgs scores (parse and convert betas to odds ratio)-------------------------------------------------
@@ -209,65 +210,65 @@ function pgsPlot(dt =(document.getElementById("PGS23calc")).PGS23data.pgs['dt'],
 }
 
 // pgs odds ratio toggle-----------------------------------
-PGS23.toggle_pgs_button = (button1, button2) => {
-const fnmap = {
-    'toggle': 'toggle',
-      'show': 'add',
-      'hide': 'remove'
-  };
-  const collapse = (selector, cmd) => {
-    const targets = Array.from(document.querySelectorAll(selector));
-    targets.forEach(target => {
-      target.classList[fnmap[cmd]]('show');
-    });
-  }
-  // Grab all the trigger elements on the page
-  const triggers = Array.from(document.querySelectorAll('[data-toggle="collapse2"]'));
-  // Listen for click events, but only on our triggers
-  window.addEventListener('click', (ev) => {
-    const elm = ev.target;
+// PGS23.toggle_pgs_button = (button1, button2) => {
+// const fnmap = {
+//     'toggle': 'toggle',
+//       'show': 'add',
+//       'hide': 'remove'
+//   };
+//   const collapse = (selector, cmd) => {
+//     const targets = Array.from(document.querySelectorAll(selector));
+//     targets.forEach(target => {
+//       target.classList[fnmap[cmd]]('show');
+//     });
+//   }
+//   // Grab all the trigger elements on the page
+//   const triggers = Array.from(document.querySelectorAll('[data-toggle="collapse2"]'));
+//   // Listen for click events, but only on our triggers
+//   window.addEventListener('click', (ev) => {
+//     const elm = ev.target;
   
-    if (triggers.includes(elm)) {
-      const selector = elm.getAttribute('data-target');
-      collapse(selector, 'toggle');
-      console.log("collapse(selector, 'toggle');")
-      //pgsPlot() //**************************************** */
-    }
-  } );
-  document.getElementById(button2).addEventListener("click", (e) => {
-      let textContent = e.target.textContent;
-      if (textContent == `plot scores`) {
-          e.target.textContent = `hide scores`;
-       }
-       else {
-         e.target.textContent = `plot scores`;
-       }
-   });
+//     if (triggers.includes(elm)) {
+//       const selector = elm.getAttribute('data-target');
+//       collapse(selector, 'toggle');
+//       console.log("toggle_pgs_button")
+//       //pgsPlot() //**************************************** */
+//     }
+//   } );
+//   document.getElementById(button2).addEventListener("click", (e) => {
+//       let textContent = e.target.textContent;
+//       if (textContent == `plot scores`) {
+//           e.target.textContent = `hide scores`;
+//        }
+//        else {
+//          e.target.textContent = `plot scores`;
+//        }
+//    });
 
-  //when scores are updated, plot button should reset---Grab all the trigger elements on the page
-  //https://medium.com/dailyjs/mimicking-bootstraps-collapse-with-vanilla-javascript-b3bb389040e7
-  const triggers2 = Array.from(document.querySelectorAll('[data-toggle="collapse1"]'));
-  // Listen for click events, but only on our triggers
-  window.addEventListener('click', (ev) => {
-    const elm = ev.target;
+//   //when scores are updated, plot button should reset---Grab all the trigger elements on the page
+//   //https://medium.com/dailyjs/mimicking-bootstraps-collapse-with-vanilla-javascript-b3bb389040e7
+//   const triggers2 = Array.from(document.querySelectorAll('[data-toggle="collapse1"]'));
+//   // Listen for click events, but only on our triggers
+//   window.addEventListener('click', (ev) => {
+//     const elm = ev.target;
   
-    if (triggers2.includes(elm)) {
-      const selector = elm.getAttribute('data-target');
-      collapse(selector, 'hide');
-    }
-  } );
+//     if (triggers2.includes(elm)) {
+//       const selector = elm.getAttribute('data-target');
+//       collapse(selector, 'hide');
+//     }
+//   } );
   
-  //document.getElementById(button1).addEventListener("click", (e) => {
-      let textContent = document.getElementById(button2).innerHTML;
-      if (textContent == `hide scores`) {
-          document.getElementById(button2).innerHTML = `plot scores`;
-       }
-       else {
-          document.getElementById(button2).innerHTML = `plot scores`;
+//   //document.getElementById(button1).addEventListener("click", (e) => {
+//       let textContent = document.getElementById(button2).innerHTML;
+//       if (textContent == `hide scores`) {
+//           document.getElementById(button2).innerHTML = `plot scores`;
+//        }
+//        else {
+//           document.getElementById(button2).innerHTML = `plot scores`;
   
-       }
-   //});
-}
+//        }
+//    //});
+// }
 //------------------------------------------------
 PGS23.load23 = async () => {
     let div = PGS23.div23
