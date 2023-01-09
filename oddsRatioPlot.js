@@ -11,7 +11,7 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
         })
     } else {
         dt.forEach((row) => {
-            oddsRatio[row[0]] = row[4];
+            oddsRatio[row[0]] = math.exp(row[4]);
         })
     }
     //sort pgs variants by beta
@@ -42,10 +42,11 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
     var data = [trace1];
     var layout = {
         title: `Odds Ratios for PGS Variants`,
-
+        yaxis: {
+            title: `rsid or chromosome and position`,
+        },
         xaxis: {
-          
-                title: 'odds ratios for variants',
+            title: `Odds ratios`,
             showgrid: false,
             showline: true,
             linecolor: 'rgb(102, 102, 102)',
@@ -67,7 +68,7 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
             tickcolor: 'rgb(102, 102, 102)'
         },
         margin: {
-            l: 140,
+            l: 250,
             r: 40,
             b: 50,
             t: 80
