@@ -41,7 +41,7 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
     };
     var data = [trace1];
     var layout = {
-        title: `Odds Ratios for PGS Variants`,
+        title: `Odds Ratios (OR) for PGS Variants`,
         yaxis: {
             title: `rsid or chromosome and position`,
         },
@@ -68,7 +68,7 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
             tickcolor: 'rgb(102, 102, 102)'
         },
         margin: {
-            l: 250,
+            l: 190,
             r: 40,
             b: 50,
             t: 80
@@ -94,7 +94,55 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
         }],
         width: 600,
         height: 600,
-        hovermode: 'closest' //plot_bgcolor: 'rgb(254, 247, 234)', 
+        hovermode: 'closest', //plot_bgcolor: 'rgb(254, 247, 234)', 
+
+        annotations: [
+            {
+              xref: 'paper',
+              yref: 'paper',
+              x: 0,
+              y: 1.06,
+              xanchor: 'left',
+              yanchor: 'left',
+              text: 'OR > 1 ~ higher odds of the outcome',
+              font:{
+                family: 'Arial',
+                size: 12,
+                color: 'rgb(150,150,150)'
+              },
+              showarrow: false
+            },
+            {
+              xref: 'paper',
+              yref: 'paper',
+              x: 0,
+              y: 1.03,
+              xanchor: 'left',
+              yanchor: 'left',
+              text: 'OR = 1 ~ no association',
+              font:{
+                family: 'Arial',
+                size: 12,
+                color: 'rgb(150,150,150)'
+              },
+              showarrow: false
+            },
+            {
+              xref: 'paper',
+              yref: 'paper',
+              x: 0,
+              y: 0.995,
+              xanchor: 'left',
+              yanchor: 'left',
+              text: 'OR < 1 ~ lower odds of the outcome',
+              font:{
+                family: 'Arial',
+                size: 12,
+                color: 'rgb(150,150,150)'
+              },
+              showarrow: false
+            }
+          ]
     };
     Plotly.newPlot(div, data, layout)
 }
