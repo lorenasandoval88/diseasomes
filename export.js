@@ -340,6 +340,11 @@ PGS23.loadCalc = async () => {
     </p>
 	<textarea id="my23CalcTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea>
 	<div id="plotRiskDiv"><div id="plotAllMatchByPosDiv">...</div><div id="plotAllMatchByEffectDiv">...</div></div>
+	
+	<div id='plotSnpConsequence' style='display: inline-block;' ></div>
+	<div id='plotSnpClinical' style='display: inline-block;' ></div>
+	<div id='plotSnpChrom' style='display: inline-block;' ></div>
+	
 	<hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
 	<div id="tabulateAllMatchByEffectDiv"></div>
 	`
@@ -462,6 +467,7 @@ PGS23.Match2 = function (data, progressReport) {
                 //ploting
                 plotAllMatchByPos()
                 plotAllMatchByEffect()
+                plotSummarySnps()
             }
             document.querySelector('#buttonCalculateRisk').disabled = false
             document.querySelector('#buttonCalculateRisk').style.color = 'blue'
@@ -746,11 +752,134 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     //debugger
 }
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function getInfoSnps(){
+    var data = document.getElementById("PGS23calc").PGS23data
+    var rs = data.calcRiskScore
+    var i=0
+    var ide=[]
+    rs.forEach( risk => {
+        if(risk>0 || risk<0){
+            ide.push( data.pgsMatchMy23[i][0][0] )
+        }
+        i+=1
+    })
+    
+    var info = await Promise.all( ide.map( async rsid => {
+        var url = `https://rest.ensembl.org/variation/human/${rsid}?content-type=application/json`
+        var enrich = await (await fetch(url)).json()
+        sleep(100)
+        return enrich
+    } ))
+    
+    return info
+}
+
+function plotSummarySnps(){
+    var modata = document.getElementById("PGS23calc").PGS23data
+    if(Object.keys(modata).length!=0){
+        getInfoSnps().then( (value) => {
+            var info = value
+            
+            /* Plot consequence */
+            var consequence = {}
+            info.forEach( el => {
+                var col = el.most_severe_consequence
+                if( ! Object.keys(consequence).includes(col) ){
+                    consequence[col]=0
+                }
+                consequence[col]+=1
+            })
+            
+            var y = Object.values(consequence)
+            var x = Object.keys(consequence)
+            var data = [{
+              values: y,
+              labels: x,
+              type: 'pie'
+            }];
+
+            var layout = {
+              title: 'Consequence Distribution',
+              height: 400,
+              width: 500
+            };
+
+            Plotly.newPlot('plotSnpConsequence', data, layout);
+            
+            /* Plot distribution by chromosome */
+            var filt = info.filter( el => el['mappings'].length!=0 )
+            if(filt.length > 0){
+                var chr = {}
+                filt.forEach( el => {
+                    var col = 'Chromosome '+el.mappings[0].seq_region_name
+                    if( ! Object.keys(chr).includes(col) ){
+                        chr[col]=0
+                    }
+                    chr[col]+=1
+                })
+                
+                y = Object.values(chr)
+                x = Object.keys(chr)
+                data = [{
+                  values: y,
+                  labels: x,
+                  type: 'pie'
+                }];
+
+                layout = {
+                  title: 'Chromosome Distribution',
+                  height: 400,
+                  width: 500
+                };
+
+                Plotly.newPlot('plotSnpChrom', data, layout);
+            }
+            
+            /* Plot clinical */
+            var cln = info.filter( el => el['clinical_significance']!=null )
+            if(cln.length > 0){
+                var clinical = {}
+                cln.forEach( el => {
+                    var col = el.clinical_significance
+                    if( ! Object.keys(clinical).includes(col) ){
+                        clinical[col]=0
+                    }
+                    clinical[col]+=1
+                })
+                
+                y = Object.values(clinical)
+                x = Object.keys(clinical)
+                data = [{
+                  values: y,
+                  labels: x,
+                  type: 'pie'
+                }];
+
+                layout = {
+                  title: 'Clinical Significance Distribution',
+                  height: 400,
+                  width: 500
+                };
+
+                Plotly.newPlot('plotSnpClinical', data, layout);
+            }
+            
+        } )
+    }
+    else{
+        alert('No data ready to plot!')
+    }
+    
+}
+
 export {
     ui,
     PGS23,
     parsePGS,
     parse23,
     plotAllMatchByPos,
-    plotAllMatchByEffect
+    plotAllMatchByEffect,
+    plotSummarySnps
 }
