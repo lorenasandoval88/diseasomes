@@ -194,7 +194,7 @@ function pgsPlot(dt =(document.getElementById("PGS23calc")).PGS23data.pgs['dt'],
             l: 140,r: 40,b: 50,t: 80
         },
         legend: {
-            font: {size: 5,    },
+            font: {size: 10,    },
             yanchor: 'middle',   xanchor: 'right'    },
         shapes: [{
             type: 'line',
@@ -203,7 +203,7 @@ function pgsPlot(dt =(document.getElementById("PGS23calc")).PGS23data.pgs['dt'],
             line: {color: 'grey',  width: 1.5, dash: 'dot'  }
         }],
         width: 600, height: 600,
-         hovermode: 'closest'
+        hovermode: 'closest' //plot_bgcolor: 'rgb(254, 247, 234)', 
     };
     Plotly.newPlot(div, data, layout)
 }
