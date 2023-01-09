@@ -37,7 +37,7 @@ PGS23.loadPGS = async (i = 4) => {
     <button id='btLoadPgs' class="btn btn-primary btn__first" data-toggle="collapse1" data-target=".collapse.first">load</button>
     <span id="showLargeFile" hidden=true><input id="checkLargeFile"type="checkbox">large file (under development)</span>
     
-    <button id='btLoadPgsPlot' class="btn btn-primary btn__first" data-toggle="collapse2" data-target=".collapse.first" data-text="Collapse">plot polygenic risk scores</button>
+    <button id='btLoadPgsPlot' class="btn btn-primary btn__first" data-toggle="collapse2" data-target=".collapse.first" data-text="Collapse">plot scores</button>
     <span id="summarySpan" hidden=true>[<a id="urlPGS" href='' target="_blank">FTP</a>][<a id="catalogEntry" href="https://www.pgscatalog.org/score/${"PGS000000".slice(0, -JSON.stringify(i).length) + JSON.stringify(i)}" target="_blank">catalog</a>]<span id="largeFile"></span><br><span id="trait_mapped">...</span>, <span id="dataRows">...</span> variants, [<a id="pubDOI" target="_blank">Reference</a>], [<a href="#" id="objJSON">JSON</a>].</span>
     <p><textarea id="pgsTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`;
     div.querySelector('#pgsID').onkeyup = (evt => {
@@ -45,26 +45,17 @@ PGS23.loadPGS = async (i = 4) => {
             // on key up reload pgs data
             div.querySelector('#btLoadPgs').click() 
             //reset plot on keyup "load" button
-            PGS23.toggle_pgs_plot('btLoadPgs','btLoadPgsPlot')        
+            PGS23.toggle_pgs_button('btLoadPgs','btLoadPgsPlot')        
         }
     })
-    //document.getElementById('btLoadPgsPlot').addEventListener("click", pgsPlot)          //PGS23.toggle_pgs_plot('btLoadPgs','btLoadPgsPlot')
-    
-   
-    
-    div.querySelector('#btLoadPgsPlot').onclick = async (evt) => {
-
-        pgsPlot()
-    }
+ 
     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
     div.querySelector('#btLoadPgs').onclick = async (evt) => {
+
+
         //reset plot on click "load" button
-        PGS23.toggle_pgs_plot('btLoadPgs','btLoadPgsPlot')
-        // reset plot onclick pgs load Lorena! TODO
-        // if (triggers.includes(evt.target)) {
-        //     const selector = evt.target.getAttribute('data-target');
-        //     collapse(selector, 'toggle');
-        // }
+        PGS23.toggle_pgs_button('btLoadPgs','btLoadPgsPlot')
+        // fill in pgs textarea
         document.querySelector('#summarySpan').hidden = true
         PGS23.pgsTextArea.value = '... loading'
         i = parseInt(div.querySelector('#pgsID').value)
@@ -114,28 +105,49 @@ PGS23.loadPGS = async (i = 4) => {
             cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
             delete cleanObj.txt
             PGS23.data.pgs = cleanObj
-           // console.log(PGS23.data.pgs.dt) // defined
+           //console.log(PGS23.data.pgs.dt) // defined
             div.querySelector('#summarySpan').hidden = false
+
+
+           
         }
     };
+
     div.querySelector("#objJSON").onclick = evt => {
         let cleanObj = structuredClone(PGS23.pgsObj)
         cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
         delete cleanObj.txt
         saveFile(JSON.stringify(cleanObj), cleanObj.meta.pgs_id + '.json')
     }
-}
-// OR PGS plot---------------------------------------------------------
-function pgsPlot(dt = PGS23.data.pgs.dt, cols = PGS23.data.pgs.cols, div = PGS23.divPGSPlot) {
+    // plot ors
+    div.querySelector("#btLoadPgsPlot").onclick = evt => {
+
+        document.getElementById('btLoadPgsPlot').addEventListener('click', pgsPlot())
+        // hide pgs plot
+        var pgsPlotButton = document.getElementById('btLoadPgsPlot'); // Assumes element with id='button'
+
+        pgsPlotButton.onclick = function () {
+            var div = document.getElementById('divPGSPlot');
+            if (div.style.display !== 'none') {
+                div.style.display = 'none';
+            } else {
+                div.style.display = 'block';
+            }
+        };
+    }
+    }
+
+// odds ratio plot for pgs scores (parse and convert betas to odds ratio)-------------------------------------------------
+function pgsPlot(dt =(document.getElementById("PGS23calc")).PGS23data.pgs['dt'], cols = PGS23.data.pgs.cols, div = divPGSPlot) {
 
     // display pgs scores as beta or odds ratio with rsids or chr and position on the x axis
     let oddsRatio = {};
     const rs_idx = cols.indexOf('hm_rsID')
-    console.log(dt)
+    console.log("pgsPlot")
 
     if (dt[0][rs_idx] == '' || dt[0][rs_idx] == undefined) {
         dt.forEach((row) => {
-            oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = row[4];
+            oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = math.exp(row[4]);
         })
     } else {
         dt.forEach((row) => {
@@ -150,85 +162,54 @@ function pgsPlot(dt = PGS23.data.pgs.dt, cols = PGS23.data.pgs.cols, div = PGS23
             [k]: v
         }), {});
 
-// PGS plotly
+// use plotly to make odds ratio chart----
     var trace1 = {
         type: 'scatter',
         x: Object.values(oddsRatioSorted), // odds ratios
         y: Object.keys(oddsRatioSorted), // rsids
-        mode: 'markers',
-        name: 'legend1',
+        mode: 'markers', name: 'legend1',
         marker: {
             color: 'rgba(156, 165, 196, 0.95)',
-            line: {
-                color: 'rgba(156, 165, 196, 1.0)',
-                width: 1,
-            },
-            symbol: 'circle',
-            size: 5
+            line: {color: 'rgba(156, 165, 196, 1.0)',  width: 1,},
+            symbol: 'circle',  size: 5
         }
     };
-
     var data = [trace1];
     var layout = {
         title: `Odds Ratios for PGS Variants`,
 
         xaxis: {
-            showgrid: false,
-            showline: true,
-            linecolor: 'rgb(102, 102, 102)',
+            showgrid: false,  showline: true,  linecolor: 'rgb(102, 102, 102)',
             titlefont: {
-                font: {
-                    size: 10,
-                    color: 'rgb(204, 204, 204)'
+                font: {size: 10,  color: 'rgb(204, 204, 204)'
                 }
             },
             tickfont: {
-                font: {
-                    size: 10,
-                    color: 'rgb(102, 102, 102)'
-                }
+                font: {  size: 10, color: 'rgb(102, 102, 102)'        }
             },
             autotick: true,
-            dtick: 10,
-            ticks: 'outside',
-            tickcolor: 'rgb(102, 102, 102)'
+            dtick: 10, ticks: 'outside', tickcolor: 'rgb(102, 102, 102)'
         },
         margin: {
-            l: 140,
-            r: 40,
-            b: 50,
-            t: 50
+            l: 140,r: 40,b: 50,t: 80
         },
         legend: {
-            font: {
-                size: 10,
-            },
-            yanchor: 'middle',
-            xanchor: 'right'
-        },
+            font: {size: 5,    },
+            yanchor: 'middle',   xanchor: 'right'    },
         shapes: [{
             type: 'line',
-            x0: 1,
-            y0: 0,
-            x1: 1,
+            x0: 1,  y0: 0,  x1: 1,
             y1: Object.values(oddsRatio).length,
-            line: {
-                color: 'grey',
-                width: 1.5,
-                dash: 'dot'
-            }
+            line: {color: 'grey',  width: 1.5, dash: 'dot'  }
         }],
-        width: 600,
-        height: 600,
-        //paper_bgcolor: 'rgb(99,99,100)',
-        plot_bgcolor: 'rgb(254, 247, 234)',
-        hovermode: 'closest'
+        width: 600, height: 600,
+         hovermode: 'closest'
     };
-
     Plotly.newPlot(div, data, layout)
 }
+
 // pgs odds ratio toggle-----------------------------------
-PGS23.toggle_pgs_plot = (button1, button2) => {
+PGS23.toggle_pgs_button = (button1, button2) => {
 const fnmap = {
     'toggle': 'toggle',
       'show': 'add',
@@ -249,6 +230,8 @@ const fnmap = {
     if (triggers.includes(elm)) {
       const selector = elm.getAttribute('data-target');
       collapse(selector, 'toggle');
+      console.log("collapse(selector, 'toggle');")
+      //pgsPlot() //**************************************** */
     }
   } );
   document.getElementById(button2).addEventListener("click", (e) => {
@@ -508,6 +491,8 @@ function ui(targetDiv = document.body) {
     div.appendChild(PGS23.divPGS)
     PGS23.divPGSPlot = document.createElement('div');
     div.appendChild(PGS23.divPGSPlot)
+    PGS23.divPGSPlot.id = "divPGSPlot"
+
     PGS23.div23 = document.createElement('div');
     div.appendChild(PGS23.div23)
     PGS23.divCalc = document.createElement('div');
