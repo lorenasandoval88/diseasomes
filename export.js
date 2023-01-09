@@ -769,7 +769,7 @@ async function getInfoSnps(){
     var info = await Promise.all( ide.map( async rsid => {
         var url = `https://rest.ensembl.org/variation/human/${rsid}?content-type=application/json`
         var enrich = await (await fetch(url)).json()
-        sleep(100)
+        await sleep(300)
         return enrich
     } ))
     
