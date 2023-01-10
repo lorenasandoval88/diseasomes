@@ -766,12 +766,25 @@ async function getInfoSnps(){
         i+=1
     })
     
-    var info = await Promise.all( ide.map( async rsid => {
-        var url = `https://rest.ensembl.org/variation/human/${rsid}?content-type=application/json`
-        var enrich = await (await fetch(url)).json()
-        await sleep(300)
-        return enrich
-    } ))
+    i=0
+    var info=[]
+    while (i<ide.length) {
+        var end = ((i+15)<=ide.length) ? i+15 : ide.length
+        temp = ide.slice(i, end)
+        console.log(temp)
+        info = info.concat( await Promise.all( temp.map( async rsid => {
+            var url = `https://rest.ensembl.org/variation/human/${rsid}?content-type=application/json`
+            var enrich = await (await fetch(url)).json()
+            await sleep(300)
+            return enrich
+        } )) )
+        
+        console.log(info)
+        i+=15
+        if(i>=ide.length){
+            break
+        }
+    }
     
     return info
 }
