@@ -812,6 +812,7 @@ function plotSummarySnps(){
             }];
 
             var layout = {
+              legend: { x: -1 },
               title: 'Consequence Distribution',
               height: 400,
               width: 500
