@@ -629,8 +629,7 @@ async function getInfoSnps(){
     var info=[]
     while (i<ide.length) {
         var end = ((i+15)<=ide.length) ? i+15 : ide.length
-        temp = ide.slice(i, end)
-        console.log(temp)
+        var temp = ide.slice(i, end)
         info = info.concat( await Promise.all( temp.map( async rsid => {
             var url = `https://rest.ensembl.org/variation/human/${rsid}?content-type=application/json`
             var enrich = await (await fetch(url)).json()
@@ -638,7 +637,6 @@ async function getInfoSnps(){
             return enrich
         } )) )
         
-        console.log(info)
         i+=15
         if(i>=ide.length){
             break
