@@ -672,7 +672,7 @@ function plotSummarySnps(){
 
             var layout = {
               legend: { x: -1 },
-              title: 'Consequence Distribution',
+              title: 'Variant Type',
               height: 400,
               width: 500
             };
