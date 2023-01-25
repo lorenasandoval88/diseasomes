@@ -496,7 +496,7 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
         title: `<i style="color:navy">${data.pgs.meta.trait_mapped} (PGP#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
 			  <br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
         yaxis: {
-            title: '<span style="font-size:medium">variant sorted by chromosome and position</span>',
+            title: '<span style="font-size:medium">variant i sorted by chromosome and position</span>',
             linewidth: 1,
                 mirror: true,
                 rangemode: "tozero",
@@ -556,7 +556,7 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
         title: `<i style="color:navy">${data.pgs.meta.trait_mapped} (PGP#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
 			  <br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
         yaxis: {
-            title: '<span style="font-size:medium">variant sorted by effect</span>',
+            title: '<span style="font-size:medium">variant i sorted by effect</span>',
             linewidth: 1,
             mirror: true,
             rangemode: "tozero",
