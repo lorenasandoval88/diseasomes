@@ -532,8 +532,8 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
     const z = data.aleles
     const ii = [...Array(y.length)].map((_, i) => i)
     let trace0 = {
-        x: ii.map(i => i + 1),
-        y: y.map((yi, i) => y[jj[i]]),
+        y: ii.map(i => i + 1),
+        x: y.map((yi, i) => y[jj[i]]),
         mode: 'lines+markers',
         type: 'scatter',
         text: x,
