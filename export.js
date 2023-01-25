@@ -502,7 +502,7 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
             rangemode: "tozero"
         },
         yaxis: {
-            title: '<span style="font-size:large">βz</span>, where <span style="font-size:small">PRS = exp(Σ β<sup>.</sup>z)</span>',
+            title: '<span style="font-size:large">βz</span>, where <span style="font-size:medium">PRS = exp(Σ β<sup>.</sup>z)</span>',
             linewidth: 1,
             mirror: true
         }
