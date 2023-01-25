@@ -498,14 +498,15 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
         xaxis: {
             title: {
                 text: 'variant sorted by chromosome and position',
-                linewidth: 1,
-                mirror: true,
-                rangemode: "tozero",
+                
                 font: {
                     family: 'Courier New, monospace',
-                    size: 13
+                    size: 5
               },
-            }
+            },
+            linewidth: 1,
+                mirror: true,
+                rangemode: "tozero",
         },
         yaxis: {
             title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
