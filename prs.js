@@ -145,6 +145,19 @@ pgs.parse=async(txt)=>{
     return y
 }
 
+pgs.parse23=async(txt)=>{
+    if(!txt){ // sample score file
+        txt="load 23andmefile"
+    }
+  
+    let arr = txt.split(/\n/).filter(x=>x.length>0) // remove empty rows
+
+    //console.log(i,arr[i])
+    y.fields = arr[i].split(/\t/g) // list
+    y.values = arr.slice(i+1).map(x=>x.split(/\t/g).map(xi=>parseFloat(xi)?parseFloat(xi):xi))
+    return y
+}
+
 pgs.info = async(id='PGS000004')=>{
     return await pgs.get(`score/${id}?format=json`)
 }
