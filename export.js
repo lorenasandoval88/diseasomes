@@ -499,7 +499,10 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
             title: 'variant sorted by chromosome and position',
             linewidth: 1,
             mirror: true,
-            rangemode: "tozero"
+            rangemode: "tozero",
+            font: {
+                size: 12
+              },
         },
         yaxis: {
             title: '<span style="font-size:large">βz</span>, where <span style="font-size:medium">PRS = exp(Σ β<sup>.</sup>z)</span>',
@@ -559,10 +562,13 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
             title: 'variant sorted by effect',
             linewidth: 1,
             mirror: true,
-            rangemode: "tozero"
+            rangemode: "tozero",
+            font: {
+                size: 12
+              },
         },
         yaxis: {
-            title: '<span style="font-size:large">βz</span>, where <span style="font-size:small">PRS = exp(Σ β<sup>.</sup>z)</span>',
+            title: '<span style="font-size:large">βz</span>, where <span style="font-size:medium">PRS = exp(Σ β<sup>.</sup>z)</span>',
             linewidth: 1,
             mirror: true
         }
