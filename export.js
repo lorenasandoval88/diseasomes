@@ -501,11 +501,12 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
             mirror: true,
             rangemode: "tozero",
             font: {
-                size: 18
+                family: 'Courier New, monospace',
+                size: 20
               },
         },
         yaxis: {
-            title: '<span style="font-size:large">βi</span><span style="font-size:small">, effect size (or beta) of variant i</span>',
+            title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
             linewidth: 1,
             mirror: true
         }
@@ -568,7 +569,7 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
               },
         },
         yaxis: {
-            title: '<span style="font-size:large">βi</span><span style="font-size:small">, effect size (or beta) of variant i</span>',
+            title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
             linewidth: 1,
             mirror: true
         }
