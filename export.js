@@ -347,7 +347,7 @@ function ui(targetDiv = document.body) {
     div.id = 'prsCalcUI'
     div.innerHTML = `
     <p>
-	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targetted by the PGS entry.
+	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targetted by the PGS entry using the equation, PRS j  =  exp( ∑jN  𝛽i * dosage ij ).
     </p>
     <hr>
     `
@@ -501,11 +501,11 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
             mirror: true,
             rangemode: "tozero",
             font: {
-                size: 14
+                size: 18
               },
         },
         yaxis: {
-            title: '<span style="font-size:large">βz</span>, where <span style="font-size:medium">PRS = exp(Σ β<sup>.</sup>z)</span>',
+            title: '<span style="font-size:large">βi, effect size (or beta) of variant i</span>',
             linewidth: 1,
             mirror: true
         }
@@ -564,11 +564,11 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
             mirror: true,
             rangemode: "tozero",
             font: {
-                size: 14
+                size: 18
               },
         },
         yaxis: {
-            title: '<span style="font-size:large">βz</span>, where <span style="font-size:medium">PRS = exp(Σ β<sup>.</sup>z)</span>',
+            title: '<span style="font-size:large">βi, effect size (or beta) of variant i</span>',
             linewidth: 1,
             mirror: true
         }
