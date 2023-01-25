@@ -503,7 +503,7 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
                 rangemode: "tozero",
                 font: {
                     family: 'Courier New, monospace',
-                    size: 20
+                    size: 13
               },
             }
         },
