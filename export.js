@@ -496,14 +496,16 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
         title: `<i style="color:navy">${data.pgs.meta.trait_mapped} (PGP#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
 			  <br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
         xaxis: {
-            title: 'variant sorted by chromosome and position',
-            linewidth: 1,
-            mirror: true,
-            rangemode: "tozero",
-            font: {
-                family: 'Courier New, monospace',
-                size: 20
+            title: {
+                text: 'variant sorted by chromosome and position',
+                linewidth: 1,
+                mirror: true,
+                rangemode: "tozero",
+                font: {
+                    family: 'Courier New, monospace',
+                    size: 20
               },
+            }
         },
         yaxis: {
             title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
