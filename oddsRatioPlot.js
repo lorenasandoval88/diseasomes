@@ -41,7 +41,7 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
     };
     var data = [trace1];
     var layout = {
-        title: `Odds Ratios (OR) for PGS Variants`,
+        title: `Odds Ratios (OR) for ${data.pgs.meta.trait_mapped} PGS Variants`,
         yaxis: {
             title: `rsid or chromosome and position`,
         },
