@@ -354,6 +354,8 @@ function ui(targetDiv = document.body) {
     // recall that PGS23 is only global to the module, it is not exported
     PGS23.divPGS = document.createElement('div');
     div.appendChild(PGS23.divPGS)
+    PGS23.divPGS.id = "divPGS"
+
     PGS23.divPGSPlot = document.createElement('div');
     div.appendChild(PGS23.divPGSPlot)
     PGS23.divPGSPlot.id = "divPGSPlot"
