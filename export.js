@@ -476,8 +476,8 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
     const z = data.aleles
     const ii = [...Array(y.length)].map((_, i) => i)
     let trace0 = {
-        x: ii.map(i => i + 1),
-        y: y,
+        y: ii.map(i => i + 1),
+        x: y,
         mode: 'markers',
         type: 'scatter',
         text: x,
@@ -495,13 +495,13 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         title: `<i style="color:navy">${data.pgs.meta.trait_mapped} (PGP#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
 			  <br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
-        xaxis: {
+        yaxis: {
             title: '<span style="font-size:medium">variant sorted by chromosome and position</span>',
             linewidth: 1,
                 mirror: true,
                 rangemode: "tozero",
         },
-        yaxis: {
+        xaxis: {
             title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
             linewidth: 1,
             mirror: true
@@ -555,7 +555,7 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         title: `<i style="color:navy">${data.pgs.meta.trait_mapped} (PGP#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
 			  <br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
-        xaxis: {
+        yaxis: {
             title: '<span style="font-size:medium">variant sorted by effect</span>',
             linewidth: 1,
             mirror: true,
@@ -564,7 +564,7 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
                 size: 18
               },
         },
-        yaxis: {
+        xaxis: {
             title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
             linewidth: 1,
             mirror: true
