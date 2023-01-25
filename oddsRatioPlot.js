@@ -30,23 +30,23 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
         mode: 'markers',
         name: 'legend1',
         marker: {
-            color: 'rgba(156, 165, 196, 0.95)',
+            color: 'navy',
             line: {
-                color: 'rgba(156, 165, 196, 1.0)',
+                color: 'navy',
                 width: 1,
             },
             symbol: 'circle',
-            size: 5
+            size: 4
         }
     };
     var data = [trace1];
     var layout = {
         title: `Odds Ratios (OR) for PGS Variants`,
         yaxis: {
-            title: `rsid or chromosome and position`,
+            title: `variant rsid/chromosome and position`,
         },
         xaxis: {
-            title: `Odds ratios`,
+            title: `variant odds ratio`,
             showgrid: false,
             showline: true,
             linecolor: 'rgb(102, 102, 102)',

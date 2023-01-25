@@ -131,7 +131,7 @@ PGS23.loadPGS = async (i = 4) => {
 PGS23.load23 = async () => {
     let div = PGS23.div23
     div.innerHTML =
-        `<hr><b style="color:maroon">B)</b> Load test <a href= "genome_Dorothy_Wolf_v4_Full_20170525101345.txt" download="23andMe_test_data.txt">data</a> or your 23andMe raw data file <input type="file" id="file23andMeInput">
+        `<hr><b style="color:maroon">B)</b> Load 23andme <a href= "genome_Dorothy_Wolf_v4_Full_20170525101345.txt" download="genome_Dorothy_Wolf_v4_Full_20170525101345.txt">female </a> or <a href= "genome_Chad_Wrye_v5_Full_20220921063742.txt" download="genome_Chad_Wrye_v5_Full_20220921063742.txt">male </a>test data or your data <input type="file" id="file23andMeInput">
 
     <br><span hidden=true id="my23hidden" style="font-size:small">
 		 <span style="color:maroon" id="my23Info"></span> (<span id="my23variants"></span> variants) [<a href='#' id="json23">JSON</a>].
@@ -347,14 +347,14 @@ function ui(targetDiv = document.body) {
     div.id = 'prsCalcUI'
     div.innerHTML = `
     <p>
-	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targetted by the PGS entry using equation,<br>PRS j  =  exp( ∑jN  𝛽i * dosage ij ).
+	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targetted by the PGS entry based on <br>PRS j  =  exp( ∑jN  𝛽i * dosage ij ).
     </p>
     <hr>
     `
     // recall that PGS23 is only global to the module, it is not exported
     PGS23.divPGS = document.createElement('div');
     div.appendChild(PGS23.divPGS)
-    PGS23.divPGS.id = "divPGS"
+    //PGS23.divPGS.id = "divPGS"
 
     PGS23.divPGSPlot = document.createElement('div');
     div.appendChild(PGS23.divPGSPlot)
@@ -507,7 +507,13 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
             title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
             linewidth: 1,
             mirror: true
-        }
+        },
+        // margin: {
+        //     l: 100,
+        //     r: 600,
+        //     b: 50,
+        //     t: 80
+        // },
     })
     //debugger
 }
