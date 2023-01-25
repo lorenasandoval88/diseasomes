@@ -501,7 +501,7 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
             mirror: true,
             rangemode: "tozero",
             font: {
-                size: 12
+                size: 14
               },
         },
         yaxis: {
@@ -564,7 +564,7 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
             mirror: true,
             rangemode: "tozero",
             font: {
-                size: 12
+                size: 14
               },
         },
         yaxis: {
