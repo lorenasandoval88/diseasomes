@@ -333,7 +333,10 @@ pgs.parse23 = async (txt, info) => {
     obj.info = info
 
     let n = rows.filter(r => (r[0] == '#')).length
-    obj.meta = rows.slice(0, n - 1).join('\r\n')
+    let metaL = rows.filter(r => (r[0] == '#')).length
+    obj.meta = {
+        txt: rows.slice(0, metaL)
+    }
     obj.cols = rows[n - 1].slice(2).split(/\t/)
     obj.dt = rows.slice(n)
     obj.dt = obj.dt.map((r, i) => {
