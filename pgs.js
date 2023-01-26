@@ -133,7 +133,7 @@ pgs.parse23 = async(txt, info)=>{
     return obj
 }
 
-pgs.23textArea = async(txt)=>{
+pgs.prs23textArea = async(txt)=>{
     let ta = document.createElement('textarea'); //DOM.element('textarea');
     ta.value = 'loading, please wait ...'
     ta.style="width:100%;color:lime;background-color:black;height:20em;font-size:small"
