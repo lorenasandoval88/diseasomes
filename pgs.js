@@ -9,7 +9,7 @@ pgs.loadScript=async(url)=>{
     return document.head.appendChild(s)
 }
 
-pgs.plotAllMatchByPos=async(data, div = DOM.element("div"))=>{
+pgs.plotAllMatchByPos=async(data,div)=>{
     div.style.height = '500px'
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
