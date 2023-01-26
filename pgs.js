@@ -45,6 +45,52 @@ pgs.getArrayBuffer=async(range=[0,1000],url='https://ftp.ncbi.nih.gov/snp/organi
     }))).arrayBuffer()
 }
 
+// create PGS obj and data
+pgs.parsePGS=async(i = 4)=>{
+    let obj = {
+        id: i
+    }
+    obj.txt = await pgs.loadScore(i)
+    let rows = obj.txt.split(/[\r\n]/g)
+    let metaL = rows.filter(r => (r[0] == '#')).length
+    obj.meta = {
+        txt: rows.slice(0, metaL)
+    }
+    obj.cols = rows[metaL].split(/\t/g)
+    obj.dt = rows.slice(metaL + 1).map(r => r.split(/\t/g))
+    if (obj.dt.slice(-1).length == 1) {
+        obj.dt.pop(-1)
+    }
+    // parse numerical types
+    //const indInt=obj.cols.map((c,i)=>c.match(/_pos/g)?i:null).filter(x=>x)
+    const indInt = [obj.cols.indexOf('chr_position'), obj.cols.indexOf('hm_pos')]
+    const indFloat = [obj.cols.indexOf('effect_weight'), obj.cols.indexOf('allelefrequency_effect')]
+    const indBol = [obj.cols.indexOf('hm_match_chr'), obj.cols.indexOf('hm_match_pos')]
+
+    // /* this is the efficient way to do it, but for large files it has memory issues
+    obj.dt = obj.dt.map(r => {
+        // for each data row
+        indFloat.forEach(ind => {
+            r[ind] = parseFloat(r[ind])
+        })
+        indInt.forEach(ind => {
+            r[ind] = parseInt(r[ind])
+        })
+        indBol.forEach(ind => {
+            r[ind] = (r[11] == 'True') ? true : false
+        })
+        return r
+    })
+    // */
+    // parse metadata
+    obj.meta.txt.filter(r => (r[1] != '#')).forEach(aa => {
+        aa = aa.slice(1).split('=')
+        obj.meta[aa[0]] = aa[1]
+        //debugger
+    })
+    return obj
+}
+
 pgs.textArea = async (entry='PGS000004',build=37,range=20000)=>{
     let ta = document.createElement('textarea'); //DOM.element('textarea');
     ta.value = 'loading, please wait ...'
