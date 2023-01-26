@@ -9,7 +9,7 @@ pgs.loadScript=async(url)=>{
     return document.head.appendChild(s)
 }
 
-pgs.plotAllMatchByPos=async(data, div = document.createElement('plotAllMatchByPosDiv'))=>{
+pgs.plotAllMatchByPos=async(data, div = document.createElement('div'))=>{
     div.style.height = '500px'
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
@@ -44,7 +44,7 @@ pgs.plotAllMatchByPos=async(data, div = document.createElement('plotAllMatchByPo
     pgs.Plotly.newPlot(div, [trace0], {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         title: `<i style="color:navy">${data.pgs.meta.trait_mapped} (PGP#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
-			  <br><a href="${'https://doi.org/' + data.my23.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
+			  <br><a href="${'https://doi.org/' + data.pgs.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
         yaxis: {
             title: '<span style="font-size:medium">variant i sorted by chromosome and position</span>',
             linewidth: 1,
