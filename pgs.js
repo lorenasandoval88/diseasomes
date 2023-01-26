@@ -566,7 +566,7 @@ pgs.pgsPlot=async(dt, cols)=>{
 
 if(typeof(define)!="undefined"){
     //define(pgs)
-    define(['https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.j',
+    define(['https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.3/pako.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/localforage/1.9.0/localforage.min.js'],function(Plotly,pako,localforage){
         pgs.Plotly = Plotly
