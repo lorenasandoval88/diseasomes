@@ -9,7 +9,7 @@ pgs.loadScript=async(url)=>{
     return document.head.appendChild(s)
 }
 
-pgs.plotAllMatchByPos=async(data, div = document.createElement('div'))=>{
+pgs.plotAllMatchByPos=async(data, div = DOM.element("div"))=>{
     div.style.height = '500px'
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
@@ -19,12 +19,15 @@ pgs.plotAllMatchByPos=async(data, div = document.createElement('div'))=>{
     }
     const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
     const x = data.pgsMatchMy23.map(xi => {
+        console.log("map1")
         return `Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}
 		<br> <a href="#" target="_blank">${xi[0][0]}</a>`
     })
     const y = data.calcRiskScore
     const z = data.aleles
     const ii = [...Array(y.length)].map((_, i) => i)
+    console.log("map2")
+
     let trace0 = {
         y: ii.map(i => i + 1),
         x: y,
@@ -40,6 +43,8 @@ pgs.plotAllMatchByPos=async(data, div = document.createElement('div'))=>{
             }
         }
     }
+    console.log("map3")
+
     div.innerHTML = ''
     pgs.Plotly.newPlot(div, [trace0], {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
@@ -64,6 +69,8 @@ pgs.plotAllMatchByPos=async(data, div = document.createElement('div'))=>{
         // },
     })
     //debugger
+    return div
+
 }
 
 pgs.Match2=async(data, progressReport)=>{
