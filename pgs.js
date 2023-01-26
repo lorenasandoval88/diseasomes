@@ -10,7 +10,7 @@ pgs.loadScript=async(url)=>{
 }
 
 
-Match2=async(data, progressReport)=>{
+pgs.Match2=async(data, progressReport)=>{
     // extract harmonized data from PGS entry first
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
