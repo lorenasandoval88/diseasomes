@@ -44,6 +44,27 @@ pgs.getArrayBuffer=async(range=[0,1000],url='https://ftp.ncbi.nih.gov/snp/organi
     }))).arrayBuffer()
 }
 
+// 23andme----------------------------------
+pgs.parse23(txt, info) {
+    // normally info is the file name
+    let obj = {}
+    let rows = txt.split(/[\r\n]+/g)
+    let n = rows.filter(r => (r[0] == '#')).length
+    obj.meta = rows.slice(0, n - 1).join('\r\n')
+    obj.cols = rows[n - 1].slice(2).split(/\t/)
+    obj.dt = rows.slice(n)
+    obj.dt = obj.dt.map((r, i) => {
+        r = r.split('\t')
+        r[2] = parseInt(r[2])
+        // position in the chr
+        r[4] = i
+        return r
+    })
+    obj.info = info
+    return obj
+}
+//------------------------------------------
+
 pgs.textArea = async (entry='PGS000004',build=37,range=20000)=>{
     let ta = document.createElement('textarea'); //DOM.element('textarea');
     ta.value = 'loading, please wait ...'
@@ -145,16 +166,20 @@ pgs.parse=async(txt)=>{
     return y
 }
 
-pgs.parse23=async(txt)=>{
+pgs23.parse23=async(txt)=>{
     if(!txt){ // sample score file
         txt="load 23andmefile"
     }
   
     let arr = txt.split(/\n/).filter(x=>x.length>0) // remove empty rows
-
+    let y={info:pgs.deblank(arr[0])}
+    let parm=''
+    for(var i = 1;i<arr.length;i++){
+ 
     //console.log(i,arr[i])
     y.fields = arr[i].split(/\t/g) // list
     y.values = arr.slice(i+1).map(x=>x.split(/\t/g).map(xi=>parseFloat(xi)?parseFloat(xi):xi))
+    }
     return y
 }
 
