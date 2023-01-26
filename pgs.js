@@ -9,6 +9,62 @@ pgs.loadScript=async(url)=>{
     return document.head.appendChild(s)
 }
 
+plotAllMatchByPos=async(data, div = document.createElement('plotAllMatchByPosDiv'))=>{
+    div.style.height = '500px'
+    const indChr = data.pgs.cols.indexOf('hm_chr')
+    const indPos = data.pgs.cols.indexOf('hm_pos')
+    let indOther_allele = data.pgs.cols.indexOf('other_allele')
+    if (indOther_allele == -1) {
+        indOther_allele = data.pgs.cols.indexOf('hm_inferOtherAllele')
+    }
+    const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
+    const x = data.pgsMatchMy23.map(xi => {
+        return `Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}
+		<br> <a href="#" target="_blank">${xi[0][0]}</a>`
+    })
+    const y = data.calcRiskScore
+    const z = data.aleles
+    const ii = [...Array(y.length)].map((_, i) => i)
+    let trace0 = {
+        y: ii.map(i => i + 1),
+        x: y,
+        mode: 'markers',
+        type: 'scatter',
+        text: x,
+        marker: {
+            size: 6,
+            color: 'navy',
+            line: {
+                color: 'navy',
+                width: 1
+            }
+        }
+    }
+    div.innerHTML = ''
+    Plotly.newPlot(div, [trace0], {
+        //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
+        title: `<i style="color:navy">${data.pgs.meta.trait_mapped} (PGP#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
+			  <br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
+        yaxis: {
+            title: '<span style="font-size:medium">variant i sorted by chromosome and position</span>',
+            linewidth: 1,
+                mirror: true,
+                rangemode: "tozero",
+        },
+        xaxis: {
+            title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
+            linewidth: 1,
+            mirror: true
+        },
+        // margin: {
+        //     l: 100,
+        //     r: 600,
+        //     b: 50,
+        //     t: 80
+        // },
+    })
+    //debugger
+}
 
 pgs.Match2=async(data, progressReport)=>{
     // extract harmonized data from PGS entry first
