@@ -117,8 +117,9 @@ pgs.parse23 = async(txt, info)=>{
     let obj = {}
     let rows = txt.split(/[\r\n]+/g)
     obj.txt = txt
-    let n = rows.filter(r => (r[0] == '#')).length
     obj.info = info
+
+    let n = rows.filter(r => (r[0] == '#')).length
     obj.meta = rows.slice(0, n - 1).join('\r\n')
     obj.cols = rows[n - 1].slice(2).split(/\t/)
     obj.dt = rows.slice(n)
@@ -129,7 +130,6 @@ pgs.parse23 = async(txt, info)=>{
         r[4] = i
         return r
     })
-    obj.info = info
     return obj
 }
 
