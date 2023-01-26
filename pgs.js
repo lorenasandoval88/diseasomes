@@ -133,6 +133,14 @@ pgs.parse23 = async(txt, info)=>{
     return obj
 }
 
+pgs.prs23textArea = async(txt)=>{
+    let ta = document.createElement('textarea'); //DOM.element('textarea');
+    ta.value = 'loading, please wait ...'
+    ta.style="width:100%;color:lime;background-color:black;height:20em;font-size:small"
+    ta.value = txt
+  return ta;
+}
+
 pgs.parse=async(txt)=>{
     if(!txt){ // sample score file
         txt=await pgs.loadScore('PGS000004')
