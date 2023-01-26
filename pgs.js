@@ -41,7 +41,7 @@ pgs.plotAllMatchByPos=async(data, div = document.createElement('plotAllMatchByPo
         }
     }
     div.innerHTML = ''
-    Plotly.newPlot(div, [trace0], {
+    pgs.Plotly.newPlot(div, [trace0], {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         title: `<i style="color:navy">${data.pgs.meta.trait_mapped} (PGP#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
 			  <br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
@@ -306,6 +306,11 @@ pgs.loadDependencies=function(){
             pgs.localforage=localforage
         }
     })
+    pgs.loadScript("https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.j").then(s=>{
+        s.onload=function(){
+            pgs.Plotly=Plotly
+        }
+    })
     // https://cdnjs.cloudflare.com/ajax/libs/localforage/1.9.0/localforage.min.js  
 }
 
@@ -556,12 +561,14 @@ pgs.pgsPlot=async(dt, cols)=>{
             }
           ]
     };
-    Plotly.newPlot(div, data, layout)
+    pgs.Plotly.newPlot(div, data, layout)
 }
 
 if(typeof(define)!="undefined"){
     //define(pgs)
-    define(['https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.j','https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.3/pako.min.js','https://cdnjs.cloudflare.com/ajax/libs/localforage/1.9.0/localforage.min.js'],function(Plotly,pako,localforage){
+    define(['https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.j',
+    'https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.3/pako.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/localforage/1.9.0/localforage.min.js'],function(Plotly,pako,localforage){
         pgs.Plotly = Plotly
         pgs.pako = pako
         pgs.localforage=localforage
