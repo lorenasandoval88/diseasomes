@@ -183,25 +183,6 @@ pgs.ini=()=>{ // act on context, such as search parameters. Not called automatic
 }
 
 
-pgs.parse23=async(txt, info)=>{
-    // normally info is the file name
-    let obj = {}
-    let rows = txt.split(/[\r\n]+/g)
-    let n = rows.filter(r => (r[0] == '#')).length
-    obj.meta = rows.slice(0, n - 1).join('\r\n')
-    obj.cols = rows[n - 1].slice(2).split(/\t/)
-    obj.dt = rows.slice(n)
-    obj.dt = obj.dt.map((r, i) => {
-        r = r.split('\t')
-        r[2] = parseInt(r[2])
-        // position in the chr
-        r[4] = i
-        return r
-    })
-    obj.info = info
-    return obj
-}
-
 if(typeof(define)!="undefined"){
     //define(pgs)
     define(['https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.3/pako.min.js','https://cdnjs.cloudflare.com/ajax/libs/localforage/1.9.0/localforage.min.js'],function(pako,localforage){

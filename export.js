@@ -755,10 +755,7 @@ function plotSummarySnps(){
     }
     
 }
-(()=>{ // anonymous function
-setTimeout(()=>{pgs.ini();retrieveButton.click()},1000)
-        
-    })()
+
 export {
     ui,
     PGS23,
