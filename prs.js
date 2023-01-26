@@ -3,27 +3,6 @@ console.log('pgs.js loaded')
 pgs = {date:Date()}
 
 
-
-pgs.parse23=async(txt, info)=>{
-    // normally info is the file name
-    let obj = {}
-    let rows = txt.split(/[\r\n]+/g)
-    let n = rows.filter(r => (r[0] == '#')).length
-    obj.meta = rows.slice(0, n - 1).join('\r\n')
-    obj.cols = rows[n - 1].slice(2).split(/\t/)
-    obj.dt = rows.slice(n)
-    obj.dt = obj.dt.map((r, i) => {
-        r = r.split('\t')
-        r[2] = parseInt(r[2])
-        // position in the chr
-        r[4] = i
-        return r
-    })
-    obj.info = info
-    return obj
-}
-
-
 pgs.loadScript=async(url)=>{
     let s = document.createElement('script')
     s.src=url
@@ -201,6 +180,26 @@ pgs.ini=()=>{ // act on context, such as search parameters. Not called automatic
             bt.click()
         }
     }
+}
+
+
+pgs.parse23=async(txt, info)=>{
+    // normally info is the file name
+    let obj = {}
+    let rows = txt.split(/[\r\n]+/g)
+    let n = rows.filter(r => (r[0] == '#')).length
+    obj.meta = rows.slice(0, n - 1).join('\r\n')
+    obj.cols = rows[n - 1].slice(2).split(/\t/)
+    obj.dt = rows.slice(n)
+    obj.dt = obj.dt.map((r, i) => {
+        r = r.split('\t')
+        r[2] = parseInt(r[2])
+        // position in the chr
+        r[4] = i
+        return r
+    })
+    obj.info = info
+    return obj
 }
 
 if(typeof(define)!="undefined"){
