@@ -18,7 +18,7 @@ pgs.plotAllMatchByPos=async(data, div = document.createElement('plotAllMatchByPo
         indOther_allele = data.pgs.cols.indexOf('hm_inferOtherAllele')
     }
     const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
-    const x = data.pgs.pgsMatchMy23.map(xi => {
+    const x = data.pgsMatchMy23.map(xi => {
         return `Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}
 		<br> <a href="#" target="_blank">${xi[0][0]}</a>`
     })
