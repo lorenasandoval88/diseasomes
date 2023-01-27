@@ -41,7 +41,7 @@ pgs.plotAllMatchByPos=async(data,div)=>{
         }
     }
     div.innerHTML = ''
-    pgs.Plotly.newPlot(div, [trace0], {
+    setTimeout(_=>{pgs.Plotly.newPlot(div, [trace0], {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         title: `<i style="color:navy">${data.pgs.meta.trait_mapped} (PGP#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
 			  <br><a href="${'https://doi.org/' + data.pgs.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
@@ -56,7 +56,7 @@ pgs.plotAllMatchByPos=async(data,div)=>{
             linewidth: 1,
             mirror: true
         },
-        // margin: {
+        // margin: {s
         //     l: 100,
         //     r: 600,
         //     b: 50,
@@ -65,6 +65,7 @@ pgs.plotAllMatchByPos=async(data,div)=>{
     })
     //debugger
     return div
+})
 
 }
 
