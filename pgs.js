@@ -9,7 +9,7 @@ pgs.loadScript=async(url)=>{
     return document.head.appendChild(s)
 }
 
-pgsPlot = function(data) {
+pgs.pgsPlot = function(data) {
     let div = DOM.element("PGSdiv");
 
     // display pgs scores as beta or odds ratio with rsids or chr and position on the x axis
