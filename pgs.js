@@ -18,11 +18,11 @@ pgs.pgsPlot = function(data,div) {
 
     if (data.pgs.dt[0][rs_idx] == '' || data.pgs.dt[0][rs_idx] == undefined) {
         data.pgs.dt.forEach((row) => {
-            oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = math.exp(row[4]);
+            oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = pgs.math.exp(row[4]);
         })
     } else {
         data.pgs.dt.forEach((row) => {
-            oddsRatio[row[0]] = math.exp(row[4]);
+            oddsRatio[row[0]] = pgs.math.exp(row[4]);
         })
     }
     //sort pgs variants by beta
