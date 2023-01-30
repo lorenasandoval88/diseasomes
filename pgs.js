@@ -9,7 +9,7 @@ pgs.loadScript=async(url)=>{
     return document.head.appendChild(s)
 }
 
-pgs.plotAllMatchByPos(data,div2)=>{ 
+pgs.plotAllMatchByPos=(data,div2)=>{ 
     const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
     div2.style.height = '350px'
     const indChr = data.pgs.cols.indexOf('hm_chr')
