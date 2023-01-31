@@ -38,7 +38,7 @@ pgs.piechart =  function(data,div){
     })
 }
 
-getInfoSnps= async function(){
+getInfoSnps= async function(data){
     var dat = data
     const sleep = ms => new Promise(r => setTimeout(r, ms));
       var rs = dat.calcRiskScore
