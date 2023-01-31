@@ -253,8 +253,7 @@ pgs.plotAllMatchByPos=(data,div2)=>{
                 width: 1
             }
         },
-        height: 700,
-        width: 400
+       
     }
       div2.innerHTML = ""
     //setTimeout(_=>{
@@ -272,7 +271,9 @@ pgs.plotAllMatchByPos=(data,div2)=>{
             title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
             linewidth: 1,
             mirror: true
-        }
+        },
+        height: 700,
+        width: 400
     })
     return div2
 }
