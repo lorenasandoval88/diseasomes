@@ -8,6 +8,37 @@ pgs.loadScript=async(url)=>{
     s.src=url
     return document.head.appendChild(s)
 }
+pgs.piechart =  function(data,div){
+    getInfoSnps(data).then( (value) => {
+    var info = value
+    /* Plot consequence */
+    var consequence = {}
+    info.forEach( el => {
+        var col = el.most_severe_consequence
+        if( ! Object.keys(consequence).includes(col) ){
+            consequence[col]=0
+        }
+        consequence[col]+=1
+    })
+    var y = Object.values(consequence)
+    var x = Object.keys(consequence)
+    var data = [{
+      values: y,
+      labels: x,
+      type: 'pie'
+    }];
+    var layout = {
+      legend: { x: 5 },
+      title: 'Variant Type',
+      height: 400,
+      width: 500
+    };
+    div.innerHTML = ""     
+            return Plotly.newPlot(div, data, layout);
+
+})
+
+
 
 pgs.pgsPlot = function(data,div) {
     //let div = DOM.element("PGSdiv");
@@ -103,8 +134,8 @@ pgs.pgsPlot = function(data,div) {
                 dash: 'dot'
             }
         }],
-        width: 600,
-        height: 600,
+        height: 400,
+        width: 500,
         hovermode: 'closest', //plot_bgcolor: 'rgb(254, 247, 234)', 
 
         annotations: [
