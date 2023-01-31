@@ -251,7 +251,9 @@ pgs.plotAllMatchByPos=(data,div2)=>{
                 color: 'navy',
                 width: 1
             }
-        }
+        },
+        height: 400,
+        width: 500
     }
       div2.innerHTML = ""
     //setTimeout(_=>{
