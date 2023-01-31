@@ -30,8 +30,8 @@ pgs.piechart =  function(data,div){
     var layout = {
       legend: { x: 5 },
       title: 'Variant Type',
-      height: 500,
-      width: 600
+      height: 400,
+      width: 550
     };
     div.innerHTML = ""     
             return pgs.Plotly.newPlot(div, data, layout);
@@ -103,8 +103,8 @@ pgs.pgsPlot = function(data,div) {
         y: Object.keys(oddsRatioSorted), // rsids
         mode: 'markers',
         name: 'legend1',
-        height: 500,
-        width: 400,
+        // height: 500,
+        // width: 400,
         marker: {
             color: 'navy',
             line: {
@@ -117,6 +117,8 @@ pgs.pgsPlot = function(data,div) {
     };
     var dat = [trace1];
     var layout = {
+        height: 500,
+        width: 400,
         title: `Odds Ratios (OR) for PGS Variants`,
         yaxis: {
             title: `variant rsid/chromosome and position`,
@@ -225,7 +227,7 @@ pgs.pgsPlot = function(data,div) {
 
 pgs.plotAllMatchByPos=(data,div2)=>{ 
     const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
-    div2.style.height = '350px'
+    //div2.style.height = '350px'
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
     let indOther_allele = data.pgs.cols.indexOf('other_allele')
