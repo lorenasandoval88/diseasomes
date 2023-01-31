@@ -77,14 +77,14 @@ pgs.pgsPlot = function(data,div) {
 
     // display pgs scores as beta or odds ratio with rsids or chr and position on the x axis
     let oddsRatio = {};
-    const rs_idx = data.pgs.cols.indexOf('hm_rsID')
+    const rs_idx = data.cols.indexOf('hm_rsID')
 
-    if (data.pgs.dt[0][rs_idx] == '' || data.pgs.dt[0][rs_idx] == undefined) {
-        data.pgs.dt.forEach((row) => {
+    if (data.dt[0][rs_idx] == '' || data.dt[0][rs_idx] == undefined) {
+        data.dt.forEach((row) => {
             oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = pgs.math.exp(row[4]);
         })
     } else {
-        data.pgs.dt.forEach((row) => {
+        data.dt.forEach((row) => {
             oddsRatio[row[0]] = pgs.math.exp(row[4]);
         })
     }
