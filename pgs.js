@@ -31,7 +31,7 @@ pgs.piechart =  function(data,div){
       legend: { x: 5 },
       title: 'Variant Type',
       height: 500,
-      width: 400
+      width: 600
     };
     div.innerHTML = ""     
             return pgs.Plotly.newPlot(div, data, layout);
@@ -103,6 +103,8 @@ pgs.pgsPlot = function(data,div) {
         y: Object.keys(oddsRatioSorted), // rsids
         mode: 'markers',
         name: 'legend1',
+        height: 500,
+        width: 400,
         marker: {
             color: 'navy',
             line: {
@@ -166,8 +168,7 @@ pgs.pgsPlot = function(data,div) {
                 dash: 'dot'
             }
         }],
-        height: 500,
-        width: 400,
+      
         hovermode: 'closest', //plot_bgcolor: 'rgb(254, 247, 234)', 
 
         annotations: [
@@ -252,7 +253,7 @@ pgs.plotAllMatchByPos=(data,div2)=>{
                 width: 1
             }
         },
-        height: 500,
+        height: 700,
         width: 400
     }
       div2.innerHTML = ""
