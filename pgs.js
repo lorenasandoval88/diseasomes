@@ -35,8 +35,8 @@ pgs.piechart =  function(data,div){
     };
     div.innerHTML = ""     
             return Plotly.newPlot(div, data, layout);
-
-})
+    })
+}
 
 getInfoSnps= async function(){
     var dat = data
