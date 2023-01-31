@@ -165,7 +165,7 @@ pgs.pgsPlot = function(data,div) {
             x1: 1,
             y1: Object.values(oddsRatio).length,
             line: {
-                color: 'grey',
+                color: 'navy',
                 width: 1.5,
                 dash: 'dot'
             }
