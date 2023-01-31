@@ -30,11 +30,11 @@ pgs.piechart =  function(data,div){
     var layout = {
       legend: { x: 5 },
       title: 'Variant Type',
-      height: 400,
-      width: 500
+      height: 500,
+      width: 400
     };
     div.innerHTML = ""     
-            return Plotly.newPlot(div, data, layout);
+            return pgs.Plotly.newPlot(div, data, layout);
     })
 }
 
@@ -166,8 +166,8 @@ pgs.pgsPlot = function(data,div) {
                 dash: 'dot'
             }
         }],
-        height: 400,
-        width: 500,
+        height: 500,
+        width: 400,
         hovermode: 'closest', //plot_bgcolor: 'rgb(254, 247, 234)', 
 
         annotations: [
@@ -252,8 +252,8 @@ pgs.plotAllMatchByPos=(data,div2)=>{
                 width: 1
             }
         },
-        height: 400,
-        width: 500
+        height: 500,
+        width: 400
     }
       div2.innerHTML = ""
     //setTimeout(_=>{
