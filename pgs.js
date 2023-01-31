@@ -38,6 +38,38 @@ pgs.piechart =  function(data,div){
 
 })
 
+getInfoSnps= async function(){
+    var dat = data
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+      var rs = dat.calcRiskScore
+      var i=0
+      var ide=[]
+      rs.forEach( risk => {
+          if(risk>0 || risk<0){
+              ide.push( dat.pgsMatchMy23[i][0][0] )
+          }
+          i+=1
+      })
+      
+      i=0
+      var info=[]
+      while (i<ide.length) {
+          var end = ((i+15)<=ide.length) ? i+15 : ide.length
+          var temp = ide.slice(i, end)
+          info = info.concat( await Promise.all( temp.map( async rsid => {
+              var url = `https://rest.ensembl.org/variation/human/${rsid}?content-type=application/json`
+              var enrich = await (await fetch(url)).json()
+              await sleep(300)
+              return enrich
+          } )) )
+          
+          i+=15
+          if(i>=ide.length){
+              break
+          }
+      }
+      return info
+  }
 
 
 pgs.pgsPlot = function(data,div) {
