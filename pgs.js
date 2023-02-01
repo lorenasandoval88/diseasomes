@@ -275,7 +275,7 @@ pgs.plotAllMatchByPos=(data,div2)=>{
             mirror: true
         },
         height: 600,
-        width: 400
+        width: 450
     })
     return div2
 }
