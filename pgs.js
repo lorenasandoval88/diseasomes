@@ -261,7 +261,7 @@ pgs.plotAllMatchByPos=(data,div2)=>{
     //setTimeout(_=>{
     pgs.Plotly.newPlot(div2, [trace0], {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
-        title: `<i style="color:navy"> risk scores for ${data.calcRiskScore.length} ${data.pgs.meta.trait_reported}, PRS ${Math.round(data.PRS*1000)/1000}</i>
+        title: `<i style="color:navy">  risk scores for ${data.calcRiskScore.length} ${data.pgs.meta.trait_reported}, PRS ${Math.round(data.PRS*1000)/1000}</i>
 			  <br><a href="${'https://doi.org/' + data.pgs.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
         yaxis: {
             title: '<span style="font-size:medium">variant i sorted by chromosome and position</span>',
