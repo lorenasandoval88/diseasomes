@@ -119,7 +119,7 @@ pgs.pgsPlot = function(data,div) {
     var layout = {
         height: 500,
         width: 400,
-        title: `Odds ratios for ${data.dt.length} ${data.meta.pgs_id} variants`,
+        title: `Odds ratios for ${data.dt.length} PGS variants`,
         yaxis: {
             title: `variant rsid/chromosome and position`,
         },
