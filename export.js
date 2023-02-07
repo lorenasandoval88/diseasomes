@@ -261,7 +261,11 @@ PGS23.Match2 = function (data, progressReport) {
                 matchFloor = dtMatch.at(-1)[0][4]
             }
             // MATCH 23andme chromosome and position TO PGS chromosome and position *******
-            let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos])).filter(myr => (myr[1] == r[indChr]))
+            var regexPattern = new RegExp([r[2],r[3]].join('|'))
+
+            let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos])).
+                            filter(myr => (myr[1] == r[indChr])).
+                            filter(myr => regexPattern.test(myr[3]))//also filter by pgs alt or effect allele match			//let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
 
             if (dtMatch_i.length > 0) {
                 dtMatch.push(dtMatch_i.concat([r]))
