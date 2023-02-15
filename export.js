@@ -732,7 +732,7 @@ function plotSummarySnps(){
                 }];
 
                 layout = {
-                  title: 'Chromosome Distribution',
+                  title: 'Chromosome',
                   height: 400,
                   width: 500
                 };
@@ -761,7 +761,7 @@ function plotSummarySnps(){
                 }];
 
                 layout = {
-                  title: 'Clinical Significance Distribution',
+                  title: 'Clinical Significance',
                   height: 400,
                   width: 500
                 };
