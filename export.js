@@ -546,22 +546,37 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
 	ii = ii.filter(i=>y[jj[i]]) // removing indexes with null betas
     //const ii = [...Array(y.length)].map((_, i) => i)
     let trace0 = {
-        y: ii.map(i => i + 1),
-        x: y.map((yi, i) => y[jj[i]]),
-        mode: 'lines+markers',
-        type: 'scatter',
-        text: x,
-        marker: {
-            size: 6,
-            color: 'navy',
-            line: {
-                color: 'navy',
-                width: 1
-            }
-        },
-        line: {
-            color: 'navy'
-        }
+        y: [...Array(ii.length)].map((_,i)=>i+1),
+		x: y.map((yi,i)=>y[jj[ii[i]]]),
+		mode: 'lines+markers',
+		type: 'scatter',
+		text: x,
+		marker: { 
+			size: 6,
+			color:'navy',
+			line:{
+				color:'navy',
+				width:1
+			}
+		},
+		line:{
+			color:'navy'
+		}
+        //x: y.map((yi, i) => y[jj[i]]),
+        // mode: 'lines+markers',
+        // type: 'scatter',
+        // text: x,
+        // marker: {
+        //     size: 6,
+        //     color: 'navy',
+        //     line: {
+        //         color: 'navy',
+        //         width: 1
+        //     }
+        // },
+        // line: {
+        //     color: 'navy'
+        // }
 
     }
     div.innerHTML = ''
