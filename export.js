@@ -542,7 +542,9 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
     })
     const y = data.calcRiskScore
     const z = data.aleles
-    const ii = [...Array(y.length)].map((_, i) => i)
+    let ii = [...Array(y.length)].map((_,i)=>i)//.filter(i=>y[jj[i]]!=0)
+	ii = ii.filter(i=>y[jj[i]]) // removing indexes with null betas
+    //const ii = [...Array(y.length)].map((_, i) => i)
     let trace0 = {
         y: ii.map(i => i + 1),
         x: y.map((yi, i) => y[jj[i]]),
