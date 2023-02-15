@@ -30,7 +30,7 @@ let PGS23 = {
 
 // in case someone wants to see it in the console
 
-PGS23.loadPGS = async (i = 4) => {
+PGS23.loadPGS = async (i = 1) => {
     // startng with a default pgs
     let div = PGS23.divPGS
     div.innerHTML = `<b style="color:maroon">A)</b> PGS # <input id="pgsID" value=${i} size=5>
