@@ -131,7 +131,7 @@ PGS23.loadPGS = async (i = 1) => {
 PGS23.load23 = async () => {
     let div = PGS23.div23
     div.innerHTML =
-        `<hr><b style="color:maroon">B)</b> Load 23andme <a href= "genome_Dorothy_Wolf_v4_Full_20170525101345.txt" download="genome_Dorothy_Wolf_v4_Full_20170525101345.txt">female </a> or <a href= "genome_Chad_Wrye_v5_Full_20220921063742.txt" download="genome_Chad_Wrye_v5_Full_20220921063742.txt">male </a>test data or your data <input type="file" id="file23andMeInput">
+        `<hr><b style="color:maroon">B)</b> Load 23andme <a href= "genome_Dorothy_Wolf_v4_Full_20170525101345.txt" download="genome_Dorothy_Wolf_v4_Full_20170525101345.txt">female </a> or <a href= "genome_Chad_Wrye_v5_Full_20220921063742.txt" download="genome_Chad_Wrye_v5_Full_20220921063742.txt">male </a>or your file <input type="file" id="file23andMeInput">
 
     <br><span hidden=true id="my23hidden" style="font-size:small">
 		 <span style="color:maroon" id="my23Info"></span> (<span id="my23variants"></span> variants) [<a href='#' id="json23">JSON</a>].
@@ -199,10 +199,6 @@ PGS23.loadCalc = async () => {
     </p>
 	<textarea id="my23CalcTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea>
 	<div id="plotRiskDiv"><div id="plotAllMatchByPosDiv">...</div><div id="plotAllMatchByEffectDiv">...</div></div>
-	
-	<div id='plotSnpConsequence' style='display: inline-block;' ></div>
-	<div id='plotSnpClinical' style='display: inline-block;' ></div>
-	<div id='plotSnpChrom' style='display: inline-block;' ></div>
 	
 	<hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
 	<div id="tabulateAllMatchByEffectDiv"></div>
@@ -330,7 +326,6 @@ PGS23.Match2 = function (data, progressReport) {
                 //ploting
                 plotAllMatchByPos()
                 plotAllMatchByEffect()
-                plotSummarySnps()
             }
             document.querySelector('#buttonCalculateRisk').disabled = false
             document.querySelector('#buttonCalculateRisk').style.color = 'blue'
@@ -562,21 +557,6 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
 		line:{
 			color:'navy'
 		}
-        //x: y.map((yi, i) => y[jj[i]]),
-        // mode: 'lines+markers',
-        // type: 'scatter',
-        // text: x,
-        // marker: {
-        //     size: 6,
-        //     color: 'navy',
-        //     line: {
-        //         color: 'navy',
-        //         width: 1
-        //     }
-        // },
-        // line: {
-        //     color: 'navy'
-        // }
 
     }
     div.innerHTML = ''
@@ -601,7 +581,9 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
     })
     // add table
     tabulateAllMatchByEffect()
-    //debugger
+    // add 3 pie charts
+    plotSummarySnps()
+     //debugger
 }
 
 function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementById('tabulateAllMatchByEffectDiv')) {
@@ -639,6 +621,12 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         let xi = data.pgsMatchMy23[ind]
         row.innerHTML = `<tr><td align="left">${ind+1}) </td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">wiki</a></td><td align="center">${xi[0][3]}</td></tr>`
     })
+    let pieDiv = document.createElement('div');
+    document.body.appendChild(pieDiv)
+    pieDiv.innerHTML = `<hr><div>SNP summary</div><hr>
+    <div id='plotSnpConsequence' style='display: inline-block;' ></div>
+	<div id='plotSnpClinical' style='display: inline-block;' ></div>
+	<div id='plotSnpChrom' style='display: inline-block;' ></div>`
 
     //debugger
 }
