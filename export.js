@@ -319,7 +319,7 @@ PGS23.Match2 = function (data, progressReport) {
                 plotAllMatchByEffect()
             } else {
                 data.PRS = Math.exp(calcRiskScore.reduce((a, b) => a + b))
-                document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score (PRS) = ${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.pgsMatchMy23.length}/${data.pgs.dt.length} matches.`
+                document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score (PRS) = ${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.aleles.filter(x => x!=0).length} (non-zero betas) out of ${data.pgsMatchMy23.length} matches.` ///${data.pgs.dt.length}
                 //my23CalcTextArea.value+=` ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
                 document.getElementById('plotRiskDiv').hidden = false
                 document.getElementById('hidenCalc').hidden = false
