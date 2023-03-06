@@ -494,8 +494,8 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
     div.innerHTML = ''
     Plotly.newPlot(div, [trace0], {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
-        title: `<i style="color:navy">${data.aleles.length} ${data.pgs.meta.trait_mapped} variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
-			  <br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
+        //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
+        title: `<i style="color:navy">${data.aleles.length} ${data.pgs.meta.trait_mapped} variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
         yaxis: {
             title: '<span style="font-size:medium">variant i sorted by chromosome and position</span>',
             linewidth: 1,
@@ -562,8 +562,8 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
     div.innerHTML = ''
     Plotly.newPlot(div, [trace0], {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
-        title: `<i style="color:navy">${ii.length} ${data.pgs.meta.trait_mapped} variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>
-			  <br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>`,
+        //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
+        title: `<i style="color:navy">${ii.length} ${data.pgs.meta.trait_mapped} variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
         yaxis: {
             title: '<span style="font-size:medium">variant i sorted by effect</span>',
             linewidth: 1,
