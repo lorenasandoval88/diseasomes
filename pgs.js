@@ -81,7 +81,10 @@ pgs.pgsPlot = function(data,div) {
 
     if (data.dt[0][rs_idx] == '' || data.dt[0][rs_idx] == undefined) {
         data.dt.forEach((row) => {
-            oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = pgs.math.exp(row[4]);
+            // show effect sizes of all PGS catalog entry effect sizes (or ORs using exp())
+            //oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = pgs.math.exp(row[4]);
+            oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = row[4];
+
         })
     } else {
         data.dt.forEach((row) => {
@@ -124,7 +127,7 @@ pgs.pgsPlot = function(data,div) {
             title: `variant rsid/chromosome and position`,
         },
         xaxis: {
-            title: `variant odds ratio`,
+            title: ` odds ratios`,
             showgrid: false,
             showline: true,
             linecolor: 'rgb(102, 102, 102)',
@@ -160,6 +163,8 @@ pgs.pgsPlot = function(data,div) {
         },
         shapes: [{
             type: 'line',
+            // mark line at zero for effect size and 1 for OR
+            //x0: 1,
             x0: 1,
             y0: 0,
             x1: 1,

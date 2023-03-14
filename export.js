@@ -131,7 +131,8 @@ PGS23.loadPGS = async (i = 1) => {
 PGS23.load23 = async () => {
     let div = PGS23.div23
     div.innerHTML =
-        `<hr><b style="color:maroon">B)</b> Load 23andme <a href= "genome_Dorothy_Wolf_v4_Full_20170525101345.txt" download="genome_Dorothy_Wolf_v4_Full_20170525101345.txt">female </a> or <a href= "genome_Chad_Wrye_v5_Full_20220921063742.txt" download="genome_Chad_Wrye_v5_Full_20220921063742.txt">male </a>or your file <input type="file" id="file23andMeInput">
+        `<hr><b style="color:maroon">B)</b> Load <a href= "genome_Dorothy_Wolf_v4_Full_20170525101345.txt" download="genome_Dorothy_Wolf_v4_Full_20170525101345.txt">female </a> or <a href= "genome_Chad_Wrye_v5_Full_20220921063742.txt" download="genome_Chad_Wrye_v5_Full_20220921063742.txt">male </a> 
+        public 23andme file from the <a id="PGP" href="https://my.pgp-hms.org/public_genetic_data?data_type=23andMe" target="_blank">Personal Genome Project (PGP)</a> or your file <input type="file" id="file23andMeInput">
 
     <br><span hidden=true id="my23hidden" style="font-size:small">
 		 <span style="color:maroon" id="my23Info"></span> (<span id="my23variants"></span> variants) [<a href='#' id="json23">JSON</a>].
@@ -194,11 +195,15 @@ PGS23.loadCalc = async () => {
     let div = PGS23.divCalc
     div.innerHTML = `<hr>
 	<b style="color:maroon">C)</b> Polygenic Risk Score (PRS)
-	<p><button id="buttonCalculateRisk">Calculate Risk</button><span id="hidenCalc" hidden=true>
-	[<a href="#" id="matchesJSON">matches</a>][<a href="#" id="riskCalcScoreJSON">calculation</a>]</span> <input id="progressCalc" type="range" value=0 hidden=false>
+	<p><button id="buttonCalculateRisk">Calculate Risk</button>
+    <span id="hidenCalc" hidden=true>[<a href="#" id="matchesJSON">matches</a>][<a href="#" id="riskCalcScoreJSON">calculation</a>]</span> 
+    <input id="progressCalc" type="range" value=0 hidden=false>
     </p>
 	<textarea id="my23CalcTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea>
-	<div id="plotRiskDiv"><div id="plotAllMatchByPosDiv">...</div><div id="plotAllMatchByEffectDiv">...</div></div>
+	<div id="plotRiskDiv">
+    <div id="pgsPlotDiv">..</div>
+    <div id="plotAllMatchByEffectDiv">...</div>
+    </div>
 	
 	<hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
 	<div id="tabulateAllMatchByEffectDiv"></div>
@@ -234,6 +239,9 @@ PGS23.loadCalc = async () => {
         }
     }
 }
+
+
+//LORENA: ask Montse if the effect size should be plugged directly from the PGS entry!
 
 PGS23.Match2 = function (data, progressReport) {
     // extract harmonized data from PGS entry first
@@ -319,13 +327,15 @@ PGS23.Match2 = function (data, progressReport) {
                 plotAllMatchByEffect()
             } else {
                 data.PRS = Math.exp(calcRiskScore.reduce((a, b) => a + b))
-                document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score (PRS) = ${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.aleles.filter(x => x!=0).length} (non-zero betas) out of ${data.pgsMatchMy23.length} matches.` ///${data.pgs.dt.length}
+                //document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score (PRS) = ${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.aleles.filter(x => x!=0).length} (non-zero betas) out of ${data.pgsMatchMy23.length} matches.` ///${data.pgs.dt.length}
+                document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score (PRS) = ${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.pgsMatchMy23.length} matches.` ///${data.pgs.dt.length}
                 //my23CalcTextArea.value+=` ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
                 document.getElementById('plotRiskDiv').hidden = false
                 document.getElementById('hidenCalc').hidden = false
                 //ploting
-                plotAllMatchByPos()
+                pgsPlot2();
                 plotAllMatchByEffect()
+
             }
             document.querySelector('#buttonCalculateRisk').disabled = false
             document.querySelector('#buttonCalculateRisk').style.color = 'blue'
@@ -538,12 +548,13 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
     const y = data.calcRiskScore
     const z = data.aleles
     let ii = [...Array(y.length)].map((_,i)=>i)//.filter(i=>y[jj[i]]!=0)
-	ii = ii.filter(i=>y[jj[i]]) // removing indexes with null betas
+	//ii = ii.filter(i=>y[jj[i]]) // removing indexes with null betas
     //const ii = [...Array(y.length)].map((_, i) => i)
     let trace0 = {
-        y: [...Array(ii.length)].map((_,i)=>i+1),
-		x: y.map((yi,i)=>y[jj[ii[i]]]),
-		mode: 'lines+markers',
+        x: [...Array(ii.length)].map((_,i)=>i+1),
+		y: y.map((yi,i)=>y[jj[ii[i]]]),
+		mode: 'markers',
+        name: 'Matched',
 		type: 'scatter',
 		text: x,
 		marker: { 
@@ -557,14 +568,30 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
 		line:{
 			color:'navy'
 		}
-
     }
+    var trace1 = {
+        x: [...Array(ii.length)].map((_,i)=>i+1),
+        y: [0.15, 0.16],
+		mode: 'markers',
+        name: 'Unmatched',
+        type: 'scatter',
+		text: x,
+        marker: {
+          size: 6,
+          color: 'rgba(156, 165, 196, 0.95)',
+          line: {
+            color: 'rgba(156, 165, 196, 1.0)',
+            width: 1,
+          },
+        }
+      };
+      var tr = [trace0,trace1]
     div.innerHTML = ''
-    Plotly.newPlot(div, [trace0], {
+    Plotly.newPlot(div, tr, {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
         title: `<i style="color:navy">${ii.length} ${data.pgs.meta.trait_mapped} variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
-        yaxis: {
+        xaxis: {
             title: '<span style="font-size:medium">variant i sorted by effect</span>',
             linewidth: 1,
             mirror: true,
@@ -573,7 +600,7 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
                 size: 15
               },
         },
-        xaxis: {
+        yaxis: {
             title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
             linewidth: 1,
             mirror: true
@@ -582,7 +609,7 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
     // add table
     tabulateAllMatchByEffect()
     // add 3 pie charts
-    plotSummarySnps()
+    //plotSummarySnps()
      //debugger
 }
 
@@ -621,12 +648,12 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         let xi = data.pgsMatchMy23[ind]
         row.innerHTML = `<tr><td align="left">${ind+1}) </td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">wiki</a></td><td align="center">${xi[0][3]}</td></tr>`
     })
-    let pieDiv = document.createElement('div');
-    document.body.appendChild(pieDiv)
-    pieDiv.innerHTML = `<hr><div>SNP summary</div><hr>
-    <div id='plotSnpConsequence' style='display: inline-block;' ></div>
-	<div id='plotSnpClinical' style='display: inline-block;' ></div>
-	<div id='plotSnpChrom' style='display: inline-block;' ></div>`
+    // let pieDiv = document.createElement('div');
+    // document.body.appendChild(pieDiv)
+    // pieDiv.innerHTML = `<hr><div>SNP summary</div><hr>
+    // <div id='plotSnpConsequence' style='display: inline-block;' ></div>
+	// <div id='plotSnpClinical' style='display: inline-block;' ></div>
+	// <div id='plotSnpChrom' style='display: inline-block;' ></div>`
 
     //debugger
 }
