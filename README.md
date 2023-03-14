@@ -1,6 +1,9 @@
 
-# sample files
-public 23andme sample files: https://my.pgp-hms.org/public_genetic_data?data_type=23andMe
+# public 23andme sample files: 
+
+The participants in the Personal Genome Project (PGP) have volunteered to share their DNA sequences, medical information, and other personal information with the research community and the general public.
+
+https://my.pgp-hms.org/public_genetic_data?data_type=23andMe
 
 female sample (dorothy): https://my.pgp-hms.org/profile/hu54EEB2
 
