@@ -131,8 +131,8 @@ PGS23.loadPGS = async (i = 1) => {
 PGS23.load23 = async () => {
     let div = PGS23.div23
     div.innerHTML =
-        `<hr><b style="color:maroon">B)</b> Load <a href= "genome_Dorothy_Wolf_v4_Full_20170525101345.txt" download="genome_Dorothy_Wolf_v4_Full_20170525101345.txt">female </a> or <a href= "genome_Chad_Wrye_v5_Full_20220921063742.txt" download="genome_Chad_Wrye_v5_Full_20220921063742.txt">male </a> 
-        public 23andme file from the <a id="PGP" href="https://my.pgp-hms.org/public_genetic_data?data_type=23andMe" target="_blank">Personal Genome Project (PGP)</a> or your file <input type="file" id="file23andMeInput">
+        `<hr><b style="color:maroon">B)</b> Download <a href= "genome_Dorothy_Wolf_v4_Full_20170525101345.txt" download="genome_Dorothy_Wolf_v4_Full_20170525101345.txt">female </a> or <a href= "genome_Chad_Wrye_v5_Full_20220921063742.txt" download="genome_Chad_Wrye_v5_Full_20220921063742.txt">male </a> 
+        public 23andme file from the <a id="PGP" href="https://my.pgp-hms.org/public_genetic_data?data_type=23andMe" target="_blank">Personal Genome Project (PGP)</a> and <input type="file" id="file23andMeInput">
 
     <br><span hidden=true id="my23hidden" style="font-size:small">
 		 <span style="color:maroon" id="my23Info"></span> (<span id="my23variants"></span> variants) [<a href='#' id="json23">JSON</a>].
@@ -505,7 +505,7 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
     Plotly.newPlot(div, [trace0], {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
-        title: `<i style="color:navy">${data.aleles.length} ${data.pgs.meta.trait_mapped} variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
+        title: `<i style="color:navy">Effect Sizes for ${data.aleles.length} Matched Variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
         yaxis: {
             title: '<span style="font-size:medium">variant i sorted by chromosome and position</span>',
             linewidth: 1,
@@ -513,7 +513,7 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
                 rangemode: "tozero",
         },
         xaxis: {
-            title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
+            title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size</span>',
             linewidth: 1,
             mirror: true
         },
@@ -544,14 +544,21 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
         let xi = data.pgsMatchMy23[j]
         return `Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}
 		<br> <a href="#" target="_blank">${xi[0][0]}</a>`
+        })
+
+    const x2 = jj.map(j => {
+        let xi = data.pgsMatchMy23[j]
+        return `Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}`       
     })
+    console.log(x2)
+
     const y = data.calcRiskScore
     const z = data.aleles
     let ii = [...Array(y.length)].map((_,i)=>i)//.filter(i=>y[jj[i]]!=0)
 	//ii = ii.filter(i=>y[jj[i]]) // removing indexes with null betas
     //const ii = [...Array(y.length)].map((_, i) => i)
     let trace0 = {
-        x: [...Array(ii.length)].map((_,i)=>i+1),
+        x: x2,
 		y: y.map((yi,i)=>y[jj[ii[i]]]),
 		mode: 'markers',
         name: 'Matched',
@@ -590,18 +597,19 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
     Plotly.newPlot(div, tr, {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
-        title: `<i style="color:navy">${ii.length} ${data.pgs.meta.trait_mapped} variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
+        title: `<i style="color:navy">Effect Sizes for ${data.aleles.length} Matched Variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
         xaxis: {
-            title: '<span style="font-size:medium">variant i sorted by effect</span>',
+            title: '<span style="font-size:medium">variant, sorted by effect</span>',
             linewidth: 1,
             mirror: true,
             rangemode: "tozero",
+            tickangle: 45,           
             font: {
                 size: 15
               },
         },
         yaxis: {
-            title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size (or beta) of variant i</span>',
+            title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size</span>',
             linewidth: 1,
             mirror: true
         }

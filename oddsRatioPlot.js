@@ -55,7 +55,7 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
             rangemode: "tozero",
         },
         yaxis: {
-            title: `effect size`,
+            title: `βi, effect size`,
             showgrid: true,
             showline: true,
             mirror: true,
@@ -162,26 +162,15 @@ function pgsPlot(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt']
 // odds ratio plot for pgs scores (parse and convert betas to odds ratio)-------------------------------------------------
 function pgsPlot2(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt'], cols = (document.getElementById("PGS23calc")).PGS23data.pgs['cols'], div = pgsPlotDiv) {
     div.style.height = '400px'
-
-    // display pgs scores as beta or odds ratio with rsids or chr and position on the x axis
+    console.log(dt)
+    // display pgs scores as beta with rsids or chr and position on the x axis
     let oddsRatio = {};
-    const rs_idx = cols.indexOf('hm_rsID')
-
-    if (dt[0][rs_idx] == '' || dt[0][rs_idx] == undefined) {
-        dt.forEach((row) => {
-            // effect size or odds ratio (exp)
-           // oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = math.exp(row[4]);
-            oddsRatio["chr_" + row[8] + "_pos_" + row[9]] = row[4]
-
-        })
-    } else {
-        dt.forEach((row) => {
+    dt.forEach((row) => {
             //oddsRatio[row[0]] = math.exp(row[4]);
+        oddsRatio["Chr" + row[9] + "." + row[10]] = row[4]
+     })
 
-            oddsRatio[row[0]] = row[4]
-        })
-    }
-    //sort pgs variants by beta
+        //sort pgs variants by beta
     let oddsRatioSorted = Object.entries(oddsRatio)
         .sort(([, a], [, b]) => a - b)
         .reduce((r, [k, v]) => ({
@@ -208,7 +197,10 @@ function pgsPlot2(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt'
     };
     var data = [trace1];
     var layout = {
-        title: `Effect Sizes or (betas) for PGS Variants`,
+        title: `Effect Sizes (betas) for all PGS Variants`,
+        titlefont: {
+        color: "navy",
+        },
         xaxis: {
             title: `variant rsid/chromosome and position`,
             showline: true,
@@ -217,7 +209,7 @@ function pgsPlot2(dt = (document.getElementById("PGS23calc")).PGS23data.pgs['dt'
             rangemode: "tozero",
         },
         yaxis: {
-            title: `effect size`,
+            title: `βi, effect size`,
             showgrid: true,
             showline: true,
             mirror: true,
