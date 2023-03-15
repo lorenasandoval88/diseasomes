@@ -323,6 +323,7 @@ PGS23.Match2 = function (data, progressReport) {
                 document.getElementById('plotRiskDiv').hidden = true
                 document.getElementById('hidenCalc').hidden = false
                 //plotHazardAllMatchByPos()
+                pgsPlot3()
                 //plotHazardAllMatchByEffect()
                 plotAllMatchByEffect()
             } else {
@@ -333,7 +334,8 @@ PGS23.Match2 = function (data, progressReport) {
                 document.getElementById('plotRiskDiv').hidden = false
                 document.getElementById('hidenCalc').hidden = false
                 //ploting
-                pgsPlot2();
+                //pgsPlot2();
+                pgsPlot3()
                 plotAllMatchByEffect()
 
             }
@@ -550,16 +552,20 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
         let xi = data.pgsMatchMy23[j]
         return `Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}`       
     })
-    console.log(x2)
 
     const y = data.calcRiskScore
     const z = data.aleles
+
     let ii = [...Array(y.length)].map((_,i)=>i)//.filter(i=>y[jj[i]]!=0)
 	//ii = ii.filter(i=>y[jj[i]]) // removing indexes with null betas
     //const ii = [...Array(y.length)].map((_, i) => i)
+    console.log("y", y)
+
+    console.log("y", y.map((yi,i)=>y[jj[ii[i]]]))
+
     let trace0 = {
         x: x2,
-		y: y.map((yi,i)=>y[jj[ii[i]]]),
+		y: y.map((yi,i)=>y[jj[ii[i]]]), // order betas (inreasing)
 		mode: 'markers',
         name: 'Matched',
 		type: 'scatter',
