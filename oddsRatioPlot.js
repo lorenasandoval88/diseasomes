@@ -317,41 +317,88 @@ function pgsPlot3(data = document.getElementById("PGS23calc").PGS23data , div = 
     div.style.height = '500px'
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
+    // separate pgs.dt into 2 (matches and non matches) arrays
+    const match23 = data.pgsMatchMy23.map(function(v) { return v[1]; });
+    const nonMatches = data.pgs.dt.filter(element => !match23.includes(element));
+    const matches = data.pgs.dt.filter(element => match23.includes(element));
+
     let indOther_allele = data.pgs.cols.indexOf('other_allele')
     if (indOther_allele == -1) {
         indOther_allele = data.pgs.cols.indexOf('hm_inferOtherAllele')
     }
     const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
     // sort by effect
-    let jj = [...Array(data.pgs.dt.length)].map((_, i) => i) // match indexes
-    jj = jj.sort((a, b) => (data.pgs.dt[a][4] -data.pgs.dt[b][4]))
-    console.log("jj",jj)
-    //const x = data.pgsMatchMy23.map(xi=>{
-    const x = jj.map(j => {
-        let xi = data.pgs.dt[j]
-        return `Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}
-		<br> <a href="#" target="_blank">${xi[0][0]}</a>`
-        })
-    const x2 = jj.map(j => {
-        let xi = data.pgs.dt[j]
+    let jj = [...Array(matches.length)].map((_, i) => i) // match indexes
+    jj = jj.sort((a, b) => (matches[a][4] -matches[b][4]))
+ 
+    // sort by effect
+    let jj2 = [...Array(nonMatches.length)].map((_, i) => i) // match indexes
+    jj2 = jj2.sort((a, b) => (nonMatches[a][4] -nonMatches[b][4]))
+
+    // matches data
+    const xmatches = jj.map(j => {
+        let xi = matches[j]
         return `Chr${xi[indChr]}.${xi[indPos]}`       
     })
-    console.log("x2",x2)
+    const ymatches = matches
 
-    const y = data.pgs.dt
+    // non matches data
+    console.log(nonMatches)
+     const x_nonmatches = jj2.map(j => {
+         let xi = nonMatches[j]
+         return `Chr${xi[indChr]}.${xi[indPos]}`       
+     })
+    const y_nonmatches = nonMatches
+    
     const z = data.aleles
-    let ii = [...Array(y.length)].map((_,i)=>i)//.filter(i=>y[jj[i]]!=0)
-	//ii = ii.filter(i=>y[jj[i]]) // removing indexes with null betas
-    //const ii = [...Array(y.length)].map((_, i) => i)
-    console.log("ii",ii)
+    let ii = [...Array(ymatches.length)].map((_,i)=>i)
+    let ii2 = [...Array(y_nonmatches.length)].map((_,i)=>i)
+
+
+Match3 = function (data) {
+    let dtMatch = []
+    const n = data.pgs.dt.length
+    const indChr = data.pgs.cols.indexOf('hm_chr')
+    const indPos = data.pgs.cols.indexOf('hm_pos')
+
+
+    i = 0
+    function unMatch(i=0) {
+        if (i < n) {
+        let r = data.pgsMatchMy23[i][1] //  PGS data to be matched
+        console.log(r)
+        // MATCH 23andme chromosome and position TO PGS chromosome and position *******
+
+        let dtMatch_i = data.pgs.dt[i].filter(myr => (myr[indPos] == r[indPos])).
+                        filter(myr => (myr[indChr] == r[indChr]))
+
+        if (dtMatch_i.length > 0) {
+            dtMatch.push(dtMatch_i.concat([r]))
+        }
+        console.log("dtMatch_i",dtMatch_i)
+    }
+    setTimeout(() => {
+        unMatch(i + 1)
+    }, 0)
+}
+unMatch()
+}
+
+var title1 = `${xmatches.length}`+" matched"
+var title2 = `${x_nonmatches.length}`+" not matched"
 
     let trace0 = {
-        x: x2,
-		y: y.map((yi,i)=>y[jj[ii[i]]][4]),
+        x: xmatches,
+		y: ymatches.map((yi,i)=>ymatches[jj[ii[i]]][4]),
 		mode: 'markers',
-        name: 'Matched',
+        name: title1,
 		type: 'scatter',
-		text: x2,
+        transforms: [{
+            type:"sort",
+            target: "y",
+            order:"ascending"
+        }],
+		text: xmatches,
 		marker: { 
 			size: 6,
 			color:'navy',
@@ -365,12 +412,17 @@ function pgsPlot3(data = document.getElementById("PGS23calc").PGS23data , div = 
 		}
     }
     var trace1 = {
-        x: [...Array(ii.length)].map((_,i)=>i+1),
-        y: [0.15, 0.16],
+        x: x_nonmatches,
+		y: y_nonmatches.map((yi,i)=>y_nonmatches[jj2[ii2[i]]][4]),
 		mode: 'markers',
-        name: 'Unmatched',
+        name: title2,
         type: 'scatter',
-		text: x,
+        transforms: [{
+            type:"aggregate",
+            target: "y",
+            order:"ascending"
+        }],
+		text: x_nonmatches,
         marker: {
           size: 6,
           color: 'rgba(156, 165, 196, 0.95)',
@@ -380,12 +432,12 @@ function pgsPlot3(data = document.getElementById("PGS23calc").PGS23data , div = 
           },
         }
       };
-      var tr = [trace0]//,trace1]
+      var tr = [trace0,trace1]
     div.innerHTML = ''
     Plotly.newPlot(div, tr, {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
-        title: `<i style="color:navy">Effect Sizes for ${data.aleles.length} Matched Variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
+        title: `<i style="color:navy">Effect Sizes for All PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')} Variants</i>`,
         xaxis: {
             title: '<span style="font-size:medium">variant, sorted by effect</span>',
             linewidth: 1,

@@ -554,15 +554,15 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
     })
 
     const y = data.calcRiskScore
+
+    // filter by allele (TODO)
     const z = data.aleles
 
     let ii = [...Array(y.length)].map((_,i)=>i)//.filter(i=>y[jj[i]]!=0)
 	//ii = ii.filter(i=>y[jj[i]]) // removing indexes with null betas
     //const ii = [...Array(y.length)].map((_, i) => i)
-    console.log("y", y)
 
-    console.log("y", y.map((yi,i)=>y[jj[ii[i]]]))
-
+    
     let trace0 = {
         x: x2,
 		y: y.map((yi,i)=>y[jj[ii[i]]]), // order betas (inreasing)
@@ -582,28 +582,13 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
 			color:'navy'
 		}
     }
-    var trace1 = {
-        x: [...Array(ii.length)].map((_,i)=>i+1),
-        y: [0.15, 0.16],
-		mode: 'markers',
-        name: 'Unmatched',
-        type: 'scatter',
-		text: x,
-        marker: {
-          size: 6,
-          color: 'rgba(156, 165, 196, 0.95)',
-          line: {
-            color: 'rgba(156, 165, 196, 1.0)',
-            width: 1,
-          },
-        }
-      };
-      var tr = [trace0,trace1]
+
+    var tr = [trace0]
     div.innerHTML = ''
     Plotly.newPlot(div, tr, {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
-        title: `<i style="color:navy">Effect Sizes for ${data.aleles.length} Matched Variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
+        title: `<i style="color:navy">Effect Sizes for ${data.aleles.length} Matched Variants, PRS ${Math.round(data.PRS*1000)/1000}</i>`,
         xaxis: {
             title: '<span style="font-size:medium">variant, sorted by effect</span>',
             linewidth: 1,
