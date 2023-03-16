@@ -322,11 +322,6 @@ function pgsPlot3(data = document.getElementById("PGS23calc").PGS23data , div = 
     const nonMatches = data.pgs.dt.filter(element => !match23.includes(element));
     const matches = data.pgs.dt.filter(element => match23.includes(element));
 
-    let indOther_allele = data.pgs.cols.indexOf('other_allele')
-    if (indOther_allele == -1) {
-        indOther_allele = data.pgs.cols.indexOf('hm_inferOtherAllele')
-    }
-    const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
     // sort by effect
     let jj = [...Array(matches.length)].map((_, i) => i) // match indexes
     jj = jj.sort((a, b) => (matches[a][4] -matches[b][4]))
@@ -425,9 +420,9 @@ var title2 = `${x_nonmatches.length}`+" not matched"
 		text: x_nonmatches,
         marker: {
           size: 6,
-          color: 'rgba(156, 165, 196, 0.95)',
+          color: 'rgb(140, 140, 140)',
           line: {
-            color: 'rgba(156, 165, 196, 1.0)',
+            color: 'rgb(140, 140, 140)',
             width: 1,
           },
         }

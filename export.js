@@ -530,60 +530,163 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
 }
 
 function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('plotAllMatchByEffectDiv')) {
+  //https://community.plotly.com/t/fill-shade-a-chart-above-a-specific-y-value-in-plotlyjs/5133
     div.style.height = '500px'
-    const indChr = data.pgs.cols.indexOf('hm_chr')
-    const indPos = data.pgs.cols.indexOf('hm_pos')
-    let indOther_allele = data.pgs.cols.indexOf('other_allele')
-    if (indOther_allele == -1) {
-        indOther_allele = data.pgs.cols.indexOf('hm_inferOtherAllele')
-    }
-    const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
-    // sort by effect
-    let jj = [...Array(data.calcRiskScore.length)].map((_, i) => i) // match indexes
-    jj.sort((a, b) => (data.calcRiskScore[a] - data.calcRiskScore[b]))
-    //const x = data.pgsMatchMy23.map(xi=>{
-    const x = jj.map(j => {
-        let xi = data.pgsMatchMy23[j]
-        return `Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}
-		<br> <a href="#" target="_blank">${xi[0][0]}</a>`
-        })
+    const match23_2 = data.pgsMatchMy23.map(function(v) { return v[1]; });
 
-    const x2 = jj.map(j => {
-        let xi = data.pgsMatchMy23[j]
-        return `Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}`       
+    // NON-MATCHED ----------------------------------------------
+    const indChr2 = data.pgs.cols.indexOf('hm_chr')
+    const indPos2 = data.pgs.cols.indexOf('hm_pos')
+    // separate pgs.dt into 2 (matches and non matches) arrays
+    const nonMatches = data.pgs.dt.filter(element => !match23_2.includes(element));
+
+    // sort by effect
+    let jj3 = [...Array(nonMatches.length)].map((_, i) => i) // match indexes
+    jj3 = jj3.sort((a, b) => (nonMatches[a][4] -nonMatches[b][4]))
+
+    // non matches data
+    console.log("nonMatches",nonMatches)
+     const x_nonmatches = jj3.map(j => {
+         let xi = nonMatches[j]
+         return `Chr${xi[indChr2]}.${xi[indPos2]}`       
+     })
+    const y_nonmatches = nonMatches
+    
+    let ii3 = [...Array(y_nonmatches.length)].map((_,i)=>i)
+
+    // MATCHED ---------------------------
+    const indChr = data.my23.cols.indexOf('chromosome')
+    const indPos = data.my23.cols.indexOf('position')
+
+    // separate data.pgsMatchMy23 into 3 (dosage #) arrays
+    const dt = {}
+    dt.risk = data.calcRiskScore
+    dt.matches = data.pgsMatchMy23
+    dt.aleles = data.aleles
+    const match23 = data.pgsMatchMy23.map(function(v) { return v[0]; });
+
+    const zero_allele = match23.filter((ele, idx) => data.aleles[idx] == 0);
+    const zero_allele_risk = dt.risk.filter((ele, idx) => dt.aleles[idx] == 0);
+
+    const one_allele = match23.filter((ele, idx) => data.aleles[idx] == 1);
+    const one_allele_risk = dt.risk.filter((ele, idx) => dt.aleles[idx] == 1);
+
+    const two_allele = match23.filter((ele, idx) => data.aleles[idx] == 2);
+    const two_allele_risk = dt.risk.filter((ele, idx) => dt.aleles[idx] == 2);
+
+
+    // sort zero_allele by effect
+    let jj0 = [...Array(zero_allele.length)].map((_, i) => i) // match indexes
+
+    let jj1 = [...Array(one_allele.length)].map((_, i) => i) // match indexes
+
+    let jj2 = [...Array(two_allele.length)].map((_, i) => i) // match indexes
+
+    // x y data
+    const x_zero_allele = jj0.map(j => {
+        let xi = zero_allele[j]
+        return `Chr${xi[indChr]}.${xi[indPos]}`       
+    })
+    const x_one_allele = jj1.map(j => {
+        let xi = one_allele[j]
+        return `Chr${xi[indChr]}.${xi[indPos]}`       
+    })
+    const x_two_allele = jj2.map(j => {
+        let xi = two_allele[j]
+        return `Chr${xi[indChr]}.${xi[indPos]}`       
     })
 
-    const y = data.calcRiskScore
-
-    // filter by allele (TODO)
-    const z = data.aleles
-
-    let ii = [...Array(y.length)].map((_,i)=>i)//.filter(i=>y[jj[i]]!=0)
-	//ii = ii.filter(i=>y[jj[i]]) // removing indexes with null betas
-    //const ii = [...Array(y.length)].map((_, i) => i)
-
+    // calculated risk scores
+    const y0 = zero_allele_risk
+    const y1 = one_allele_risk
+    const y2 = two_allele_risk
     
-    let trace0 = {
-        x: x2,
-		y: y.map((yi,i)=>y[jj[ii[i]]]), // order betas (inreasing)
+    var trace4 = {
+        x: x_nonmatches,
+		y: y_nonmatches.map((yi,i)=>y_nonmatches[jj3[ii3[i]]][4]),
 		mode: 'markers',
-        name: 'Matched',
+        name: 'not matched',
+        type: 'scatter',
+        transforms: [{
+            type:"aggregate",
+            target: "y",
+            order:"ascending"
+        }],
+		text: x_nonmatches,
+        marker: {
+          size: 6,
+          color: 'rgb(140, 140, 140)',
+          line: {
+            color: 'rgb(140, 140, 140)',
+            width: 1,
+          },
+        }
+      };
+    let trace0 = {
+        x: x_zero_allele,
+		y: y0,//.map((yi,i)=>y0[jj0[ii0[i]]]), // order betas (inreasing)
+		mode: 'markers',
+        name: 'no effect allele',
 		type: 'scatter',
-		text: x,
+		text: x_zero_allele,
 		marker: { 
 			size: 6,
-			color:'navy',
+			color:'green',
 			line:{
-				color:'navy',
+				color:'green',
 				width:1
 			}
 		},
-		line:{
-			color:'navy'
-		}
+        transforms: [{
+            type:"sort",
+            target: "y",
+            order:"ascending"
+        }],
+    }
+    let trace1 = {
+        x: x_one_allele,
+		y: y1,//.map((yi,i)=>y0[jj0[ii0[i]]]), // order betas (inreasing)
+		mode: 'markers',
+        name: '1 effect allele',
+		type: 'scatter',
+		text: x_one_allele,
+		marker: { 
+			size: 6,
+			color:'rgb(253,174,97)',
+			line:{
+				color:'rgb(253,174,97)',
+				width:1
+			}
+		},
+        transforms: [{
+            type:"sort",
+            target: "y",
+            order:"ascending"
+        }],
+    }
+    let trace2 = {
+        x: x_two_allele,
+		y: y2,//.map((yi,i)=>y0[jj0[ii0[i]]]), // order betas (inreasing)
+		mode: 'markers',
+        name: '2 effect allele',
+		type: 'scatter',
+		text: x_two_allele,
+		marker: { 
+			size: 6,
+			color:'red',
+			line:{
+				color:'red',
+				width:1
+			}
+		},
+        transforms: [{
+            type:"sort",
+            target: "y",
+            order:"ascending"
+        }],
     }
 
-    var tr = [trace0]
+    var tr = [trace0,trace1,trace2, trace4]
     div.innerHTML = ''
     Plotly.newPlot(div, tr, {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
