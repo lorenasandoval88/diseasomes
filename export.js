@@ -476,7 +476,7 @@ function saveFile(x, fileName) {
 // ploting
 
 function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plotAllMatchByPosDiv')) {
-    div.style.height = '500px'
+    div.style.height = '450px'
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
     let indOther_allele = data.pgs.cols.indexOf('other_allele')
@@ -534,7 +534,7 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
 
 function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('plotAllMatchByEffectDiv')) {
   //https://community.plotly.com/t/fill-shade-a-chart-above-a-specific-y-value-in-plotlyjs/5133
-    div.style.height = '500px'
+    div.style.height = '450px'
     const match23_2 = data.pgsMatchMy23.map(function(v) { return v[1]; });
 
     // NON-MATCHED ----------------------------------------------
@@ -608,28 +608,7 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
     const y0 = zero_allele_risk
     const y1 = one_allele_risk
     const y2 = two_allele_risk
-    
-    var trace4 = {
-        x: x_nonmatches,
-		y: y_nonmatches.map((yi,i)=>y_nonmatches[jj3[ii3[i]]][4]),
-		mode: 'markers',
-        name: 'not matched',
-        type: 'scatter',
-        transforms: [{
-            type:"aggregate",
-            target: "y",
-            order:"ascending"
-        }],
-		text: x_nonmatches,
-        marker: {
-          size: 6,
-          color: 'rgb(140, 140, 140)',
-          line: {
-            color: 'rgb(140, 140, 140)',
-            width: 1,
-          },
-        }
-      };
+
     let trace0 = {
         x: x_zero_allele,
 		y: y0,//.map((yi,i)=>y0[jj0[ii0[i]]]), // order betas (inreasing)
@@ -693,27 +672,54 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
             order:"ascending"
         }],
     }
+        
+    var trace4 = {
+        x: x_nonmatches,
+		y: y_nonmatches.map((yi,i)=>y_nonmatches[jj3[ii3[i]]][4]),
+		mode: 'markers',
+        name: 'not matched',
+        type: 'scatter',
+        transforms: [{
+            type:"aggregate",
+            target: "y",
+            order:"ascending"
+        }],
+		text: x_nonmatches,
+        marker: {
+          size: 6,
+          color: 'rgb(140, 140, 140)',
+          line: {
+            color: 'rgb(140, 140, 140)',
+            width: 1,
+          },
+        }
+      };
 
     var tr = [trace0,trace1,trace2, trace4]
     div.innerHTML = ''
     Plotly.newPlot(div, tr, {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
-        title: `<i style="color:navy">Effect Sizes for ${data.aleles.length} Matched (* 23andMe dosage) and ${data.pgs.dt.length-data.aleles.length} Unmatched Variants (PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}), PRS ${Math.round(data.PRS*1000)/1000}</i>`,
+        title: `<i style="color:navy">PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: Effect Sizes for ${data.aleles.length} Matched (* 23andMe dosage=PRS ${Math.round(data.PRS*1000)/1000}) and ${data.pgs.dt.length-data.aleles.length} Unmatched Variants</i>`,
+        autosize: true,
+        margin: {t:60,r:40,b:180,l:70},
         xaxis: {
-            title: '<span style="font-size:medium">variant, sorted by effect</span>',
             linewidth: 1,
             mirror: true,
-            rangemode: "tozero",
-            tickangle: 45,           
-            font: {
-                size: 15
-              },
+            tickangle: -90,   
+            automargin: true,
+            showline: true,
+            // title: {
+            //     text:`<span style="font-size:medium">variant, sorted by effect</span>`,
+            //     standoff: 70,
+            // },
+            title: `<span style="font-size:medium">variant, sorted by effect</span>`,
         },
         yaxis: {
-            title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size</span>',
             linewidth: 1,
-            mirror: true
+            mirror: true,
+            automargin: true,
+            title: `<span style="font-size:large">βi</span><span style="font-size:medium">, effect size</span>`,
         }
     })
     // add table
@@ -725,7 +731,7 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
 
 function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById('plotAllMatchByEffectDiv2')) {
     //https://community.plotly.com/t/fill-shade-a-chart-above-a-specific-y-value-in-plotlyjs/5133
-      div.style.height = '500px'
+      div.style.height = '450px'
       console.log("plotAllMatchByEffect2")
       const match23_2 = data.pgsMatchMy23.map(function(v) { return v[1]; });
   
@@ -805,7 +811,7 @@ function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById(
           x: x_nonmatches,
           y: y_nonmatches.map((yi,i)=>y_nonmatches[jj3[ii3[i]]][4]),
           mode: 'markers',
-          name: 'matched,not matched',
+          name: 'not matched',
           type: 'scatter',
           transforms: [{
               type:"aggregate",
@@ -868,7 +874,7 @@ function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById(
           x: x_two_allele,
           y: y2,//.map((yi,i)=>y0[jj0[ii0[i]]]), // order betas (inreasing)
           mode: 'markers',
-          name: '2 effect allele',
+          name: 'matched, 2 effect allele',
           type: 'scatter',
           text: x_two_allele,
           marker: { 
@@ -892,12 +898,17 @@ function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById(
           //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
           //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
           title: `<i style="color:navy">PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: Effect Sizes for ${data.aleles.length} Matched and ${data.pgs.dt.length-data.aleles.length} Unmatched Variants, PRS ${Math.round(data.PRS*1000)/1000}</i>`,
+          autosize: true,
+          margin: {t:60,r:40,b:180,l:70},
           xaxis: {
               title: '<span style="font-size:medium">variant, sorted by effect</span>',
               linewidth: 1,
               mirror: true,
+              automargin: true,
               rangemode: "tozero",
-              tickangle: 45,           
+              type: 'category',
+              showline: true,
+              tickangle: -90,           
               font: {
                   size: 15
                 },
@@ -905,7 +916,9 @@ function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById(
           yaxis: {
               title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size</span>',
               linewidth: 1,
-              mirror: true
+              mirror: true,
+              automargin: true,     
+
           }
       })
   }
@@ -1016,7 +1029,7 @@ function plotSummarySnps(){
             var layout = {
               legend: { x: -1 },
               title: 'Variant Type',
-              height: 400,
+              height: 500,
               width: 500
             };
 
