@@ -397,14 +397,7 @@ var title2 = `${x_nonmatches.length}`+" not matched"
 		marker: { 
 			size: 6,
 			color:'navy',
-			line:{
-				color:'navy',
-				width:1
-			}
 		},
-		line:{
-			color:'navy'
-		}
     }
     var trace1 = {
         x: x_nonmatches,
@@ -421,10 +414,6 @@ var title2 = `${x_nonmatches.length}`+" not matched"
         marker: {
           size: 6,
           color: 'rgb(140, 140, 140)',
-          line: {
-            color: 'rgb(140, 140, 140)',
-            width: 1,
-          },
         }
       };
       var tr = [trace0,trace1]
