@@ -613,17 +613,14 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
         x: x_zero_allele,
 		y: y0,//.map((yi,i)=>y0[jj0[ii0[i]]]), // order betas (inreasing)
 		mode: 'markers',
-        name: 'matched,no effect allele',
+        name: 'matched, no effect allele',
 		type: 'scatter',
 		text: x_zero_allele,
-		marker: { 
-			size: 6,
-			color:'green',
-			line:{
-				color:'green',
-				width:1
-			}
-		},
+        marker: { 
+            size: 6,
+            symbol: 'square-open',
+            color: 'navy', //'rgb(102,194,165)',//'green',
+        },
         transforms: [{
             type:"sort",
             target: "y",
@@ -637,14 +634,11 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
         name: 'matched, 1 effect allele',
 		type: 'scatter',
 		text: x_one_allele,
-		marker: { 
-			size: 6,
-			color:'rgb(253,174,97)',
-			line:{
-				color:'rgb(253,174,97)',
-				width:1
-			}
-		},
+        marker: { 
+            symbol: 'triangle-ne',
+            color: 'navy', //'rgb(102,194,165)',//'green',
+              size: 6,
+          },
         transforms: [{
             type:"sort",
             target: "y",
@@ -655,17 +649,19 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
         x: x_two_allele,
 		y: y2,//.map((yi,i)=>y0[jj0[ii0[i]]]), // order betas (inreasing)
 		mode: 'markers',
-        name: 'matched,2 effect allele',
+        name: 'matched, 2 effect alleles',
 		type: 'scatter',
 		text: x_two_allele,
-		marker: { 
-			size: 6,
-			color:'red',
-			line:{
-				color:'red',
-				width:1
-			}
-		},
+        marker: { 
+            symbol: 'square',
+            color: 'navy', //'rgb(102,194,165)',//'green',
+            size: 6,
+                          //name: 'Set 4',
+              line:{
+                  color:'navy',
+                  width:1,
+              }
+            },
         transforms: [{
             type:"sort",
             target: "y",
@@ -688,10 +684,6 @@ function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('
         marker: {
           size: 6,
           color: 'rgb(140, 140, 140)',
-          line: {
-            color: 'rgb(140, 140, 140)',
-            width: 1,
-          },
         }
       };
 
@@ -813,6 +805,7 @@ function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById(
           mode: 'markers',
           name: 'not matched',
           type: 'scatter',
+          
           transforms: [{
               type:"aggregate",
               target: "y",
@@ -822,10 +815,6 @@ function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById(
           marker: {
             size: 6,
             color: 'rgb(140, 140, 140)',
-            line: {
-              color: 'rgb(140, 140, 140)',
-              width: 1,
-            },
           }
         };
       let trace0 = {
@@ -837,11 +826,8 @@ function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById(
           text: x_zero_allele,
           marker: { 
               size: 6,
-              color:'green',
-              line:{
-                  color:'green',
-                  width:1
-              }
+              symbol: 'square-open',
+              color: 'navy', //'rgb(102,194,165)',//'green',
           },
           transforms: [{
               type:"sort",
@@ -857,12 +843,9 @@ function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById(
           type: 'scatter',
           text: x_one_allele,
           marker: { 
+            symbol: 'triangle-ne',
+            color: 'navy', //'rgb(102,194,165)',//'green',
               size: 6,
-              color:'rgb(253,174,97)',
-              line:{
-                  color:'rgb(253,174,97)',
-                  width:1
-              }
           },
           transforms: [{
               type:"sort",
@@ -870,19 +853,22 @@ function plotAllMatchByEffect2(data = PGS23.data, div = document.getElementById(
               order:"ascending"
           }],
       }
+
       let trace2 = {
           x: x_two_allele,
           y: y2,//.map((yi,i)=>y0[jj0[ii0[i]]]), // order betas (inreasing)
           mode: 'markers',
-          name: 'matched, 2 effect allele',
+          name: 'matched, 2 effect alleles',
           type: 'scatter',
           text: x_two_allele,
           marker: { 
-              size: 6,
-              color:'red',
+            symbol: 'square',
+            color: 'navy', //'rgb(102,194,165)',//'green',
+            size: 6,
+                          //name: 'Set 4',
               line:{
-                  color:'red',
-                  width:1
+                  color:'navy',
+                  width:1,
               }
           },
           transforms: [{
