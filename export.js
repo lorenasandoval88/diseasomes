@@ -587,7 +587,7 @@ undefined
     matched_and_nontMatched.not_matched.color = Array(not_matched.length).fill("rgb(140, 140, 140)")
     matched_and_nontMatched.not_matched.opacity = Array(not_matched.length).fill("0.5")
     matched_and_nontMatched.not_matched.symbol = Array(not_matched.length).fill("x")
-
+    matched_and_nontMatched.not_matched.hoverinfo = Array(not_matched.length).fill("all")
 
     // ALL VARIANTS -------------------------------------------------------------------------------------
     const allData = matchData2.concat(notMatchData)
@@ -611,6 +611,8 @@ undefined
     matched_and_nontMatched.all_pgs_variants.color = Array(allData_sorted.length).fill("white")
     matched_and_nontMatched.all_pgs_variants.opacity = Array(allData_sorted.length).fill("0")
     matched_and_nontMatched.all_pgs_variants.symbol = Array(allData_sorted.length).fill("0")
+    matched_and_nontMatched.all_pgs_variants.hoverinfo = Array(allData_sorted.length).fill("none")
+
 
     // MATCHED BY ALLELES---------------------------
     // separate data.pgsMatchMy23 into 3 (dosage #) arrays
@@ -665,7 +667,13 @@ undefined
     matched_and_nontMatched.matched_by_alleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
     matched_and_nontMatched.matched_by_alleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
     matched_and_nontMatched.matched_by_alleles.two_allele.symbol = Array(two_allele.length).fill("square")
-    console.log(matched_and_nontMatched)
+    matched_and_nontMatched.matched_by_alleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
+    matched_and_nontMatched.matched_by_alleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
+    matched_and_nontMatched.matched_by_alleles.two_allele.symbol = Array(two_allele.length).fill("square")
+    matched_and_nontMatched.matched_by_alleles.zero_allele.hoverinfo = Array(zero_allele.length).fill("all")
+    matched_and_nontMatched.matched_by_alleles.one_allele.hoverinfo = Array(one_allele.length).fill("all")
+    matched_and_nontMatched.matched_by_alleles.two_allele.hoverinfo = Array(two_allele.length).fill("all")
+    console.log('matched_and_nontMatched',matched_and_nontMatched)
    
 // add matched,all, zero, one and two allele into new array
  //https://stackoverflow.com/questions/64055094/push-multiple-arrays-with-keys-into-single-array
@@ -726,13 +734,14 @@ console.log("newItems",newItems)
         y: newArray.map(a => a.chrPos),
         x: newArray.map(a => a.risk),
         name: category,
+        hoverinfo: newArray[0].hoverinfo,
         mode: 'markers',
-        type: 'scatter',
+        //type: 'scatter',
         opacity: newArray[0].opacity,
         marker : {
             color: newArray[0].color,
             symbol: newArray[0].symbol,
-            size: newArray[0].size
+            size: newArray[0].size,
         }
       })
     })
