@@ -584,7 +584,8 @@ undefined
     matched_and_nontMatched.not_matched.chrPos = not_matched_chrPos
     matched_and_nontMatched.not_matched.dt = not_matched
     matched_and_nontMatched.not_matched.risk = not_matched_risk
-    matched_and_nontMatched.not_matched.category = Array(not_matched.length).fill(`${not_matched.length} not matched`)
+    const fill_no_match = `${not_matched.length} not matched`
+    matched_and_nontMatched.not_matched.category = Array(not_matched.length).fill(fill_no_match)
     matched_and_nontMatched.not_matched.size = Array(not_matched.length).fill("8")
     matched_and_nontMatched.not_matched.color = Array(not_matched.length).fill("rgb(140, 140, 140)")
     matched_and_nontMatched.not_matched.opacity = Array(not_matched.length).fill("0.5")
