@@ -16,7 +16,7 @@ if (typeof (JSZip) == 'undefined') {
 
 if (typeof (Plotly) == 'undefined') {
     let s = document.createElement('script')
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js'
+    s.src = 'https://cdn.plot.ly/plotly-2.18.2.min.js'
     document.head.appendChild(s)
 }
 
@@ -200,15 +200,15 @@ PGS23.loadCalc = async () => {
     <input id="progressCalc" type="range" value=0 hidden=false>
     </p>
 	<textarea id="my23CalcTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea>
-	<div id="plotRiskDiv">
+	<div id="plotRiskDiv" style="height:100px; width: 100px">
     <div id="pgsPlotDiv">..</div>
-    <div id="plotAllMatchByEffectDiv">...</div>
+    <div style="height:100px;width: 100px" id="plotAllMatchByEffectDiv">...</div>
     </div>
 	
 	<hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
 	<div id="tabulateAllMatchByEffectDiv"></div>
 	`
-
+   
     div.querySelector('#matchesJSON').onclick = evt => {
         let data = document.getElementById("PGS23calc").PGS23data
         saveFile(JSON.stringify(data.pgsMatchMy23), data.my23.info.slice(0, -4) + '_match_PGS_calcRiskScore' + data.pgs.id + '.json')
@@ -334,6 +334,7 @@ PGS23.Match2 = function (data, progressReport) {
                 document.getElementById('hidenCalc').hidden = false
                 //ploting
                 plotAllMatchByEffect4(PGS23.data, document.getElementById('plotAllMatchByEffectDiv'))
+               console.log(document.getElementsByClassName("js-plotly-plot"))//document.getElementById('div.plot-container.plotly').style.height= "5000px";
             }
             document.querySelector('#buttonCalculateRisk').disabled = false
             document.querySelector('#buttonCalculateRisk').style.color = 'blue'
@@ -558,7 +559,13 @@ undefined
     const matched_chrPos = matched.map(j => {
         return `Chr${j[indChr]}.${j[indPos]}`
     })
-    
+    // matched_and_nontMatched['matched'] = {}
+    // matched_and_nontMatched.matched.chrPos = matched_chrPos
+    // matched_and_nontMatched.matched.dt = matched
+    // matched_and_nontMatched.matched.alleles = matched_alleles
+    // matched_and_nontMatched.matched.risk = matched_risk
+    // matched_and_nontMatched.matched.category = Array(matched.length).fill("matched")
+
     // NON-MATCHED --------------------------------------------------------------------------------------------
     const notMatchData = data.pgs.dt.filter(element => !matched.includes(element)); // "not matched" data
 
@@ -577,7 +584,7 @@ undefined
     matched_and_nontMatched.not_matched.chrPos = not_matched_chrPos
     matched_and_nontMatched.not_matched.dt = not_matched
     matched_and_nontMatched.not_matched.risk = not_matched_risk
-    matched_and_nontMatched.not_matched.category = Array(not_matched.length).fill(`{not_matched.length} not matched`)
+    matched_and_nontMatched.not_matched.category = Array(not_matched.length).fill(`${not_matched.length} not matched`)
     matched_and_nontMatched.not_matched.size = Array(not_matched.length).fill("8")
     matched_and_nontMatched.not_matched.color = Array(not_matched.length).fill("rgb(140, 140, 140)")
     matched_and_nontMatched.not_matched.opacity = Array(not_matched.length).fill("0.5")
@@ -647,9 +654,9 @@ undefined
     matched_and_nontMatched.matched_by_alleles.zero_allele.risk = zero_allele_idx.map(i => matched_risk[i]);
     matched_and_nontMatched.matched_by_alleles.one_allele.risk = one_allele_idx.map(i => matched_risk[i]);
     matched_and_nontMatched.matched_by_alleles.two_allele.risk = two_allele_idx.map(i => matched_risk[i]);
-    matched_and_nontMatched.matched_by_alleles.zero_allele.category = Array(zero_allele.length).fill(`${zero_allele.length} matched, zero alleles`)
-    matched_and_nontMatched.matched_by_alleles.one_allele.category = Array(one_allele.length).fill(`${one_allele.length} matched, one allele`)
-    matched_and_nontMatched.matched_by_alleles.two_allele.category = Array(two_allele.length).fill(`${two_allele.length} matched, two alleles`)
+    matched_and_nontMatched.matched_by_alleles.zero_allele.category = Array(zero_allele.length).fill(`${zero_allele.length } matched, zero alleles`)
+    matched_and_nontMatched.matched_by_alleles.one_allele.category = Array(one_allele.length).fill(`${one_allele.length } matched, one allele`)
+    matched_and_nontMatched.matched_by_alleles.two_allele.category = Array(two_allele.length).fill(`${two_allele.length } matched, two alleles`)
     matched_and_nontMatched.matched_by_alleles.zero_allele.size = Array(zero_allele.length).fill("6")
     matched_and_nontMatched.matched_by_alleles.one_allele.size = Array(one_allele.length).fill("8")
     matched_and_nontMatched.matched_by_alleles.two_allele.size = Array(two_allele.length).fill("10")
@@ -668,10 +675,6 @@ undefined
     matched_and_nontMatched.matched_by_alleles.zero_allele.hoverinfo = Array(zero_allele.length).fill("all")
     matched_and_nontMatched.matched_by_alleles.one_allele.hoverinfo = Array(one_allele.length).fill("all")
     matched_and_nontMatched.matched_by_alleles.two_allele.hoverinfo = Array(two_allele.length).fill("all")
-    matched_and_nontMatched.matched_by_alleles.zero_allele.hoverinfo = Array(zero_allele.length).fill("all")
-    matched_and_nontMatched.matched_by_alleles.one_allele.hoverinfo = Array(one_allele.length).fill("all")
-    matched_and_nontMatched.matched_by_alleles.two_allele.hoverinfo = Array(two_allele.length).fill("all")
-    
     console.log('matched_and_nontMatched',matched_and_nontMatched)
    
 // add matched,all, zero, one and two allele into new array
@@ -687,7 +690,7 @@ const items =  Push(matched_and_nontMatched.all_pgs_variants, matched_and_nontMa
     Push(matched_and_nontMatched.matched_by_alleles.one_allele, matched_and_nontMatched.matched_by_alleles.one_allele.risk)).concat(
     Push(matched_and_nontMatched.matched_by_alleles.two_allele, matched_and_nontMatched.matched_by_alleles.two_allele.risk))
 
-console.log("items",items)
+console.log("items--------",items)
 
 // make new objects with id, all mapped to one condition sorted by value
 //https://stackoverflow.com/questions/979256/sorting-an-array-of-objects-by-property-values
@@ -695,7 +698,7 @@ console.log("items",items)
 //https://stackoverflow.com/questions/4894142/making-a-subset-of-an-array-of-javascript-objects-based-on-one-of-their-properti
 
 const cache = []
-const chooseData = [" ", "matched, zero alleles","matched, one allele","matched, two alleles","not matched"]
+const chooseData = [" ",`${zero_allele.length } matched, zero alleles`,`${one_allele.length } matched, one allele`,`${two_allele.length } matched, two alleles`, `${not_matched.length} not matched`]
 // '#1f77b4',  // muted blue
 // '#ff7f0e',  // safety orange
 // '#2ca02c',  // cooked asparagus green
@@ -719,16 +722,16 @@ const newItems = items
                             })
                     .sort((a, b) => parseFloat(a.risk) - parseFloat(b.risk))
 
-console.log("newItems????????????????",newItems)
+console.log("newItems----------------------------------",newItems)
     // TODO------------------------------------------
     const conditions = new Set(newItems.map(a => a.category));
+    console.log("conditions",conditions)
     const traces = [];
     conditions.forEach(function(category) {
+        console.log("category",category)
       var newArray = newItems.filter(function(el) {
         return el.category == category;
       });
-      console.log("newArray????",newArray)
-
         traces.push({
         y: newArray.map(a => a.chrPos),
         x: newArray.map(a => a.risk),
@@ -747,13 +750,13 @@ console.log("newItems????????????????",newItems)
     //------------------------------------------
     var layout = {
     title: `<i style="color:navy">PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: Effect Sizes for ${data.aleles.length} Matched and ${data.pgs.dt.length-data.aleles.length} Unmatched Variants, PRS ${Math.round(data.PRS*1000)/1000}</i>`,
-    // style:{
-    //      width: '100%', height: '100%' },
-    //autosize: true,
-    height: '8000px', 
+     style:{
+         width: '100%', height: '100%' },
+   autosize: true,
+    height: '5000px',//(window.innerHeight+5000)+'px', 
     margin: {
                 //t: 60,
-                r: 20,
+                r: 10,
                // b: 10,
                 l: 150
             },
@@ -779,13 +782,14 @@ console.log("newItems????????????????",newItems)
                 title: '<span style="font-size:large">β</span>',
                 linewidth: 1,
                 mirror: true,
-                automargin: true,
+               // automargin: true,
     
             }
      }
 
     dv.innerHTML = ''
-    Plotly.newPlot(dv, traces, layout)
+    var config = {responsive: true}
+    Plotly.newPlot(dv, traces, layout, config)
     console.log("traces",traces)
       tabulateAllMatchByEffect()
 }
