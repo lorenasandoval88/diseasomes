@@ -200,9 +200,9 @@ PGS23.loadCalc = async () => {
     <input id="progressCalc" type="range" value=0 hidden=false>
     </p>
 	<textarea id="my23CalcTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea>
-	<div id="plotRiskDiv" style="height:100px; width: 100px">
+	<div id="plotRiskDiv" style="height:600px;">
     <div id="pgsPlotDiv">..</div>
-    <div style="height:100px;width: 100px" id="plotAllMatchByEffectDiv">...</div>
+    <div style="height:300px;" id="plotAllMatchByEffectDiv">...</div>
     </div>
 	
 	<hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
@@ -788,6 +788,7 @@ console.log("newItems----------------------------------",newItems)
      }
 
     dv.innerHTML = ''
+    // FIX Plot https://github.com/plotly/angular-plotly.js/issues/48
     var config = {responsive: true}
     Plotly.newPlot(dv, traces, layout, config)
     console.log("traces",traces)
