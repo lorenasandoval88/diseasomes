@@ -200,8 +200,7 @@ PGS23.loadCalc = async () => {
     <input id="progressCalc" type="range" value=0 hidden=false>
     </p>
 	<textarea id="my23CalcTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea>
-	<div id="plotRiskDiv" style="height:600px;">
-    <div id="pgsPlotDiv">..</div>
+	<div id="plotRiskDiv" style="height:300px;">
     <div style="height:300px;" id="plotAllMatchByEffectDiv">...</div>
     </div>
 	
@@ -514,7 +513,7 @@ function plotAllMatchByPos(data = PGS23.data, div = document.getElementById('plo
         xaxis: {
             title: '<span style="font-size:large">βi</span><span style="font-size:medium">, effect size</span>',
             linewidth: 1,
-            mirror: true
+            mirror: true,
         },
         // margin: {
         //     l: 100,
@@ -585,6 +584,7 @@ undefined
     matched_and_nontMatched.not_matched.dt = not_matched
     matched_and_nontMatched.not_matched.risk = not_matched_risk
     const fill_no_match = `${not_matched.length} not matched`
+    console.log("fill_no_match",fill_no_match)
     matched_and_nontMatched.not_matched.category = Array(not_matched.length).fill(fill_no_match)
     matched_and_nontMatched.not_matched.size = Array(not_matched.length).fill("8")
     matched_and_nontMatched.not_matched.color = Array(not_matched.length).fill("rgb(140, 140, 140)")
@@ -691,7 +691,9 @@ const items =  Push(matched_and_nontMatched.all_pgs_variants, matched_and_nontMa
     Push(matched_and_nontMatched.matched_by_alleles.one_allele, matched_and_nontMatched.matched_by_alleles.one_allele.risk)).concat(
     Push(matched_and_nontMatched.matched_by_alleles.two_allele, matched_and_nontMatched.matched_by_alleles.two_allele.risk))
 
-console.log("items--------",items)
+
+plotRiskDiv.style.height= 450+ data.pgs.dt.length * 3 +'px'
+plotAllMatchByEffectDiv.style.height= 450+ data.pgs.dt.length * 3 +'px'
 
 // make new objects with id, all mapped to one condition sorted by value
 //https://stackoverflow.com/questions/979256/sorting-an-array-of-objects-by-property-values
@@ -700,21 +702,7 @@ console.log("items--------",items)
 
 const cache = []
 const chooseData = [" ",`${zero_allele.length } matched, zero alleles`,`${one_allele.length } matched, one allele`,`${two_allele.length } matched, two alleles`, `${not_matched.length} not matched`]
-// '#1f77b4',  // muted blue
-// '#ff7f0e',  // safety orange
-// '#2ca02c',  // cooked asparagus green
-// '#d62728',  // brick red
-// '#9467bd',  // muted purple
-// '#8c564b',  // chestnut brown
-// '#e377c2',  // raspberry yogurt pink
-// '#7f7f7f',  // middle gray
-// '#bcbd22',  // curry yellow-green
-// '#17becf'   // blue-teal
 
-// change sizes and shapes
-// make vertical plot
-// squares 
-// remove "effect size"
 const newItems = items
                     .filter(function (item) { if (chooseData.indexOf(item.category) === -1) { 
                         cache.push(item); return false; 
@@ -723,10 +711,9 @@ const newItems = items
                             })
                     .sort((a, b) => parseFloat(a.risk) - parseFloat(b.risk))
 
-console.log("newItems----------------------------------",newItems)
+console.log("newItems--------",newItems)
     // TODO------------------------------------------
     const conditions = new Set(newItems.map(a => a.category));
-    console.log("conditions",conditions)
     const traces = [];
     conditions.forEach(function(category) {
         console.log("category",category)
@@ -750,23 +737,17 @@ console.log("newItems----------------------------------",newItems)
     })
     //------------------------------------------
     var layout = {
-    title: `<i style="color:navy">PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: Effect Sizes for ${data.aleles.length} Matched and ${data.pgs.dt.length-data.aleles.length} Unmatched Variants, PRS ${Math.round(data.PRS*1000)/1000}</i>`,
-     style:{
-         width: '100%', height: '100%' },
+    title: `<span style="color:navy">PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: Effect Sizes for ${data.aleles.length} Matched and ${data.pgs.dt.length-data.aleles.length} Unmatched Variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
    autosize: true,
-    height: '5000px',//(window.innerHeight+5000)+'px', 
-    margin: {
-                //t: 60,
-                r: 10,
-               // b: 10,
-                l: 150
-            },
+    margin: {r: 10, l: 150},
+    legend : {font :{size : 16}},
     yaxis: {
+        style:{
+        },
                 linewidth: 1,
                 mirror: true,
                 automargin: true,
                 title: {
-                    //text: "Temprature",
                     standoff: 90
                   },
                 rangemode: "tozero",
@@ -774,25 +755,30 @@ console.log("newItems----------------------------------",newItems)
                 showline: true,
                 tickangle: 0,
                 font: {
-                    size: 15
+                    size: 16
                 },
                 title: '<span style="font-size:medium">variants , sorted by <span style="font-size:large">β</span></span>',
 
             },
     xaxis: {
+        font: {
+            size: 16
+        },
                 title: '<span style="font-size:large">β</span>',
                 linewidth: 1,
                 mirror: true,
-               // automargin: true,
-    
+                rangemode: "tozero",
             }
      }
 
     dv.innerHTML = ''
+    // auto resize plot height, width is responsive, but not height
+
     // FIX Plot https://github.com/plotly/angular-plotly.js/issues/48
     var config = {responsive: true}
     Plotly.newPlot(dv, traces, layout, config)
     console.log("traces",traces)
+    console.log("plotAllMatchByEffectDiv.style.height ",plotAllMatchByEffectDiv.style.height)
       tabulateAllMatchByEffect()
 }
 function plotAllMatchByEffect(data = PGS23.data, div = document.getElementById('plotAllMatchByEffectDiv')) {
