@@ -691,8 +691,8 @@ const items =  Push(all_pgs_variants.all, all_pgs_variants.all.risk).concat(
     Push(all_pgs_variants.matched_by_alleles.two_allele, all_pgs_variants.matched_by_alleles.two_allele.risk))
 
 
-plotRiskDiv.style.height= 850+ data.pgs.dt.length * 4 +'px'
-plotAllMatchByEffectDiv.style.height= 850+ data.pgs.dt.length * 4 +'px'
+plotRiskDiv.style.height= 1050+ data.pgs.dt.length * 3 +'px'
+plotAllMatchByEffectDiv.style.height= 1050+ data.pgs.dt.length * 3 +'px'
 
 // make new objects with id, all mapped to one condition sorted by value
 //https://stackoverflow.com/questions/979256/sorting-an-array-of-objects-by-property-values
@@ -735,10 +735,12 @@ console.log("plotData-------------------------",plotData)
     })
     //------------------------------------------
     var layout = {
-    title: `<span style="color:navy">PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')} β's for ${data.alleles.length} Matched and ${data.pgs.dt.length-data.alleles.length} Unmatched Variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
+    title: `<span style="color:navy">PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.alleles.length} Matched and ${data.pgs.dt.length-data.alleles.length} Unmatched Variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
    autosize: true,
-    margin: {r: 10, l: 150, t:27, b:26},
-    legend : {font :{size : 13}},
+    margin: {r: 10, l: 150, t: 220,b:35},
+    showlegend: true,
+    legend : {orientation : 'v', x:0.2,y :4.1,font :{size : 13}},
+   // standoff: 90,
     yaxis: {
         style:{
         },
@@ -753,7 +755,7 @@ console.log("plotData-------------------------",plotData)
                 showline: true,
                 tickangle: 0,
                 tickfont: {
-                    size: 10
+                    size: 10.1
                 },
                 title: '<span style="font-size:medium">variants , sorted by <span style="font-size:large">β</span></span>',
 
