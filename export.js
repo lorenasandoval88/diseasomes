@@ -1180,7 +1180,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     div.appendChild(tb)
     let thead = document.createElement('thead')
     tb.appendChild(thead)
-    thead.innerHTML = `<tr><th align="left">#</th><th align="left"> ~ 23andMe alleles</th><th align="left"> ~ dosage</th><th align="left">~ ß*dosage</th><th align="left">~ variant</th><th align="right">~ dbSNP  </th><th align="left">~ SNPedia ~</th></tr>`
+    thead.innerHTML = `<tr><th align="left">#</th><th align="left"> 23andMe alleles</th><th align="left"> ~ dosage</th><th align="left">~ ß*dosage</th><th align="left">~ variant</th><th align="right">~ dbSNP  </th><th align="left">~ SNPedia </th></tr>`
     let tbody = document.createElement('tbody')
     tb.appendChild(tbody)
     const indChr = data.pgs.cols.indexOf('hm_chr')
