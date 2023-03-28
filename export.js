@@ -355,7 +355,7 @@ function ui(targetDiv = document.body) {
     div.id = 'prsCalcUI'
     div.innerHTML = `
     <p>
-	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targetted by the PGS entry based on <br>PRS j  =  exp( ∑jN  𝛽i * dosage ij ).
+	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targetted by the PGS entry based on <br>PRS  =  exp( ∑ N  𝛽i * dosage i ).
     </p>
     <hr>
     `
@@ -1180,7 +1180,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     div.appendChild(tb)
     let thead = document.createElement('thead')
     tb.appendChild(thead)
-    thead.innerHTML = `<tr><th align="left">#</th><th align="left"> 23andMe alleles</th><th align="left"> ~ dosage</th><th align="left">~ ß*dosage</th><th align="left">~ variant</th><th align="right">~ dbSNP  </th><th align="left">~ SNPedia </th></tr>`
+    thead.innerHTML = `<tr><th align="left">#</th><th align="left"> 23andMe alleles</th><th align="left"> | PGS ß</th><th align="left"> | dosage</th><th align="left"> | PGS ß*dosage</th><th align="left"> | variant</th><th align="right"> | dbSNP  </th><th align="left"> | SNPedia </th></tr>`
     let tbody = document.createElement('tbody')
     tb.appendChild(tbody)
     const indChr = data.pgs.cols.indexOf('hm_chr')
@@ -1199,7 +1199,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         tbody.appendChild(row)
         let xi = data.pgsMatchMy23[ind]
         let yi = data.alleles[ind]
-        row.innerHTML = `<tr><td align="left">${i+1}) </td><td align="center">${xi[0][3]}</td><td align="center">${yi}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
+        row.innerHTML = `<tr><td align="left">${i+1}) </td><td align="center">${xi[0][3]}</td><td align="center">${xi[1][4]}</td><td align="center">${yi}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
     })
 
     // <div id='plotSnpConsequence' style='display: inline-block;' ></div>
