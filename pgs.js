@@ -302,6 +302,7 @@ pgs.Match2=async(data, progressReport)=>{
     function funMatch(i = 0, matchFloor = 0) {
         if (i < n) {
             let r = data.pgs.dt[i] //  PGS data to be matched
+            console.log("line 263---, r:",i, r)
 
             if (dtMatch.length > 0) {
                 matchFloor = dtMatch.at(-1)[0][4]
@@ -424,6 +425,7 @@ pgs.getArrayBuffer=async(range=[0,1000],url='https://ftp.ncbi.nih.gov/snp/organi
 
 // create PGS obj and data
 pgs.parsePGS=async(i = 4)=>{
+    console.log("parsePGS***********************")
     let obj = {
         id: i
     }

@@ -5,7 +5,7 @@
 // Specifically the pgs library is a dependency satisfied by script tag loading
 if (typeof (pgs) == 'undefined') {
     let s = document.createElement('script')
-    s.src = 'https://episphere.github.io/pgs/pgs.js'
+    s.src = 'https://episphere.github.io/prs/pgs.js'
     document.head.appendChild(s)
 }
 if (typeof (JSZip) == 'undefined') {
@@ -27,7 +27,6 @@ let PGS23 = {
     // a global variable that is not shared by export
     data: {}
 }
-
 // in case someone wants to see it in the console
 
 PGS23.loadPGS = async (i = 1) => {
@@ -78,6 +77,8 @@ PGS23.loadPGS = async (i = 1) => {
             console.log('largeFile processing ...')
             //div.querySelector('#summarySpan').hidden = true
             let data = document.getElementById("PGS23calc").PGS23data
+            console.log("data.pgs----------33333333333-",data)
+
             if (data.pgs) {
                 delete data.pgs
             }
@@ -99,7 +100,9 @@ PGS23.loadPGS = async (i = 1) => {
             }
             div.querySelector('#checkLargeFile').checked = false
             div.querySelector('#showLargeFile').hidden = true
-            PGS23.pgsObj = await parsePGS(i)
+            PGS23.pgsObj = await parsePGS(i) // raw pgs dt
+            console.log("PGS23.pgsObj &&&&&",PGS23.pgsObj)
+
             div.querySelector('#pubDOI').href = 'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]
             div.querySelector('#trait_mapped').innerHTML = `<span style="color:maroon">${PGS23.pgsObj.meta.trait_mapped}</span>`
             div.querySelector('#dataRows').innerHTML = PGS23.pgsObj.dt.length
@@ -110,9 +113,12 @@ PGS23.loadPGS = async (i = 1) => {
             }
             //PGS23.data.pgs=pgsObj
             const cleanObj = structuredClone(PGS23.pgsObj)
+
             cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
             delete cleanObj.txt
-            PGS23.data.pgs = cleanObj
+            PGS23.data.pgs = cleanObj //edited pgs dt
+            PGS23.data.raw_pgs = PGS23.pgsObj
+
             //console.log(PGS23.data.pgs.dt) // defined
             div.querySelector('#summarySpan').hidden = false
 
@@ -236,12 +242,13 @@ PGS23.loadCalc = async () => {
             document.querySelector('#buttonCalculateRisk').style.color = 'silver'
             data.pgsMatchMy23 = []
             PGS23.Match2(data)
+            //console.log("PGS23.Match2(data)",PGS23.Match2(data))
+            //console.log("PGS23.Match2(data)",data)
         }
     }
 }
 
 
-//LORENA: ask Montse if the effect size should be plugged directly from the PGS entry!
 
 PGS23.Match2 = function (data, progressReport) {
     // extract harmonized data from PGS entry first
@@ -249,6 +256,8 @@ PGS23.Match2 = function (data, progressReport) {
     const indPos = data.pgs.cols.indexOf('hm_pos')
     // match
     let dtMatch = []
+    let dtMatch2 = []
+
     const cgrInd = data.pgs.cols.indexOf('hm_chr')
     const posInd = data.pgs.cols.indexOf('hm_pos')
     const n = data.pgs.dt.length
@@ -260,19 +269,32 @@ PGS23.Match2 = function (data, progressReport) {
     function funMatch(i = 0, matchFloor = 0) {
         if (i < n) {
             let r = data.pgs.dt[i] //  PGS data to be matched
+            let r2 = data.raw_pgs.dt[i] //  PGS data to be matched
 
+            console.log("data.pgs.dt[i]----------",i,data.pgs.dt[i][4])
+//console.log("line 263, r*********",i, r)
             if (dtMatch.length > 0) {
                 matchFloor = dtMatch.at(-1)[0][4]
             }
             // MATCH 23andme chromosome and position TO PGS chromosome and position *******
             var regexPattern = new RegExp([r[2],r[3]].join('|'))
+            console.log("regexPattern----------",i,regexPattern)
 
             let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos])).
                             filter(myr => (myr[1] == r[indChr])).
                             filter(myr => regexPattern.test(myr[3]))//also filter by pgs alt or effect allele match			//let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
-
+                            console.log("dtMatch_i----------",i,dtMatch_i)
+  let dtMatch_i2 = data.my23.dt.filter(myr => (myr[2] == r2[indPos])).
+                            filter(myr => (myr[1] == r2[indChr])).
+                            filter(myr => regexPattern.test(myr[3]))//also filter by pgs alt or effect allele match			//let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
+            
             if (dtMatch_i.length > 0) {
                 dtMatch.push(dtMatch_i.concat([r]))
+               // console.log("dtMatch_i",dtMatch_i)
+            }
+            if (dtMatch_i2.length > 0) {
+                dtMatch2.push(dtMatch_i2.concat([r2]))
+               // console.log("dtMatch_i",dtMatch_i)
             }
             progressCalc.value = 100 * i / n
             setTimeout(() => {
@@ -280,6 +302,8 @@ PGS23.Match2 = function (data, progressReport) {
             }, 0)
         } else {
             data.pgsMatchMy23 = dtMatch
+            data.pgsMatchMy23_2 = dtMatch2
+
             let calcRiskScore = []
             let alleles = []
             // calculate Risk
@@ -399,6 +423,7 @@ async function parsePGS(i = 4) {
     if (obj.dt.slice(-1).length == 1) {
         obj.dt.pop(-1)
     }
+    console.log(obj.dt)
     // parse numerical types
     //const indInt=obj.cols.map((c,i)=>c.match(/_pos/g)?i:null).filter(x=>x)
     const indInt = [obj.cols.indexOf('chr_position'), obj.cols.indexOf('hm_pos')]
@@ -419,6 +444,8 @@ async function parsePGS(i = 4) {
         })
         return r
     })
+    console.log("obj.dt",obj.dt)
+
     // */
     // parse metadata
     obj.meta.txt.filter(r => (r[1] != '#')).forEach(aa => {
@@ -1173,8 +1200,6 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     // jj.sort((a, b) => (abs[b] - abs[a])) // indexes sorted by absolute value
     jj.sort((a, b) => (data.calcRiskScore[a] - data.calcRiskScore[b])) // indexes sorted by absolute value
 
-  
-
     // tabulate
     let tb = document.createElement('table')
     div.appendChild(tb)
@@ -1198,8 +1223,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         let row = document.createElement('tr')
         tbody.appendChild(row)
         let xi = data.pgsMatchMy23[ind]
-        let yi = data.alleles[ind]
-        row.innerHTML = `<tr><td align="left">${i+1}) </td><td align="center">${xi[0][3]}</td><td align="center">${xi[1][4]}</td><td align="center">${yi}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
+        row.innerHTML = `<tr><td align="left">${i+1}) </td><td align="left">${xi[0][3]}</td><td align="left">${data.pgsMatchMy23_2[ind][1][4]}</td><td align="center">${data.alleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
     })
 
     // <div id='plotSnpConsequence' style='display: inline-block;' ></div>
