@@ -556,8 +556,8 @@ function plotAllMatchByEffect4(data,dv) {
     // TODO: add variable for plot title as text string!!! Lorena
     //https://community.plotly.com/t/fill-shade-a-chart-above-a-specific-y-value-in-plotlyjs/5133
    // dv.style.height = '950px'
-    //const matched_betas = data.pgsMatchMy23.map(function(v){return v[1]}).map((yi,i)=>yi[4])
-    const matched_betas = data.calcRiskScore
+    const matched_betas = data.pgsMatchMy23_2.map(function(v){return v[1]}).map((yi,i)=>yi[4])
+    //const matched_betas = data.calcRiskScore
     const all_pgs_variants = {}
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
@@ -1198,7 +1198,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
    jj = jj.filter(x=>data.calcRiskScore[x]!=0)
     // let abs = data.calcRiskScore.map(x => Math.abs(x))
     // jj.sort((a, b) => (abs[b] - abs[a])) // indexes sorted by absolute value
-    jj.sort((a, b) => (data.calcRiskScore[a] - data.calcRiskScore[b])) // indexes sorted by absolute value
+    jj.sort((a, b) => (data.calcRiskScore[b] - data.calcRiskScore[a])) // indexes sorted by absolute value
 
     // tabulate
     let tb = document.createElement('table')
