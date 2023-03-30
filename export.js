@@ -195,16 +195,15 @@ PGS23.loadCalc = async () => {
     <input id="progressCalc" type="range" value=0 hidden=false>
     </p>
 	<textarea id="my23CalcTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea>
-    <hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
 
 	<div id="plotRiskDiv" style="height:300px;">
+    <hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
+
     <div id="tabulateAllMatchByEffectDiv"></div>
     <div style="height:300px;" id="pieChartDiv">...</div>
     <div style="height:300px;" id="plotAllMatchByEffectDiv">...</div>
     </div>
-	
 	`
-   
     div.querySelector('#matchesJSON').onclick = evt => {
         
         let data = document.getElementById("PGS23calc").PGS23data
@@ -557,7 +556,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     all_pgs_variants.all.color = Array(allData_sorted.length).fill("green")
     all_pgs_variants.all.opacity = Array(allData_sorted.length).fill("0")
     all_pgs_variants.all.symbol = Array(allData_sorted.length).fill("square")
-    all_pgs_variants.all.hoverinfo = Array(allData_sorted.length).fill("all")
+    all_pgs_variants.all.hoverinfo = Array(allData_sorted.length).fill("none")
     // MATCHED BY aleles---------------------------
     // separate data.pgsMatchMy23 into 3 (dosage #) arrays
 
@@ -635,8 +634,8 @@ const items =  Push(all_pgs_variants.all, all_pgs_variants.all.risk).concat(
     Push(all_pgs_variants.matched_by_aleles.two_allele, all_pgs_variants.matched_by_aleles.two_allele.risk))
 
 
-plotRiskDiv.style.height= 1050+ data.pgs.dt.length * 3 +'px'
-plotAllMatchByEffectDiv.style.height= 1050+ data.pgs.dt.length * 3 +'px'
+plotRiskDiv.style.height=  data.pgs.dt.length * 1.1 +'em'
+plotAllMatchByEffectDiv.style.height= data.pgs.dt.length * 1.1 +'em'
 
 // make new objects with id, all mapped to one condition sorted by value
 //https://stackoverflow.com/questions/979256/sorting-an-array-of-objects-by-property-values
@@ -680,17 +679,19 @@ const plotData = items
    
     //------------------------------------------
     var layout = {
-    title: `<span style="color:navy">PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.aleles.length} Matched and ${data.pgs.dt.length-data.aleles.length} Unmatched Variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
-  autosize: true,
-    margin: {r: 10, l: 150, t: 220,b:35},
+    title: {
+        text:`<span >PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
+    },
+    //autosize: true,
+    margin: {r: 10, l: 150, t: 250,b:35},
     showlegend: true,
-     legend : {orientation : 'v', x:0.2,y :4.1,font :{size : 13}},
+    legend : {orientation : 'v', x:0.2,y :4.1,font :{size : 13}},
     yaxis: {
         style:{
         },
                 linewidth: 1,
                 mirror: true,
-                automargin: true,
+                //automargin: true,
                 title: {
                     standoff: 90
                   },
@@ -736,7 +737,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         div = document.createElement('div')
         document.body.appendChild(div)
     }
-    div.innerHTML = `<hr><div>Table of matched PGS variants(dosage = 1 or 2)</div><hr>`
+    div.innerHTML = `<br><hr><div>Table for ${data.plot.matched_by_aleles.one_allele.dt.length + data.plot.matched_by_aleles.two_allele.dt.length} matched PGS variants (dosage = 1 or 2)</div><hr>`
     // sort by absolute value
     let jj = [...Array(data.calcRiskScore.length)].map((_, i) => i) // match indexes
       // remove zero effect
@@ -744,14 +745,14 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
    jj = jj.filter(x=>data.calcRiskScore[x]!=0)
     // let abs = data.calcRiskScore.map(x => Math.abs(x))
     // jj.sort((a, b) => (abs[b] - abs[a])) // indexes sorted by absolute value
-    jj.sort((a, b) => (data.calcRiskScore[a] - data.calcRiskScore[b])) // indexes sorted by absolute value
+    jj.sort((a, b) => (data.calcRiskScore[b] - data.calcRiskScore[a])) // indexes sorted by absolute value
 
     // tabulate
     let tb = document.createElement('table')
     div.appendChild(tb)
     let thead = document.createElement('thead')
     tb.appendChild(thead)
-    thead.innerHTML = `<tr><th align="left">#</th><th align="center">dosage</th><th align="right">risk_score</th><th align="right">variant</th><th align="center">dbSNP</th><th align="left">SNPedia </th></tr>`
+    thead.innerHTML = `<tr><th align="left">#</th><th>β</th><th align="left">z</th><th align="right"> β*z</th><th align="center">variant</th><th align="center">dbSNP</th><th align="left">SNPedia </th></tr>`
     let tbody = document.createElement('tbody')
     tb.appendChild(tbody)
     const indChr = data.pgs.cols.indexOf('hm_chr')
@@ -769,7 +770,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         let row = document.createElement('tr')
         tbody.appendChild(row)
         let xi = data.pgsMatchMy23[ind]
-        row.innerHTML = `<tr><td align="left">${i+1})</td><td align="center">${data.aleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
+        row.innerHTML = `<tr><td align="left">${i+1})</td><td align="center">${Math.round(xi[1][4]*1000)/1000}</td><td align="center">${data.aleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
     })
 
     // <div id='plotSnpConsequence' style='display: inline-block;' ></div>
@@ -783,23 +784,28 @@ function pieChart(data = PGS23.data){
         const risk_composition = {}
         const risk1 = data.plot.matched.risk.reduce((partialSum, a) => partialSum + a, 0);
         const risk2 = data.plot.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
-    
-        risk_composition["matched"]=risk1
-        risk_composition["not_matched"]=risk2
-    
+        risk_composition[`${data.plot.matched.risk.length} matched<br>variants`]=risk1
+        risk_composition[`${data.plot.not_matched.risk.length} unmatched<br>variants`]=risk2
+   
+    console.log("risk_composition",risk_composition)
         var y = Object.values(risk_composition)
         var x = Object.keys(risk_composition)
         var piePlotData = [{
           values: y,
           labels: x,
+          showlegend: false,
+          textinfo: "label+percent",
+          textposition: "outside",
           type: 'pie',
+          automargin: true,
           marker:{
-            colors:["#2ca02c","rgb(140, 140, 140)"],
-            size: 18
+            colors:["#2ca02c","grey"],
+            size: 18,
+            line: {color: 'black'}
           },
           textfont: {
             family: 'Lato',
-            color: 'white',
+            color: 'black',
             size: 18
           },
           hoverlabel: {
@@ -813,12 +819,15 @@ function pieChart(data = PGS23.data){
         }}]
         var layout = {
           //legend: { x: -1 },
-          title: 'Total β contribution',
+          title: `PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution ${data.pgs.dt.length} for ${data.pgs.meta.trait_mapped} variants`,
           height: 340,
-          width: 500,
-          legend : {font:{size : 18}}
+          width: 550,
+          legend : {font:{size : 18}},
+          margin: { l: 250}
         };
-        Plotly.newPlot('pieChartDiv', piePlotData, layout);
+        var config = {responsive: true}
+
+        Plotly.newPlot('pieChartDiv', piePlotData, layout, config);
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
