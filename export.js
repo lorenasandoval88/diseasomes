@@ -736,7 +736,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         div = document.createElement('div')
         document.body.appendChild(div)
     }
-    div.innerHTML = `<hr><div>Table of PGS SNPS matched to 23andMe file (one or two aleles only)</div><hr>`
+    div.innerHTML = `<hr><div>Table of matched PGS variants(dosage = 1 or 2)</div><hr>`
     // sort by absolute value
     let jj = [...Array(data.calcRiskScore.length)].map((_, i) => i) // match indexes
       // remove zero effect
@@ -751,7 +751,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     div.appendChild(tb)
     let thead = document.createElement('thead')
     tb.appendChild(thead)
-    thead.innerHTML = `<tr><th align="left">#</th><th align="center">dosage</th><th align="right">risk_score</th><th align="right">variant</th><th align="left">dbSNP</th><th align="left">SNPedia </th></tr>`
+    thead.innerHTML = `<tr><th align="left">#</th><th align="center">dosage</th><th align="right">risk_score</th><th align="right">variant</th><th align="center">dbSNP</th><th align="left">SNPedia </th></tr>`
     let tbody = document.createElement('tbody')
     tb.appendChild(tbody)
     const indChr = data.pgs.cols.indexOf('hm_chr')
@@ -794,7 +794,7 @@ function pieChart(data = PGS23.data){
           labels: x,
           type: 'pie',
           marker:{
-            colors:["navy","rgb(140, 140, 140)"],
+            colors:["#2ca02c","rgb(140, 140, 140)"],
             size: 18
           },
           textfont: {
