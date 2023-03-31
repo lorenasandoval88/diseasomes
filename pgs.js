@@ -531,7 +531,7 @@ pgs.loadDependencies=function(){
             pgs.localforage=localforage
         }
     })
-    pgs.loadScript("https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.j").then(s=>{
+    pgs.loadScript("https://cdn.plot.ly/plotly-2.18.2.min.js").then(s=>{
         s.onload=function(){
             pgs.Plotly=Plotly
         }

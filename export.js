@@ -56,11 +56,12 @@ PGS23.loadPGS = async (i = 1) => {
             div2.style.display = 'none';
             e.target.textContent = `plot risk scores`
 
-        }})
+        }
+    })
 
-     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
-    div.querySelector('#btLoadPgs').onclick = async(evt)=>{
-		document.querySelector('#summarySpan').hidden = true
+    PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
+    div.querySelector('#btLoadPgs').onclick = async (evt) => {
+        document.querySelector('#summarySpan').hidden = true
         PGS23.pgsTextArea.value = '... loading'
         i = parseInt(div.querySelector('#pgsID').value)
         let PGSstr = i.toString()
@@ -70,8 +71,8 @@ PGS23.loadPGS = async (i = 1) => {
         let fsize = (await fetch(`https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/${PGSstr}/ScoringFiles/Harmonized/${PGSstr}_hmPOS_GRCh37.txt.gz`, {
             method: 'HEAD'
         })).headers.get('Content-Length');
-        if ((fsize > 1000000)&(!div.querySelector('#checkLargeFile').checked)) {
-			console.log('largeFile processing ...')
+        if ((fsize > 1000000) & (!div.querySelector('#checkLargeFile').checked)) {
+            console.log('largeFile processing ...')
             //div.querySelector('#summarySpan').hidden = true
             let data = document.getElementById("PGS23calc").PGS23data
             if (data.pgs) {
@@ -79,23 +80,22 @@ PGS23.loadPGS = async (i = 1) => {
             }
             PGS23.pgsTextArea.value += ` ... whoa! ... this is a large PGS entry, over ${Math.floor(fsize / 1000000)}Mb. If you still want to process it please check "large file" above and press load again. Don't do this if you are not ready to wait ...`
             div.querySelector('#summarySpan').hidden = true
-			div.querySelector('#showLargeFile').style.backgroundColor = 'yellow'
+            div.querySelector('#showLargeFile').style.backgroundColor = 'yellow'
             div.querySelector('#showLargeFile').style.color = 'red'
-			div.querySelector('#showLargeFile').hidden=false
-			div.querySelector('#checkLargeFile').checked=false
-            setTimeout(_=>{
+            div.querySelector('#showLargeFile').hidden = false
+            div.querySelector('#checkLargeFile').checked = false
+            setTimeout(_ => {
                 div.querySelector('#showLargeFile').style.backgroundColor = ''
                 div.querySelector('#showLargeFile').style.color = ''
-				//div.querySelector('#summarySpan').hidden = true
-            }
-            , 2000)
+                //div.querySelector('#summarySpan').hidden = true
+            }, 2000)
             //debugger
         } else {
-			if(div.querySelector('#checkLargeFile').checked){
-				PGS23.pgsTextArea.value=`... processing large file (this may not work, feature under development). If the wait gets too long, remember you can always reset by reloading the page.`
-			}
-			div.querySelector('#checkLargeFile').checked=false
-			div.querySelector('#showLargeFile').hidden=true
+            if (div.querySelector('#checkLargeFile').checked) {
+                PGS23.pgsTextArea.value = `... processing large file (this may not work, feature under development). If the wait gets too long, remember you can always reset by reloading the page.`
+            }
+            div.querySelector('#checkLargeFile').checked = false
+            div.querySelector('#showLargeFile').hidden = true
             PGS23.pgsObj = await parsePGS(i)
             div.querySelector('#pubDOI').href = 'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]
             div.querySelector('#trait_mapped').innerHTML = `<span style="color:maroon">${PGS23.pgsObj.meta.trait_mapped}</span>`
@@ -110,10 +110,10 @@ PGS23.loadPGS = async (i = 1) => {
             cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
             delete cleanObj.txt
             PGS23.data.pgs = cleanObj
-			div.querySelector('#summarySpan').hidden = false
+            div.querySelector('#summarySpan').hidden = false
         }
     };
-    div.querySelector("#objJSON").onclick = evt=>{
+    div.querySelector("#objJSON").onclick = evt => {
         //console.log(Date())
         let cleanObj = structuredClone(PGS23.pgsObj)
         cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
@@ -186,7 +186,7 @@ PGS23.load23 = async () => {
 }
 
 PGS23.loadCalc = async () => {
-   
+
     let div = PGS23.divCalc
     div.innerHTML = `<hr>
 	<b style="color:maroon">C)</b> Polygenic Risk Score (PRS)
@@ -205,10 +205,10 @@ PGS23.loadCalc = async () => {
     </div>
 	`
     div.querySelector('#matchesJSON').onclick = evt => {
-        
+
         let data = document.getElementById("PGS23calc").PGS23data
         saveFile(JSON.stringify(data.pgsMatchMy23), data.my23.info.slice(0, -4) + '_match_PGS_calcRiskScore' + data.pgs.id + '.json')
-        console.log("data 1111",data)
+        console.log("data 1111", data)
 
     }
     div.querySelector('#riskCalcScoreJSON').onclick = evt => {
@@ -241,120 +241,118 @@ PGS23.loadCalc = async () => {
 
 }
 
-         // MATCH 23andme chromosome and position TO PGS chromosome and position *******
-         //var regexPattern = new RegExp([r[2],r[3]].join('|'))
+// MATCH 23andme chromosome and position TO PGS chromosome and position *******
+//var regexPattern = new RegExp([r[2],r[3]].join('|'))
 
-         PGS23.Match2 = function(data, progressReport) {
-            // extract harmonized data from PGS entry first
-            const indChr = data.pgs.cols.indexOf('hm_chr')
-            const indPos = data.pgs.cols.indexOf('hm_pos')
-            // match
-            let dtMatch = []
-            const cgrInd = data.pgs.cols.indexOf('hm_chr')
-            const posInd = data.pgs.cols.indexOf('hm_pos')
-            const n = data.pgs.dt.length
-            let progressCalc = document.getElementById('progressCalc')
-            progressCalc.hidden = false
-            let i = 0
-            let j = 0 //index of last match, the nex can match will have to be beyond this point since both pgs and 23and me are sorted by chr/position
-            //let matchFloor=0 // to advance the earliest match as it advances
-            function funMatch(i=0,matchFloor=0) {
-                if (i < n) {
-                    let r = data.pgs.dt[i]
-                    let regexPattern = new RegExp([r[2],r[3]].join('|'))
+PGS23.Match2 = function (data, progressReport) {
+    // extract harmonized data from PGS entry first
+    const indChr = data.pgs.cols.indexOf('hm_chr')
+    const indPos = data.pgs.cols.indexOf('hm_pos')
+    // match
+    let dtMatch = []
+    const cgrInd = data.pgs.cols.indexOf('hm_chr')
+    const posInd = data.pgs.cols.indexOf('hm_pos')
+    const n = data.pgs.dt.length
+    let progressCalc = document.getElementById('progressCalc')
+    progressCalc.hidden = false
+    let i = 0
+    let j = 0 //index of last match, the nex can match will have to be beyond this point since both pgs and 23and me are sorted by chr/position
+    //let matchFloor=0 // to advance the earliest match as it advances
+    function funMatch(i = 0, matchFloor = 0) {
+        if (i < n) {
+            let r = data.pgs.dt[i]
+            let regexPattern = new RegExp([r[2], r[3]].join('|'))
 
-                    if (dtMatch.length > 0){
-                        matchFloor=dtMatch.at(-1)[0][4]
-                        //console.log(matchFloor)
-                    }
-                    let dtMatch_i = data.my23.dt.filter(myr=>(myr[2] == r[indPos]))
-                                    .filter(myr=>(myr[1] == r[indChr]))
-                                    .filter(myr => regexPattern.test(myr[3]))//also filter by pgs alt or effect allele match
-                    //let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
-                    if (dtMatch_i.length > 0) {
-                        dtMatch.push(dtMatch_i.concat([r]))
-                    }
-                    progressCalc.value = 100 * i / n
-                    setTimeout(()=>{
-                        funMatch(i + 1)
-                    }
-                    , 0)
-                } else {
-                    data.pgsMatchMy23 = dtMatch
-                    let calcRiskScore = []
-                    let aleles = []
-                    // calculate Risk
-                    let logR = 0
-                    // log(0)=1
-                    let ind_effect_allele = data.pgs.cols.indexOf('effect_allele')
-                    let ind_other_allele = data.pgs.cols.indexOf('other_allele')
-                    let ind_effect_weight = data.pgs.cols.indexOf('effect_weight')
-                    let ind_allelefrequency_effect = data.pgs.cols.indexOf('allelefrequency_effect')
-                    dtMatch.forEach((m,i)=>{
-                        calcRiskScore[i] = 0
-                        // default no risk
-                        aleles[i] = 0
-                        // default no alele
-                        let mi = m[0][3].match(/^[ACGT]{2}$/)
-                        // we'll only consider duplets in the 23adme report
-                        if (mi) {
-                            //'effect_allele', 'other_allele', 'effect_weight'
-                            mi = mi[0]
-                            // 23andme match
-                            let pi = m.at(-1)
-                            //pgs match
-                            let alele = pi[ind_effect_allele]
-                            let L = mi.match(RegExp(alele, 'g'))
-                            // how many, 0,1, or 2
-                            if (L) {
-                                L = L.length
-                                calcRiskScore[i] = L * pi[ind_effect_weight]
-                                aleles[i] = L
-                            }
-                            //debugger
-                        }
-                    }
-                    )
-                    data.aleles = aleles
-                    data.calcRiskScore = calcRiskScore
-                    if(calcRiskScore.reduce((a,b)=>Math.min(a,b))==0){//&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
-                        console.log('these are not betas :-(')
-                        document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
-                        //document.getElementById('my23CalcTextArea').value += ` However, these don't look like betas. I am going to assume they are hazard ratios ... You could also look for another entry for the same trait where betas were calculated, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
-                        document.getElementById('my23CalcTextArea').value += ` However, these don't look right, QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
-                        document.getElementById('plotRiskDiv').hidden=true
-                        document.getElementById('hidenCalc').hidden=false
-                        plotAllMatchByEffect4()
-                        pieChart()
-                    }else{
-                        data.PRS = Math.exp(calcRiskScore.reduce((a,b)=>a + b))
-                        document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score, PRS=${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
-                        //my23CalcTextArea.value+=` ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
-                        document.getElementById('plotRiskDiv').hidden=false
-                        document.getElementById('hidenCalc').hidden=false
-                        //ploting
-                        plotAllMatchByEffect4()
-                        pieChart()
-                    }
-                    document.querySelector('#buttonCalculateRisk').disabled = false
-                    document.querySelector('#buttonCalculateRisk').style.color = 'blue'
-                }
-        
+            if (dtMatch.length > 0) {
+                matchFloor = dtMatch.at(-1)[0][4]
+                //console.log(matchFloor)
             }
-            funMatch()
-        
-            /*
-            data.pgs.dt.forEach((r,i)=>{
-                let dtMatch_i=data.my23.dt.filter(myr=>(myr[2]==r[indPos])).filter(myr=>(myr[1]==r[indChr]))
-                if(dtMatch_i.length>0){
-                    dtMatch.push(dtMatch_i.concat([r]))
+            let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos]))
+                .filter(myr => (myr[1] == r[indChr]))
+                .filter(myr => regexPattern.test(myr[3])) //also filter by pgs alt or effect allele match
+            //let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
+            if (dtMatch_i.length > 0) {
+                dtMatch.push(dtMatch_i.concat([r]))
+            }
+            progressCalc.value = 100 * i / n
+            setTimeout(() => {
+                funMatch(i + 1)
+            }, 0)
+        } else {
+            data.pgsMatchMy23 = dtMatch
+            let calcRiskScore = []
+            let alleles = []
+            // calculate Risk
+            let logR = 0
+            // log(0)=1
+            let ind_effect_allele = data.pgs.cols.indexOf('effect_allele')
+            let ind_other_allele = data.pgs.cols.indexOf('other_allele')
+            let ind_effect_weight = data.pgs.cols.indexOf('effect_weight')
+            let ind_allelefrequency_effect = data.pgs.cols.indexOf('allelefrequency_effect')
+            dtMatch.forEach((m, i) => {
+                calcRiskScore[i] = 0
+                // default no risk
+                alleles[i] = 0
+                // default no alele
+                let mi = m[0][3].match(/^[ACGT]{2}$/)
+                // we'll only consider duplets in the 23adme report
+                if (mi) {
+                    //'effect_allele', 'other_allele', 'effect_weight'
+                    mi = mi[0]
+                    // 23andme match
+                    let pi = m.at(-1)
+                    //pgs match
+                    let alele = pi[ind_effect_allele]
+                    let L = mi.match(RegExp(alele, 'g'))
+                    // how many, 0,1, or 2
+                    if (L) {
+                        L = L.length
+                        calcRiskScore[i] = L * pi[ind_effect_weight]
+                        alleles[i] = L
+                    }
+                    //debugger
                 }
-                //console.log(i/n)
             })
-             */
-        
+            data.alleles = alleles
+            data.calcRiskScore = calcRiskScore
+            if (calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
+                console.log('these are not betas :-(')
+                document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
+                //document.getElementById('my23CalcTextArea').value += ` However, these don't look like betas. I am going to assume they are hazard ratios ... You could also look for another entry for the same trait where betas were calculated, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
+                document.getElementById('my23CalcTextArea').value += ` However, these don't look right, QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
+                document.getElementById('plotRiskDiv').hidden = true
+                document.getElementById('hidenCalc').hidden = false
+                plotAllMatchByEffect4()
+                pieChart()
+            } else {
+                data.PRS = Math.exp(calcRiskScore.reduce((a, b) => a + b))
+                document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score, PRS=${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
+                //my23CalcTextArea.value+=` ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
+                document.getElementById('plotRiskDiv').hidden = false
+                document.getElementById('hidenCalc').hidden = false
+                //ploting
+                plotAllMatchByEffect4()
+                pieChart()
+            }
+            document.querySelector('#buttonCalculateRisk').disabled = false
+            document.querySelector('#buttonCalculateRisk').style.color = 'blue'
         }
-        
+
+    }
+    funMatch()
+
+    /*
+    data.pgs.dt.forEach((r,i)=>{
+        let dtMatch_i=data.my23.dt.filter(myr=>(myr[2]==r[indPos])).filter(myr=>(myr[1]==r[indChr]))
+        if(dtMatch_i.length>0){
+            dtMatch.push(dtMatch_i.concat([r]))
+        }
+        //console.log(i/n)
+    })
+     */
+
+}
+
 
 function ui(targetDiv = document.body) {
     // target div for the user interface
@@ -368,7 +366,7 @@ function ui(targetDiv = document.body) {
     div.id = 'prsCalcUI'
     div.innerHTML = `
     <p>
-	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targetted by the PGS entry based on <br>PRS  =  exp( ∑ N  𝛽i * dosage i ).
+	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targeted by the PGS entry based on <br>PRS  =  exp( ∑ N  𝛽i * dosage i ). Where N is the number of SNPs in PGS catalog entry, βi is the effect size (or beta) of variant i and dosage i is the number of copies of the alternate allele of SNP i in that 23andme individual.
     </p>
     <hr>
     `
@@ -492,9 +490,13 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
 
     // MATCHED ---------------------------
     // separate pgs.dt into 2 (matches and non matches) arrays and then sort by effect  
-    const matched= data.pgsMatchMy23.map(function (v) {  return v[1]}) // " matched" data
+    const matched = data.pgsMatchMy23.map(function (v) {
+        return v[1]
+    }) // " matched" data
 
-    const matched_risk = matched.map((j) => {return j[4]})
+    const matched_risk = matched.map((j) => {
+        return j[4]
+    })
 
     const matched_chrPos = matched.map(j => {
         return `Chr${j[indChr]}.${j[indPos]}`
@@ -502,11 +504,11 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     all_pgs_variants['matched'] = {}
     all_pgs_variants.matched.chrPos = matched_chrPos
     all_pgs_variants.matched.dt = matched
-    all_pgs_variants.matched.aleles = data.aleles
+    all_pgs_variants.matched.alleles = data.alleles
     all_pgs_variants.matched.risk = matched_risk
     all_pgs_variants.matched.category = Array(matched.length).fill("matched")
 
-//     // NON-MATCHED --------------------------------------------------------------------------------------------
+    //     // NON-MATCHED --------------------------------------------------------------------------------------------
     const notMatchData = data.pgs.dt.filter(element => !matched.includes(element)); // "not matched" data
 
     // sort by effect
@@ -514,24 +516,26 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
         .map((_, i) => i).sort((a, b) => (notMatchData[a][4] - notMatchData[b][4])) //match indexes
     const not_matched = not_matched_idx.map(j => {
         let xi = notMatchData[j]
-        return xi })
+        return xi
+    })
     const not_matched_chrPos = not_matched.map(j => {
-        return `Chr${j[indChr]}.${j[indPos]}` })
+        return `Chr${j[indChr]}.${j[indPos]}`
+    })
 
     const not_matched_risk = not_matched.map((yi, i) => yi[4])
-    
+
     all_pgs_variants['not_matched'] = {}
     all_pgs_variants.not_matched.chrPos = not_matched_chrPos
     all_pgs_variants.not_matched.dt = not_matched
     all_pgs_variants.not_matched.risk = not_matched_risk
     const fill_no_match = `${not_matched.length} not matched`
     all_pgs_variants.not_matched.category = Array(not_matched.length).fill(fill_no_match)
-    all_pgs_variants.not_matched.size = Array(not_matched.length).fill("8")
+    all_pgs_variants.not_matched.size = Array(not_matched.length).fill("9")
     all_pgs_variants.not_matched.color = Array(not_matched.length).fill("rgb(140, 140, 140)")
     all_pgs_variants.not_matched.opacity = Array(not_matched.length).fill("0.5")
     all_pgs_variants.not_matched.symbol = Array(not_matched.length).fill("x")
     all_pgs_variants.not_matched.hoverinfo = Array(not_matched.length).fill("all")
-//     // ALL VARIANTS -------------------------------------------------------------------------------------
+    //     // ALL VARIANTS -------------------------------------------------------------------------------------
     //const allData = matchData2.concat(notMatchData)
     const allData = data.pgs.dt
     //const allData = data.pgs.dt
@@ -546,7 +550,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     })
 
     const allData_risk = allData.map((yi, i) => yi[4])
-    
+
     all_pgs_variants['all'] = {}
     all_pgs_variants.all.chrPos = allData_chrPos
     all_pgs_variants.all.dt = allData_sorted
@@ -557,178 +561,240 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     all_pgs_variants.all.opacity = Array(allData_sorted.length).fill("0")
     all_pgs_variants.all.symbol = Array(allData_sorted.length).fill("square")
     all_pgs_variants.all.hoverinfo = Array(allData_sorted.length).fill("none")
-    // MATCHED BY aleles---------------------------
+    // MATCHED BY alleles---------------------------
     // separate data.pgsMatchMy23 into 3 (dosage #) arrays
 
-   // 43 matched variants (betas from pgs for now)
+    // 43 matched variants (betas from pgs for now)
     //https://stackoverflow.com/questions/40415231/how-to-get-an-array-of-values-based-on-an-array-of-indexes
-    const zero_allele = matched.filter((ele, idx) => data.aleles[idx] == 0);
-    const zero_allele_idx = data.aleles.map((elm, idx) => elm == 0 ? idx : '')
+    const zero_allele = matched.filter((ele, idx) => data.alleles[idx] == 0);
+    const zero_allele_idx = data.alleles.map((elm, idx) => elm == 0 ? idx : '')
         .filter(String);
-    //zero_aleles.forEach(function(arr){arr.push("matched, no effect allele")});  // add trace name here   
-    const one_allele = matched.filter((ele, idx) => data.aleles[idx] == 1);
-    const one_allele_idx = data.aleles.map((elm, idx) => elm == 1 ? idx : '')
+    //zero_alleles.forEach(function(arr){arr.push("matched, no effect allele")});  // add trace name here   
+    const one_allele = matched.filter((ele, idx) => data.alleles[idx] == 1);
+    const one_allele_idx = data.alleles.map((elm, idx) => elm == 1 ? idx : '')
         .filter(String);
-    const two_allele = matched.filter((ele, idx) => data.aleles[idx] == 2);
-    const two_allele_idx = data.aleles.map((elm, idx) => elm == 2 ? idx : '')
+    const two_allele = matched.filter((ele, idx) => data.alleles[idx] == 2);
+    const two_allele_idx = data.alleles.map((elm, idx) => elm == 2 ? idx : '')
         .filter(String);
 
 
-    //const zero_aleles_risk = (dt.matches).map(function(v) { return v[1]}).filter((ele, idx) => dt.aleles[idx] == 0).map(function(v) { return v[4]})
-   
+    //const zero_alleles_risk = (dt.matches).map(function(v) { return v[1]}).filter((ele, idx) => dt.alleles[idx] == 0).map(function(v) { return v[4]})
+
     // x (chr pos)  y (betas or betas*dosage) data
     const zero_allele_chrpos = zero_allele_idx.map(i => `Chr${matched[i][indChr]}.${matched[i][indPos]}`)
     const one_allele_chrpos = one_allele_idx.map(i => `Chr${matched[i][indChr]}.${matched[i][indPos]}`)
     const two_allele_chrpos = two_allele_idx.map(i => `Chr${matched[i][indChr]}.${matched[i][indPos]}`)
 
-    all_pgs_variants['matched_by_aleles'] = {}
-    all_pgs_variants.matched_by_aleles.zero_allele = {}
-    all_pgs_variants.matched_by_aleles.one_allele = {}
-    all_pgs_variants.matched_by_aleles.two_allele = {}
+    all_pgs_variants['matched_by_alleles'] = {}
+    all_pgs_variants.matched_by_alleles.zero_allele = {}
+    all_pgs_variants.matched_by_alleles.one_allele = {}
+    all_pgs_variants.matched_by_alleles.two_allele = {}
 
-    all_pgs_variants.matched_by_aleles.zero_allele.chrPos = zero_allele_chrpos
-    all_pgs_variants.matched_by_aleles.one_allele.chrPos = one_allele_chrpos
-    all_pgs_variants.matched_by_aleles.two_allele.chrPos = two_allele_chrpos
-    all_pgs_variants.matched_by_aleles.zero_allele.dt = zero_allele
-    all_pgs_variants.matched_by_aleles.one_allele.dt = one_allele
-    all_pgs_variants.matched_by_aleles.two_allele.dt = two_allele
-    all_pgs_variants.matched_by_aleles.zero_allele.risk = zero_allele_idx.map(i => matched[i][4]);
-    all_pgs_variants.matched_by_aleles.one_allele.risk = one_allele_idx.map(i => matched[i][4]);
-    all_pgs_variants.matched_by_aleles.two_allele.risk = two_allele_idx.map(i => matched[i][4]);
-    all_pgs_variants.matched_by_aleles.zero_allele.category = Array(zero_allele.length).fill(`${zero_allele.length } matched, zero aleles`)
-    all_pgs_variants.matched_by_aleles.one_allele.category = Array(one_allele.length).fill(`${one_allele.length } matched, one allele`)
-    all_pgs_variants.matched_by_aleles.two_allele.category = Array(two_allele.length).fill(`${two_allele.length } matched, two aleles`)
-    all_pgs_variants.matched_by_aleles.zero_allele.size = Array(zero_allele.length).fill("6")
-    all_pgs_variants.matched_by_aleles.one_allele.size = Array(one_allele.length).fill("8")
-    all_pgs_variants.matched_by_aleles.two_allele.size = Array(two_allele.length).fill("10")
-    all_pgs_variants.matched_by_aleles.zero_allele.color = Array(zero_allele.length).fill("#17becf")
-    all_pgs_variants.matched_by_aleles.one_allele.color = Array(one_allele.length).fill("navy")
-    all_pgs_variants.matched_by_aleles.two_allele.color = Array(two_allele.length).fill("#d62728")
-    all_pgs_variants.matched_by_aleles.zero_allele.opacity = Array(zero_allele.length).fill("1")
-    all_pgs_variants.matched_by_aleles.one_allele.opacity = Array(one_allele.length).fill("1")
-    all_pgs_variants.matched_by_aleles.two_allele.opacity = Array(two_allele.length).fill("1")
-    all_pgs_variants.matched_by_aleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
-    all_pgs_variants.matched_by_aleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
-    all_pgs_variants.matched_by_aleles.two_allele.symbol = Array(two_allele.length).fill("square")
-    all_pgs_variants.matched_by_aleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
-    all_pgs_variants.matched_by_aleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
-    all_pgs_variants.matched_by_aleles.two_allele.symbol = Array(two_allele.length).fill("square")
-    all_pgs_variants.matched_by_aleles.zero_allele.hoverinfo = Array(zero_allele.length).fill("all")
-    all_pgs_variants.matched_by_aleles.one_allele.hoverinfo = Array(one_allele.length).fill("all")
-    all_pgs_variants.matched_by_aleles.two_allele.hoverinfo = Array(two_allele.length).fill("all")
-    //console.log(`all pgs variants subset by matched, not macthed and by aleles: `,all_pgs_variants)
-    console.log("all_pgs_variants",all_pgs_variants)
-
-
-// add matched,all, zero, one and two allele into new array
- //https://stackoverflow.com/questions/64055094/push-multiple-arrays-with-keys-into-single-array
-function Push(data, subdata) {
-  return subdata.map((_, i) => {
-    return Object.entries(data).reduce((a, [k, arr]) => (a[k] = arr[i], a), {})
-  })
-}
-const items =  Push(all_pgs_variants.all, all_pgs_variants.all.risk).concat(
-    Push(all_pgs_variants.not_matched, all_pgs_variants.not_matched.risk)).concat(
-    Push(all_pgs_variants.matched_by_aleles.zero_allele, all_pgs_variants.matched_by_aleles.zero_allele.risk)).concat(
-    Push(all_pgs_variants.matched_by_aleles.one_allele, all_pgs_variants.matched_by_aleles.one_allele.risk)).concat(
-    Push(all_pgs_variants.matched_by_aleles.two_allele, all_pgs_variants.matched_by_aleles.two_allele.risk))
+    all_pgs_variants.matched_by_alleles.zero_allele.chrPos = zero_allele_chrpos
+    all_pgs_variants.matched_by_alleles.one_allele.chrPos = one_allele_chrpos
+    all_pgs_variants.matched_by_alleles.two_allele.chrPos = two_allele_chrpos
+    all_pgs_variants.matched_by_alleles.zero_allele.dt = zero_allele
+    all_pgs_variants.matched_by_alleles.one_allele.dt = one_allele
+    all_pgs_variants.matched_by_alleles.two_allele.dt = two_allele
+    all_pgs_variants.matched_by_alleles.zero_allele.risk = zero_allele_idx.map(i => matched[i][4]);
+    all_pgs_variants.matched_by_alleles.one_allele.risk = one_allele_idx.map(i => matched[i][4]);
+    all_pgs_variants.matched_by_alleles.two_allele.risk = two_allele_idx.map(i => matched[i][4]);
+    all_pgs_variants.matched_by_alleles.zero_allele.category = Array(zero_allele.length).fill(`${zero_allele.length } matched, zero alleles`)
+    all_pgs_variants.matched_by_alleles.one_allele.category = Array(one_allele.length).fill(`${one_allele.length } matched, one allele`)
+    all_pgs_variants.matched_by_alleles.two_allele.category = Array(two_allele.length).fill(`${two_allele.length } matched, two alleles`)
+    all_pgs_variants.matched_by_alleles.zero_allele.size = Array(zero_allele.length).fill("8")
+    all_pgs_variants.matched_by_alleles.one_allele.size = Array(one_allele.length).fill("8")
+    all_pgs_variants.matched_by_alleles.two_allele.size = Array(two_allele.length).fill("10")
+    all_pgs_variants.matched_by_alleles.zero_allele.color = Array(zero_allele.length).fill("#17becf")
+    all_pgs_variants.matched_by_alleles.one_allele.color = Array(one_allele.length).fill("navy")
+    all_pgs_variants.matched_by_alleles.two_allele.color = Array(two_allele.length).fill("#d62728")
+    all_pgs_variants.matched_by_alleles.zero_allele.opacity = Array(zero_allele.length).fill("1")
+    all_pgs_variants.matched_by_alleles.one_allele.opacity = Array(one_allele.length).fill("1")
+    all_pgs_variants.matched_by_alleles.two_allele.opacity = Array(two_allele.length).fill("1")
+    all_pgs_variants.matched_by_alleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
+    all_pgs_variants.matched_by_alleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
+    all_pgs_variants.matched_by_alleles.two_allele.symbol = Array(two_allele.length).fill("square")
+    all_pgs_variants.matched_by_alleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
+    all_pgs_variants.matched_by_alleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
+    all_pgs_variants.matched_by_alleles.two_allele.symbol = Array(two_allele.length).fill("square")
+    all_pgs_variants.matched_by_alleles.zero_allele.hoverinfo = Array(zero_allele.length).fill("all")
+    all_pgs_variants.matched_by_alleles.one_allele.hoverinfo = Array(one_allele.length).fill("all")
+    all_pgs_variants.matched_by_alleles.two_allele.hoverinfo = Array(two_allele.length).fill("all")
+    //console.log(`all pgs variants subset by matched, not macthed and by alleles: `,all_pgs_variants)
+    console.log("all_pgs_variants", all_pgs_variants)
 
 
-plotRiskDiv.style.height=  data.pgs.dt.length * 1.1 +'em'
-plotAllMatchByEffectDiv.style.height= data.pgs.dt.length * 1.1 +'em'
+    // add matched,all, zero, one and two allele into new array
+    //https://stackoverflow.com/questions/64055094/push-multiple-arrays-with-keys-into-single-array
+    function Push(data, subdata) {
+        return subdata.map((_, i) => {
+            return Object.entries(data).reduce((a, [k, arr]) => (a[k] = arr[i], a), {})
+        })
+    }
+    const items = Push(all_pgs_variants.all, all_pgs_variants.all.risk).concat(
+        Push(all_pgs_variants.not_matched, all_pgs_variants.not_matched.risk)).concat(
+        Push(all_pgs_variants.matched_by_alleles.zero_allele, all_pgs_variants.matched_by_alleles.zero_allele.risk)).concat(
+        Push(all_pgs_variants.matched_by_alleles.one_allele, all_pgs_variants.matched_by_alleles.one_allele.risk)).concat(
+        Push(all_pgs_variants.matched_by_alleles.two_allele, all_pgs_variants.matched_by_alleles.two_allele.risk))
+console.log("items",items)
 
-// make new objects with id, all mapped to one condition sorted by value
-//https://stackoverflow.com/questions/979256/sorting-an-array-of-objects-by-property-values
-// subset data depending on the plot
-//https://stackoverflow.com/questions/4894142/making-a-subset-of-an-array-of-javascript-objects-based-on-one-of-their-properti
+    plotRiskDiv.style.height = data.pgs.dt.length * 1.1 + 'em'
+    plotAllMatchByEffectDiv.style.height = data.pgs.dt.length * 1.1 + 'em'
 
-const cache = []
-const chooseData = [" ",`${zero_allele.length } matched, zero aleles`,`${one_allele.length } matched, one allele`,`${two_allele.length } matched, two aleles`, `${not_matched.length} not matched`]
+    // make new objects with id, all mapped to one condition sorted by value
+    //https://stackoverflow.com/questions/979256/sorting-an-array-of-objects-by-property-values
+    // subset data depending on the plot
+    //https://stackoverflow.com/questions/4894142/making-a-subset-of-an-array-of-javascript-objects-based-on-one-of-their-properti
 
-const plotData = items
-                    .filter(function (item) { if (chooseData.indexOf(item.category) === -1) { 
-                        cache.push(item); return false; 
-                        } else {
-                            return true; } 
-                            })
-                    .sort((a, b) => parseFloat(a.risk) - parseFloat(b.risk))
+    const cache = []
+    const chooseData = [" ", `${zero_allele.length } matched, zero alleles`, `${one_allele.length } matched, one allele`, `${two_allele.length } matched, two alleles`, `${not_matched.length} not matched`]
 
-//console.log("plotData-------------------------",plotData)
+    const plotData = items
+        .filter(function (item) {
+            if (chooseData.indexOf(item.category) === -1) {
+                cache.push(item);
+                return false;
+            } else {
+                return true;
+            }
+        })
+        .sort((a, b) => parseFloat(a.risk) - parseFloat(b.risk))
+
+    console.log("plotData-------------------------",plotData)
     // TODO------------------------------------------
-    const conditions = new Set(plotData.map(a => a.category));
+    // re-order plot legend manually
+    //const conditions = new Set(plotData.map(a => a.category));
+    const conditions = [' ',  '34 not matched', '26 matched, zero alleles','14 matched, one allele', '3 matched, two alleles']
+    
+    console.log("conditions", conditions)
     const traces = [];
-    conditions.forEach(function(category) {
-      var newArray = plotData.filter(function(el) {
-        return el.category == category;
-      });
+    conditions.forEach(function (category) {
+        var newArray = plotData.filter(function (el) {
+            return el.category == category;
+        });
         traces.push({
-        y: newArray.map(a => a.chrPos),
-        x: newArray.map(a => a.risk),
-        name: category,
-        hoverinfo: newArray[0].hoverinfo,
-        mode: 'markers',
-        type: 'scatter',
-        opacity: newArray[0].opacity,
-        marker : {
-            color: newArray[0].color,
-            symbol: newArray[0].symbol,
-            size: newArray[0].size,
-        }
-      })
+            y: newArray.map(a => a.chrPos),
+            x: newArray.map(a => a.risk),
+            name: category,
+            hoverinfo: newArray[0].hoverinfo,
+            mode: 'markers',
+            type: 'scatter',
+            opacity: newArray[0].opacity,
+            marker: {
+                color: newArray[0].color,
+                symbol: newArray[0].symbol,
+                size: newArray[0].size,
+            }
+        })
     })
-   
+    const risk_composition = {}
+    const risk1 = all_pgs_variants.matched.risk.reduce((partialSum, a) => partialSum + a, 0);
+    const risk2 = all_pgs_variants.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
+    risk_composition[`${all_pgs_variants.matched.risk.length} matched<br>variants`] = risk1
+    risk_composition[`${all_pgs_variants.not_matched.risk.length} unmatched<br>variants`] = risk2
+    var y = Object.values(risk_composition)
+    var x = Object.keys(risk_composition)
+
+    // var piePlotData = {
+    //     height: 40,
+    //     width: 50,
+    //     values: y,
+    //     labels: x,
+    //     showlegend: false,
+    //     textinfo: "label+percent",
+    //     textposition: "outside",
+    //     type: 'pie',
+    //     //automargin: true,
+    //     marker: {
+    //         colors: ["#2ca02c", "grey"],
+    //         size: 18,
+    //         line: {
+    //             color: 'black'
+    //         }
+    //     },
+    //     textfont: {
+    //         family: 'Lato',
+    //         color: 'black',
+    //         size: 18
+    //     },
+    //     hoverlabel: {
+    //         bgcolor: 'black',
+    //         bordercolor: 'black',
+    //         font: {
+    //             family: 'Lato',
+    //             color: 'white',
+    //             size: 18
+    //         }
+    //     }
+    // }
+    // traces.push(piePlotData)
     //------------------------------------------
     var layout = {
-    title: {
-        text:`<span >PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
-    },
-    //autosize: true,
-    margin: {r: 10, l: 150, t: 250,b:35},
-    showlegend: true,
-    legend : {orientation : 'v', x:0.2,y :4.1,font :{size : 13}},
-    yaxis: {
-        style:{
+        title: {
+            text: `<span >PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
         },
-                linewidth: 1,
-                mirror: true,
-                //automargin: true,
-                title: {
-                    standoff: 90
-                  },
-                rangemode: "tozero",
-                type: 'category',
-                showline: true,
-                tickangle: 0,
-                tickfont: {
-                    size: 10.1
-                },
-               // title: '<span style="font-size:medium">variants , sorted by <span style="font-size:large">β</span></span>',
-
-            },
-    xaxis: {
-        font: {
-            size: 16
+        //autosize: true,
+        margin: {
+            r: 10,
+            l: 200,
+            t: 50,
+            b: 35
         },
-                title: '<span style="font-size:large">β</span>',
-                linewidth: 1,
-                mirror: true,
-                rangemode: "tozero",
+        showlegend: true,
+        legend: {
+            orientation: 'v',
+            x: 0.02,
+            y: 0.98,
+            font: {
+                size: 13
             }
-     }
+        },
+        yaxis: {
+            // style:{
+            // },
+            linewidth: 1,
+            mirror: true,
+            //automargin: true,
+            title: {
+                title: '<span style="font-size:large">Chromosome and Position</span>',
+                standoff: 90
+            },
+            rangemode: "tozero",
+            type: 'category',
+            showline: true,
+            tickangle: 0,
+            tickfont: {
+                size: 10.5
+            },
+            // title: '<span style="font-size:medium">variants , sorted by <span style="font-size:large">β</span></span>',
+
+        },
+        xaxis: {
+            font: {
+                size: 16
+            },
+            title: '<span style="font-size:large">β</span>',
+            linewidth: 1,
+            mirror: true,
+            rangemode: "tozero",
+        }
+    }
 
     dv.innerHTML = ''
     // auto resize plot height, width is responsive, but not height
     // FIX Plot https://github.com/plotly/angular-plotly.js/issues/48
- 
-    var config = {responsive: true}
+
+    var config = {
+        responsive: true
+    }
     data.plot = all_pgs_variants
     data.plot.traces = traces
-    console.log("traces",traces)
+    console.log("traces", traces)
 
     Plotly.newPlot(dv, traces, layout, config)
     tabulateAllMatchByEffect()
 }
-            /* Plot percent of matched and not matched betas */
+/* Plot percent of matched and not matched betas */
 
 
 function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementById('tabulateAllMatchByEffectDiv')) {
@@ -737,12 +803,12 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         div = document.createElement('div')
         document.body.appendChild(div)
     }
-    div.innerHTML = `<br><hr><div>Table for ${data.plot.matched_by_aleles.one_allele.dt.length + data.plot.matched_by_aleles.two_allele.dt.length} matched PGS variants (dosage = 1 or 2)</div><hr>`
+    div.innerHTML = `<br><hr><div>Table for ${data.plot.matched_by_alleles.one_allele.dt.length + data.plot.matched_by_alleles.two_allele.dt.length} matched PGS variants (dosage = 1 or 2)</div><hr>`
     // sort by absolute value
     let jj = [...Array(data.calcRiskScore.length)].map((_, i) => i) // match indexes
-      // remove zero effect
-   // jj = jj.filter(x=>abs[x]>0)
-   jj = jj.filter(x=>data.calcRiskScore[x]!=0)
+    // remove zero effect
+    // jj = jj.filter(x=>abs[x]>0)
+    jj = jj.filter(x => data.calcRiskScore[x] != 0)
     // let abs = data.calcRiskScore.map(x => Math.abs(x))
     // jj.sort((a, b) => (abs[b] - abs[a])) // indexes sorted by absolute value
     jj.sort((a, b) => (data.calcRiskScore[b] - data.calcRiskScore[a])) // indexes sorted by absolute value
@@ -764,203 +830,215 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
     let n = jj.length
     //console.log("SNP SUMMARY TABLE: ",jj.map(x =>data.pgsMatchMy23[x]))
-   //console.log("dosage",jj.map(x =>data.aleles[x]))
+    //console.log("dosage",jj.map(x =>data.alleles[x]))
     jj.forEach((ind, i) => {
         //let jnd=n-ind
         let row = document.createElement('tr')
         tbody.appendChild(row)
         let xi = data.pgsMatchMy23[ind]
-        row.innerHTML = `<tr><td align="left">${i+1})</td><td align="center">${Math.round(xi[1][4]*1000)/1000}</td><td align="center">${data.aleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
+        row.innerHTML = `<tr><td align="left">${i+1})</td><td align="center">${Math.round(xi[1][4]*1000)/1000}</td><td align="center">${data.alleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
     })
 
     // <div id='plotSnpConsequence' style='display: inline-block;' ></div>
-	// <div id='plotSnpClinical' style='display: inline-block;' ></div>
-	// <div id='plotSnpChrom' style='display: inline-block;' ></div>`
+    // <div id='plotSnpClinical' style='display: inline-block;' ></div>
+    // <div id='plotSnpChrom' style='display: inline-block;' ></div>`
 
     //debugger
 }
-function pieChart(data = PGS23.data){
-        /* Plot percent of matched and not matched betas */
-        const risk_composition = {}
-        const risk1 = data.plot.matched.risk.reduce((partialSum, a) => partialSum + a, 0);
-        const risk2 = data.plot.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
-        risk_composition[`${data.plot.matched.risk.length} matched<br>variants`]=risk1
-        risk_composition[`${data.plot.not_matched.risk.length} unmatched<br>variants`]=risk2
-   
-    console.log("risk_composition",risk_composition)
-        var y = Object.values(risk_composition)
-        var x = Object.keys(risk_composition)
-        var piePlotData = [{
-          values: y,
-          labels: x,
-          showlegend: false,
-          textinfo: "label+percent",
-          textposition: "outside",
-          type: 'pie',
-          automargin: true,
-          marker:{
-            colors:["#2ca02c","grey"],
+
+function pieChart(data = PGS23.data) {
+    /* Plot percent of matched and not matched betas */
+    const risk_composition = {}
+    const risk1 = data.plot.matched.risk.reduce((partialSum, a) => partialSum + a, 0);
+    const risk2 = data.plot.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
+    risk_composition[`${data.plot.matched.risk.length} matched<br>variants`] = risk1
+    risk_composition[`${data.plot.not_matched.risk.length} unmatched<br>variants`] = risk2
+
+    var y = Object.values(risk_composition)
+    var x = Object.keys(risk_composition)
+    var piePlotData = [{
+        values: y,
+        labels: x,
+        showlegend: false,
+        textinfo: "label+percent",
+        textposition: "outside",
+        type: 'pie',
+        //automargin: true,
+        marker: {
+            colors: ["#2ca02c", "grey"],
             size: 18,
-            line: {color: 'black'}
-          },
-          textfont: {
+            line: {
+                color: 'black'
+            }
+        },
+        textfont: {
             family: 'Lato',
             color: 'black',
             size: 18
-          },
-          hoverlabel: {
+        },
+        hoverlabel: {
             bgcolor: 'black',
             bordercolor: 'black',
             font: {
-              family: 'Lato',
-              color: 'white',
-              size: 18
+                family: 'Lato',
+                color: 'white',
+                size: 18
             }
-        }}]
-        var layout = {
-          //legend: { x: -1 },
-          title: `PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution ${data.pgs.dt.length} for ${data.pgs.meta.trait_mapped} variants`,
-          height: 340,
-          width: 550,
-          legend : {font:{size : 18}},
-          margin: { l: 250}
-        };
-        var config = {responsive: true}
+        }
+    }]
+    var layout = {
+        //legend: { x: -1 },
+        title: `PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution ${data.pgs.dt.length} for ${data.pgs.meta.trait_mapped} variants`,
+        height: 340,
+        width: 550,
+        legend: {
+            font: {
+                size: 18
+            }
+        },
+        margin: {
+            l: 250
+        }
+    };
+    var config = {
+        responsive: true
+    }
 
-        Plotly.newPlot('pieChartDiv', piePlotData, layout, config);
+    Plotly.newPlot('pieChartDiv', piePlotData, layout, config);
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function getInfoSnps(){
+async function getInfoSnps() {
     var data = document.getElementById("PGS23calc").PGS23data
     var rs = data.calcRiskScore
-    var i=0
-    var ide=[]
-    rs.forEach( risk => {
-        if(risk>0 || risk<0){
-            ide.push( data.pgsMatchMy23[i][0][0] )
+    var i = 0
+    var ide = []
+    rs.forEach(risk => {
+        if (risk > 0 || risk < 0) {
+            ide.push(data.pgsMatchMy23[i][0][0])
         }
-        i+=1
+        i += 1
     })
-    
-    i=0
-    var info=[]
-    while (i<ide.length) {
-        var end = ((i+15)<=ide.length) ? i+15 : ide.length
+
+    i = 0
+    var info = []
+    while (i < ide.length) {
+        var end = ((i + 15) <= ide.length) ? i + 15 : ide.length
         var temp = ide.slice(i, end)
-        info = info.concat( await Promise.all( temp.map( async rsid => {
+        info = info.concat(await Promise.all(temp.map(async rsid => {
             var url = `https://rest.ensembl.org/variation/human/${rsid}?content-type=application/json`
             var enrich = await (await fetch(url)).json()
             await sleep(300)
             return enrich
-        } )) )
-        
-        i+=15
-        if(i>=ide.length){
+        })))
+
+        i += 15
+        if (i >= ide.length) {
             break
         }
     }
-    
+
     return info
 }
 
-function plotSummarySnps(){
+function plotSummarySnps() {
     var modata = document.getElementById("PGS23calc").PGS23data
-    if(Object.keys(modata).length!=0){
-        getInfoSnps().then( (value) => {
+    if (Object.keys(modata).length != 0) {
+        getInfoSnps().then((value) => {
             var info = value
-            
+
             /* Plot consequence */
             var consequence = {}
-            info.forEach( el => {
+            info.forEach(el => {
                 var col = el.most_severe_consequence
-                if( ! Object.keys(consequence).includes(col) ){
-                    consequence[col]=0
+                if (!Object.keys(consequence).includes(col)) {
+                    consequence[col] = 0
                 }
-                consequence[col]+=1
+                consequence[col] += 1
             })
-            
+
             var y = Object.values(consequence)
             var x = Object.keys(consequence)
             var data = [{
-              values: y,
-              labels: x,
-              type: 'pie'
+                values: y,
+                labels: x,
+                type: 'pie'
             }];
 
             var layout = {
-              legend: { x: -1 },
-              title: 'Variant Type',
-              height: 500,
-              width: 500
+                legend: {
+                    x: -1
+                },
+                title: 'Variant Type',
+                height: 500,
+                width: 500
             };
 
             Plotly.newPlot('plotSnpConsequence', data, layout);
-            
+
             /* Plot distribution by chromosome */
-            var filt = info.filter( el => el['mappings'].length!=0 )
-            if(filt.length > 0){
+            var filt = info.filter(el => el['mappings'].length != 0)
+            if (filt.length > 0) {
                 var chr = {}
-                filt.forEach( el => {
-                    var col = 'Chromosome '+el.mappings[0].seq_region_name
-                    if( ! Object.keys(chr).includes(col) ){
-                        chr[col]=0
+                filt.forEach(el => {
+                    var col = 'Chromosome ' + el.mappings[0].seq_region_name
+                    if (!Object.keys(chr).includes(col)) {
+                        chr[col] = 0
                     }
-                    chr[col]+=1
+                    chr[col] += 1
                 })
-                
+
                 y = Object.values(chr)
                 x = Object.keys(chr)
                 data = [{
-                  values: y,
-                  labels: x,
-                  type: 'pie'
+                    values: y,
+                    labels: x,
+                    type: 'pie'
                 }];
 
                 layout = {
-                  title: 'Chromosome',
-                  height: 400,
-                  width: 500
+                    title: 'Chromosome',
+                    height: 400,
+                    width: 500
                 };
 
                 Plotly.newPlot('plotSnpChrom', data, layout);
             }
-            
+
             /* Plot clinical */
-            var cln = info.filter( el => el['clinical_significance']!=null )
-            if(cln.length > 0){
+            var cln = info.filter(el => el['clinical_significance'] != null)
+            if (cln.length > 0) {
                 var clinical = {}
-                cln.forEach( el => {
+                cln.forEach(el => {
                     var col = el.clinical_significance
-                    if( ! Object.keys(clinical).includes(col) ){
-                        clinical[col]=0
+                    if (!Object.keys(clinical).includes(col)) {
+                        clinical[col] = 0
                     }
-                    clinical[col]+=1
+                    clinical[col] += 1
                 })
-                
+
                 y = Object.values(clinical)
                 x = Object.keys(clinical)
                 data = [{
-                  values: y,
-                  labels: x,
-                  type: 'pie'
+                    values: y,
+                    labels: x,
+                    type: 'pie'
                 }];
 
                 layout = {
-                  title: 'Clinical Significance',
-                  height: 400,
-                  width: 500
+                    title: 'Clinical Significance',
+                    height: 400,
+                    width: 500
                 };
 
                 Plotly.newPlot('plotSnpClinical', data, layout);
             }
-            
-        } )
-    }
-    else{
+
+        })
+    } else {
         alert('No data ready to plot!')
     }
-    
+
 }
 
 export {
