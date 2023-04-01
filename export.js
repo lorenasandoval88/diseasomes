@@ -366,7 +366,7 @@ function ui(targetDiv = document.body) {
     div.id = 'prsCalcUI'
     div.innerHTML = `
     <p>
-	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targeted by the PGS entry based on <br>PRS  =  exp( ∑ N  𝛽i * dosage i ). Where N is the number of SNPs in PGS catalog entry, βi is the effect size (or beta) of variant i and dosage i is the number of copies of the alternate allele of SNP i in that 23andme individual.
+	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targeted by the PGS entry based on <br>PRS  =  exp( ∑ N  𝛽 * z ). Where N is the number of SNPs in PGS catalog entry, β is the effect size (or beta) of one variant and z is the number of copies of the alternate allele in that 23andme individual.
     </p>
     <hr>
     `
@@ -636,7 +636,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
         Push(all_pgs_variants.matched_by_alleles.zero_allele, all_pgs_variants.matched_by_alleles.zero_allele.risk)).concat(
         Push(all_pgs_variants.matched_by_alleles.one_allele, all_pgs_variants.matched_by_alleles.one_allele.risk)).concat(
         Push(all_pgs_variants.matched_by_alleles.two_allele, all_pgs_variants.matched_by_alleles.two_allele.risk))
-console.log("items",items)
+    //console.log("items",items)
 
     plotRiskDiv.style.height = data.pgs.dt.length * 1.1 + 'em'
     plotAllMatchByEffectDiv.style.height = data.pgs.dt.length * 1.1 + 'em'
@@ -662,16 +662,37 @@ console.log("items",items)
 
     console.log("plotData-------------------------",plotData)
     // TODO------------------------------------------
-    // re-order plot legend manually
-    //const conditions = new Set(plotData.map(a => a.category));
-    const conditions = [' ',  '34 not matched', '26 matched, zero alleles','14 matched, one allele', '3 matched, two alleles']
-    
-    console.log("conditions", conditions)
+    // re-order plot legend manually, order conditions list by regex 
+    const conditions_arr = Array.from(new Set(plotData.map(a => a.category)))
+    console.log("conditions_arr",conditions_arr)
+
+    //const conditions_arr = [' ',  'not matched', 'matched, zero alleles', 'matched, one allele', 'matched, two alleles']
+    var rx_not = new RegExp(/\bnot?(?!S)/);
+    var rx_zero = new RegExp(/\bzero?(?!S)/);
+    var rx_one = new RegExp(/\bone?(?!S)/);
+    var rx_two = new RegExp(/\btwo?(?!S)/);
+    function getSortingKey(value) {
+        if (rx_not.test(value)) {
+            return 2}
+        if (rx_zero.test(value)) {
+            return 3}
+        if (rx_one.test(value)) {
+            return 4}
+        if (rx_two.test(value)) {
+            return 5}
+        return 1;
+    }
+    const conditions = conditions_arr.sort(function(x,y){
+        return getSortingKey(x) - getSortingKey(y);
+    });
+    console.log("conditions",conditions)
     const traces = [];
     conditions.forEach(function (category) {
         var newArray = plotData.filter(function (el) {
             return el.category == category;
         });
+        // console.log("category",category)
+        // console.log("newArray[0]",newArray[0])
         traces.push({
             y: newArray.map(a => a.chrPos),
             x: newArray.map(a => a.risk),
@@ -687,6 +708,7 @@ console.log("items",items)
             }
         })
     })
+    console.log("traces",traces)
     const risk_composition = {}
     const risk1 = all_pgs_variants.matched.risk.reduce((partialSum, a) => partialSum + a, 0);
     const risk2 = all_pgs_variants.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
@@ -734,11 +756,11 @@ console.log("items",items)
             text: `<span >PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
         },
         //autosize: true,
-        margin: {
-            r: 10,
-            l: 200,
-            t: 50,
-            b: 35
+         margin: {
+        //     r: 10,
+        l: 120,
+        //     t: 50,
+        //     b: 35
         },
         showlegend: true,
         legend: {
@@ -746,7 +768,7 @@ console.log("items",items)
             x: 0.02,
             y: 0.98,
             font: {
-                size: 13
+                size: 16
             }
         },
         yaxis: {
@@ -757,7 +779,7 @@ console.log("items",items)
             //automargin: true,
             title: {
                 title: '<span style="font-size:large">Chromosome and Position</span>',
-                standoff: 90
+                standoff: 10
             },
             rangemode: "tozero",
             type: 'category',
@@ -847,6 +869,8 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
 }
 
 function pieChart(data = PGS23.data) {
+    pieChartDiv.style.height = 25 + 'em'
+
     /* Plot percent of matched and not matched betas */
     const risk_composition = {}
     const risk1 = data.plot.matched.risk.reduce((partialSum, a) => partialSum + a, 0);
@@ -859,9 +883,11 @@ function pieChart(data = PGS23.data) {
     var piePlotData = [{
         values: y,
         labels: x,
-        showlegend: false,
-        textinfo: "label+percent",
-        textposition: "outside",
+        //showlegend: false,
+        insidetextorientation: "horizontal",
+        //automargin : "true",
+        textinfo: "percent",
+        textposition: "inside",
         type: 'pie',
         //automargin: true,
         marker: {
@@ -872,15 +898,17 @@ function pieChart(data = PGS23.data) {
             }
         },
         textfont: {
-            family: 'Lato',
+            //family: 'Lato',
             color: 'black',
             size: 18
         },
+        //insidetextfont: {size:30},
+
         hoverlabel: {
             bgcolor: 'black',
             bordercolor: 'black',
             font: {
-                family: 'Lato',
+               // family: 'Lato',
                 color: 'white',
                 size: 18
             }
@@ -888,17 +916,20 @@ function pieChart(data = PGS23.data) {
     }]
     var layout = {
         //legend: { x: -1 },
-        title: `PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution ${data.pgs.dt.length} for ${data.pgs.meta.trait_mapped} variants`,
-        height: 340,
-        width: 550,
+        title: {
+        text:` PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants`,
+     },// x: 50, y: 60},
+        // height: 410,
+        // width: 750,
         legend: {
+          //  xanchor:"right",
+           // x:-0.02, y:0.7,  // play with it
             font: {
-                size: 18
+                //family: 'Lato',
+                size: 16
             }
         },
-        margin: {
-            l: 250
-        }
+       margin: { r:400}//l: 50, t:40,b:100 }
     };
     var config = {
         responsive: true
