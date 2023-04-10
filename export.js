@@ -758,15 +758,15 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
         //autosize: true,
          margin: {
         //     r: 10,
-        l: 120,
+        l: 100,
         //     t: 50,
         //     b: 35
         },
         showlegend: true,
         legend: {
             orientation: 'v',
-            x: 0.02,
-            y: 0.98,
+           // x: 0.02,
+            //y: 0.98,
             font: {
                 size: 16
             }
@@ -929,7 +929,7 @@ function pieChart(data = PGS23.data) {
                 size: 16
             }
         },
-       margin: { r:400}//l: 50, t:40,b:100 }
+       margin: { r:4}//l: 50, t:40,b:100 }
     };
     var config = {
         responsive: true
