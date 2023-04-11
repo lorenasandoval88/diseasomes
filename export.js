@@ -35,7 +35,6 @@ PGS23.loadPGS = async (i = 1) => {
     <button id='btLoadPgs' class="btn btn-primary btn__first" data-toggle="collapse1" data-target=".collapse.first">load</button>
     <span id="showLargeFile" hidden=true><input id="checkLargeFile"type="checkbox">large file (under development)</span>
     
-    <button id='btLoadPgsPlot' class="btn btn-primary btn__first" data-toggle="collapse2" data-target=".collapse.first" data-text="Collapse">plot risk scores</button>
     <span id="summarySpan" hidden=true>[<a id="urlPGS" href='' target="_blank">FTP</a>][<a id="catalogEntry" href="https://www.pgscatalog.org/score/${"PGS000000".slice(0, -JSON.stringify(i).length) + JSON.stringify(i)}" target="_blank">catalog</a>]<span id="largeFile"></span><br><span id="trait_mapped">...</span>, <span id="dataRows">...</span> variants, [<a id="pubDOI" target="_blank">Reference</a>], [<a href="#" id="objJSON">JSON</a>].</span>
     <p><textarea id="pgsTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`;
     div.querySelector('#pgsID').onkeyup = (evt => {
@@ -45,19 +44,7 @@ PGS23.loadPGS = async (i = 1) => {
 
         }
     })
-    // hide pgs plot
-    document.getElementById('btLoadPgsPlot').addEventListener("click", (e) => {
-        pgsPlot()
-        var div2 = document.getElementById('divPGSPlot');
-        if (div2.style.display !== 'block') {
-            div2.style.display = 'block';
-            e.target.textContent = `hide scores`;
-        } else if (div2.style.display == 'block') {
-            div2.style.display = 'none';
-            e.target.textContent = `plot risk scores`
-
-        }
-    })
+ 
 
     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
     div.querySelector('#btLoadPgs').onclick = async (evt) => {
@@ -770,7 +757,6 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     }
     data.plot = all_pgs_variants
     data.plot.traces = traces
-    console.log("traces", traces)
 
     Plotly.newPlot(dv, traces, layout, config)
     tabulateAllMatchByEffect()
@@ -784,7 +770,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         div = document.createElement('div')
         document.body.appendChild(div)
     }
-    div.innerHTML = `<br><hr><div>Table for ${data.plot.matched_by_alleles.one_allele.dt.length + data.plot.matched_by_alleles.two_allele.dt.length} matched PGS variants (dosage = 1 or 2)</div><hr>`
+    div.innerHTML = `PRS = ${Math.round(data.PRS*1000)/1000}<br><hr><div>Table for ${data.plot.matched_by_alleles.one_allele.dt.length + data.plot.matched_by_alleles.two_allele.dt.length} matched PGS variants (dosage = 1 or 2)</div><hr>`
     // sort by absolute value
     let jj = [...Array(data.calcRiskScore.length)].map((_, i) => i) // match indexes
     // remove zero effect
@@ -821,9 +807,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     })
 
     // <div id='plotSnpConsequence' style='display: inline-block;' ></div>
-    // <div id='plotSnpClinical' style='display: inline-block;' ></div>
-    // <div id='plotSnpChrom' style='display: inline-block;' ></div>`
-
+ 
     //debugger
 }
 
