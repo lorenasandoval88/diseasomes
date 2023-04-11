@@ -187,7 +187,7 @@ PGS23.loadCalc = async () => {
     <hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
 
     <div id="tabulateAllMatchByEffectDiv"></div>
-    <div style="height:200px;" id="pieChartDiv">...</div>
+    <div style="height:180px;" id="pieChartDiv">...</div>
     <div style="height:300px;" id="plotAllMatchByEffectDiv">...</div>
     </div>
 	`
