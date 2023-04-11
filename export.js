@@ -700,6 +700,10 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     var layout = {
         title: {
             text: `<span >PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
+            font: {
+                //family: 'Lato',
+                size: 19
+            }
         },
         //autosize: true,
          margin: {
@@ -863,7 +867,7 @@ function pieChart(data = PGS23.data) {
         text:` PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants`,
         font: {
             //family: 'Lato',
-            size: 18
+            size: 19
         }
      },// x: 50, y: 60},
         // height: 410,
@@ -876,7 +880,7 @@ function pieChart(data = PGS23.data) {
                 size: 16
             }
         },
-       margin: { r:4}//l: 50, t:40,b:100 }
+       //margin: { r:4}//l: 50, t:40,b:100 }
     };
     var config = {
         responsive: true
