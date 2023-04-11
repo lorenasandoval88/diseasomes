@@ -184,7 +184,9 @@ PGS23.loadCalc = async () => {
 	<textarea id="my23CalcTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea>
 
 	<div id="plotRiskDiv" style="height:300px;">
+
     <hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
+    <div id="errorDiv"></div>
 
     <div id="tabulateAllMatchByEffectDiv"></div>
     <div style="height:250px;" id="pieChartDiv">...</div>
@@ -250,7 +252,6 @@ PGS23.Match2 = function (data, progressReport) {
     function funMatch(i = 0, matchFloor = 0) {
         if (i < n) {
             let r = data.pgs.dt[i]
-            console.log("r",r)
 
             let regexPattern = new RegExp([r[indEffect_allele], r[indOther_allele]].join('|'))
 
@@ -279,10 +280,7 @@ PGS23.Match2 = function (data, progressReport) {
             // calculate Risk
             let logR = 0
             // log(0)=1
-            let ind_effect_allele = data.pgs.cols.indexOf('effect_allele')
-            //let ind_other_allele = data.pgs.cols.indexOf('other_allele')
             let ind_effect_weight = data.pgs.cols.indexOf('effect_weight')
-            //let ind_allelefrequency_effect = data.pgs.cols.indexOf('allelefrequency_effect')
             dtMatch.forEach((m, i) => {
                 calcRiskScore[i] = 0
                 // default no risk
@@ -296,7 +294,7 @@ PGS23.Match2 = function (data, progressReport) {
                     // 23andme match
                     let pi = m.at(-1)
                     //pgs match
-                    let alele = pi[ind_effect_allele]
+                    let alele = pi[indEffect_allele]
                     let L = mi.match(RegExp(alele, 'g'))
                     // how many, 0,1, or 2
                     if (L) {
@@ -476,7 +474,7 @@ function saveFile(x, fileName) {
 
 // ploting
 
-function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('plotAllMatchByEffectDiv')) {
+function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById('errorDiv'),dv = document.getElementById('plotAllMatchByEffectDiv')) {
     //https://community.plotly.com/t/fill-shade-a-chart-above-a-specific-y-value-in-plotlyjs/5133
 
     const all_pgs_variants = {}
@@ -486,8 +484,25 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
 
     // MATCHED ---------------------------
     // separate pgs.dt into 2 (matches and non matches) arrays and then sort by effect  
+    if (!dv2) {
+        dv2 = document.createElement('div')
+        document.body.appendChild(dv2)
+    }
     const matched = data.pgsMatchMy23.map(function (v) {
+        if(v.length==2){
         return v[1]
+
+        } else if(v.length==3){
+            console.log(dv2)
+            dv2.innerHTML = `<span style="font-size:small; color: red">please note : two 23andMe variants mapped to pgs variant : chr.position ${v[2][indChr]+"."+v[2][indPos]}<br>Only the first 23andMe variant is used: ${v[0]}</span>`
+            return v[2]
+
+        }else if(v.length>3){
+        dv2.innerHTML = `<span style="font-size:small; color: red">please note : more than two 23andMe variants mapped to a pgs variant<br>please check 23andMe file for duplicate chromosome.position</span>`
+        console.log(dv2)
+
+        return v[2]
+    }
     }) // " matched" data
 
     const matched_risk = matched.map((j) => {
@@ -696,12 +711,11 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
             }
         })
     })
-    console.log("traces",traces)
     const risk_composition = {}
     const risk1 = all_pgs_variants.matched.risk.reduce((partialSum, a) => partialSum + a, 0);
     const risk2 = all_pgs_variants.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
-    risk_composition[`${all_pgs_variants.matched.risk.length} matched<br>variants`] = risk1
-    risk_composition[`${all_pgs_variants.not_matched.risk.length} unmatched<br>variants`] = risk2
+    risk_composition[`${all_pgs_variants.matched.risk.length} matched variants`] = risk1
+    risk_composition[`${all_pgs_variants.not_matched.risk.length} unmatched variants`] = risk2
     var y = Object.values(risk_composition)
     var x = Object.keys(risk_composition)
 
@@ -837,7 +851,7 @@ function pieChart(data = PGS23.data) {
     const risk2 = data.plot.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
     risk_composition[`${data.plot.matched.risk.length} matched<br>variants`] = risk1
     risk_composition[`${data.plot.not_matched.risk.length} unmatched<br>variants`] = risk2
-
+console.log("risk_composition",risk_composition)
     var y = Object.values(risk_composition)
     var x = Object.keys(risk_composition)
     var piePlotData = [{
