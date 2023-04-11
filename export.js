@@ -187,7 +187,7 @@ PGS23.loadCalc = async () => {
     <hr><div>If you want to see the current state of the two data objects try <code>data = document.getElementById("PGS23calc").PGS23data</code> in the browser console</div><hr>
 
     <div id="tabulateAllMatchByEffectDiv"></div>
-    <div style="height:300px;" id="pieChartDiv">...</div>
+    <div style="height:200px;" id="pieChartDiv">...</div>
     <div style="height:300px;" id="plotAllMatchByEffectDiv">...</div>
     </div>
 	`
@@ -812,7 +812,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
 }
 
 function pieChart(data = PGS23.data) {
-    pieChartDiv.style.height = 25 + 'em'
+    pieChartDiv.style.height = 20 + 'em'
 
     /* Plot percent of matched and not matched betas */
     const risk_composition = {}
