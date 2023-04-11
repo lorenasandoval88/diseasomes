@@ -253,7 +253,6 @@ PGS23.Match2 = function (data, progressReport) {
             console.log("r",r)
 
             let regexPattern = new RegExp([r[indEffect_allele], r[indOther_allele]].join('|'))
-            console.log("regexPattern",regexPattern)
 
             if (dtMatch.length > 0) {
                 matchFloor = dtMatch.at(-1)[0][4]
@@ -264,7 +263,6 @@ PGS23.Match2 = function (data, progressReport) {
                 .filter(myr => regexPattern.test(myr[indGenotype])) //also filter by pgs alt or effect allele match
             //let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
 
-            console.log("dtMatch_i",dtMatch_i)
 
             if (dtMatch_i.length > 0) {
                 dtMatch.push(dtMatch_i.concat([r]))
@@ -274,7 +272,6 @@ PGS23.Match2 = function (data, progressReport) {
                 funMatch(i + 1)
             }, 0)
         } else {
-            console.log("dtMatch",dtMatch)
 
             data.pgsMatchMy23 = dtMatch
             let calcRiskScore = []
@@ -312,7 +309,7 @@ PGS23.Match2 = function (data, progressReport) {
             })
             data.alleles = alleles
             data.calcRiskScore = calcRiskScore
-            console.log("calcRiskScore",calcRiskScore)
+
             if (calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
                 console.log('these are not betas :-(')
                 document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
