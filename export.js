@@ -494,11 +494,11 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
 
         } else if(v.length==3){
             console.log(dv2)
-            dv2.innerHTML = `<span style="font-size:small; color: red">please note : two 23andMe variants mapped to pgs variant : chr.position ${v[2][indChr]+"."+v[2][indPos]}<br>Only the first 23andMe variant is used: ${v[0]}</span>`
+            dv2.innerHTML = `<span style="font-size:small; color: red">Warning : two 23andMe variants mapped to pgs variant : chr.position ${v[2][indChr]+"."+v[2][indPos]}<br>Only the first 23andMe variant is used: ${v[0]}</span>`
             return v[2]
 
         }else if(v.length>3){
-        dv2.innerHTML = `<span style="font-size:small; color: red">please note : more than two 23andMe variants mapped to a pgs variant<br>please check 23andMe file for duplicate chromosome.position</span>`
+        dv2.innerHTML = `<span style="font-size:small; color: red">Warning : more than two 23andMe variants mapped to a pgs variant<br>please check 23andMe file for duplicate chromosome.position</span>`
         console.log(dv2)
 
         return v[2]
@@ -827,14 +827,17 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     const indEffect_weight = data.pgs.cols.indexOf('effect_weight')
 
     let n = jj.length
-    //console.log("SNP SUMMARY TABLE: ",jj.map(x =>data.pgsMatchMy23[x]))
-    //console.log("dosage",jj.map(x =>data.alleles[x]))
+ 
     jj.forEach((ind, i) => {
         //let jnd=n-ind
+        
         let row = document.createElement('tr')
         tbody.appendChild(row)
+
         let xi = data.pgsMatchMy23[ind]
-        row.innerHTML = `<tr><td align="left">${i+1})</td><td align="center">${Math.round(xi[1][indEffect_weight]*1000)/1000}</td><td align="center">${data.alleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
+        let my_23idx = 1
+         if(xi.length>2){my_23idx = 2} 
+        row.innerHTML = `<tr><td align="left">${i+1})</td><td align="center">${Math.round(xi[my_23idx][indEffect_weight]*1000)/1000}</td><td align="center">${data.alleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
     })
 
     // <div id='plotSnpConsequence' style='display: inline-block;' ></div>
@@ -851,7 +854,7 @@ function pieChart(data = PGS23.data) {
     const risk2 = data.plot.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
     risk_composition[`${data.plot.matched.risk.length} matched<br>variants`] = risk1
     risk_composition[`${data.plot.not_matched.risk.length} unmatched<br>variants`] = risk2
-console.log("risk_composition",risk_composition)
+
     var y = Object.values(risk_composition)
     var x = Object.keys(risk_composition)
     var piePlotData = [{
