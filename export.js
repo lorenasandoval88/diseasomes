@@ -473,6 +473,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     const all_pgs_variants = {}
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
+    const indBeta = data.pgs.cols.indexOf('effect_weight')
 
     // MATCHED ---------------------------
     // separate pgs.dt into 2 (matches and non matches) arrays and then sort by effect  
@@ -481,7 +482,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     }) // " matched" data
 
     const matched_risk = matched.map((j) => {
-        return j[4]
+        return j[indBeta]
     })
 
     const matched_chrPos = matched.map(j => {
@@ -508,7 +509,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
         return `Chr${j[indChr]}.${j[indPos]}`
     })
 
-    const not_matched_risk = not_matched.map((yi, i) => yi[4])
+    const not_matched_risk = not_matched.map((yi, i) => yi[indBeta])
 
     all_pgs_variants['not_matched'] = {}
     all_pgs_variants.not_matched.chrPos = not_matched_chrPos
@@ -794,11 +795,14 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     tb.appendChild(tbody)
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
+
     let indOther_allele = data.pgs.cols.indexOf('other_allele')
     if (indOther_allele == -1) {
         indOther_allele = data.pgs.cols.indexOf('hm_inferOtherAllele')
     }
     const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
+    const indEffect_weight = data.pgs.cols.indexOf('effect_weight')
+
     let n = jj.length
     //console.log("SNP SUMMARY TABLE: ",jj.map(x =>data.pgsMatchMy23[x]))
     //console.log("dosage",jj.map(x =>data.alleles[x]))
@@ -807,7 +811,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         let row = document.createElement('tr')
         tbody.appendChild(row)
         let xi = data.pgsMatchMy23[ind]
-        row.innerHTML = `<tr><td align="left">${i+1})</td><td align="center">${Math.round(xi[1][4]*1000)/1000}</td><td align="center">${data.alleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
+        row.innerHTML = `<tr><td align="left">${i+1})</td><td align="center">${Math.round(xi[1][indEffect_weight]*1000)/1000}</td><td align="center">${data.alleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
     })
 
     // <div id='plotSnpConsequence' style='display: inline-block;' ></div>
