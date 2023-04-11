@@ -272,9 +272,9 @@ PGS23.Match2 = function (data, progressReport) {
             let logR = 0
             // log(0)=1
             let ind_effect_allele = data.pgs.cols.indexOf('effect_allele')
-            let ind_other_allele = data.pgs.cols.indexOf('other_allele')
+            //let ind_other_allele = data.pgs.cols.indexOf('other_allele')
             let ind_effect_weight = data.pgs.cols.indexOf('effect_weight')
-            let ind_allelefrequency_effect = data.pgs.cols.indexOf('allelefrequency_effect')
+            //let ind_allelefrequency_effect = data.pgs.cols.indexOf('allelefrequency_effect')
             dtMatch.forEach((m, i) => {
                 calcRiskScore[i] = 0
                 // default no risk
