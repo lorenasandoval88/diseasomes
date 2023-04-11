@@ -770,7 +770,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         div = document.createElement('div')
         document.body.appendChild(div)
     }
-    div.innerHTML = `PRS = ${Math.round(data.PRS*1000)/1000}<br><hr><div>Table for ${data.plot.matched_by_alleles.one_allele.dt.length + data.plot.matched_by_alleles.two_allele.dt.length} matched PGS variants (dosage = 1 or 2)</div><hr>`
+    div.innerHTML = `<span style="font-size:large">PRS = ${Math.round(data.PRS*1000)/1000}</span><br><hr><div>Table for ${data.plot.matched_by_alleles.one_allele.dt.length + data.plot.matched_by_alleles.two_allele.dt.length} matched PGS variants (dosage = 1 or 2)</div><hr>`
     // sort by absolute value
     let jj = [...Array(data.calcRiskScore.length)].map((_, i) => i) // match indexes
     // remove zero effect
