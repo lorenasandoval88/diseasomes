@@ -234,10 +234,13 @@ PGS23.Match2 = function (data, progressReport) {
     // extract harmonized data from PGS entry first
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
+    const indOther_allele = data.pgs.cols.indexOf('other_allele')
+    const indEffect_allele = data.pgs.cols.indexOf('effect_allele')
+    const indGenotype = data.my23.cols.indexOf('genotype')
+
     // match
     let dtMatch = []
-    const cgrInd = data.pgs.cols.indexOf('hm_chr')
-    const posInd = data.pgs.cols.indexOf('hm_pos')
+
     const n = data.pgs.dt.length
     let progressCalc = document.getElementById('progressCalc')
     progressCalc.hidden = false
@@ -247,7 +250,10 @@ PGS23.Match2 = function (data, progressReport) {
     function funMatch(i = 0, matchFloor = 0) {
         if (i < n) {
             let r = data.pgs.dt[i]
-            let regexPattern = new RegExp([r[2], r[3]].join('|'))
+            console.log("r",r)
+
+            let regexPattern = new RegExp([r[indEffect_allele], r[indOther_allele]].join('|'))
+            console.log("regexPattern",regexPattern)
 
             if (dtMatch.length > 0) {
                 matchFloor = dtMatch.at(-1)[0][4]
@@ -255,8 +261,11 @@ PGS23.Match2 = function (data, progressReport) {
             }
             let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos]))
                 .filter(myr => (myr[1] == r[indChr]))
-                .filter(myr => regexPattern.test(myr[3])) //also filter by pgs alt or effect allele match
+                .filter(myr => regexPattern.test(myr[indGenotype])) //also filter by pgs alt or effect allele match
             //let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
+
+            console.log("dtMatch_i",dtMatch_i)
+
             if (dtMatch_i.length > 0) {
                 dtMatch.push(dtMatch_i.concat([r]))
             }
@@ -265,6 +274,8 @@ PGS23.Match2 = function (data, progressReport) {
                 funMatch(i + 1)
             }, 0)
         } else {
+            console.log("dtMatch",dtMatch)
+
             data.pgsMatchMy23 = dtMatch
             let calcRiskScore = []
             let alleles = []
@@ -301,6 +312,7 @@ PGS23.Match2 = function (data, progressReport) {
             })
             data.alleles = alleles
             data.calcRiskScore = calcRiskScore
+            console.log("calcRiskScore",calcRiskScore)
             if (calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
                 console.log('these are not betas :-(')
                 document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
