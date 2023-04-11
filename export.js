@@ -861,6 +861,10 @@ function pieChart(data = PGS23.data) {
         //legend: { x: -1 },
         title: {
         text:` PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants`,
+        font: {
+            //family: 'Lato',
+            size: 18
+        }
      },// x: 50, y: 60},
         // height: 410,
         // width: 750,
