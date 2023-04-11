@@ -208,7 +208,6 @@ PGS23.loadCalc = async () => {
 
         let data = document.getElementById("PGS23calc").PGS23data
         saveFile(JSON.stringify(data.pgsMatchMy23), data.my23.info.slice(0, -4) + '_match_PGS_calcRiskScore' + data.pgs.id + '.json')
-        console.log("data 1111", data)
 
     }
     div.querySelector('#riskCalcScoreJSON').onclick = evt => {
@@ -620,8 +619,6 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     all_pgs_variants.matched_by_alleles.zero_allele.hoverinfo = Array(zero_allele.length).fill("all")
     all_pgs_variants.matched_by_alleles.one_allele.hoverinfo = Array(one_allele.length).fill("all")
     all_pgs_variants.matched_by_alleles.two_allele.hoverinfo = Array(two_allele.length).fill("all")
-    //console.log(`all pgs variants subset by matched, not macthed and by alleles: `,all_pgs_variants)
-    console.log("all_pgs_variants", all_pgs_variants)
 
 
     // add matched,all, zero, one and two allele into new array
@@ -636,7 +633,6 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
         Push(all_pgs_variants.matched_by_alleles.zero_allele, all_pgs_variants.matched_by_alleles.zero_allele.risk)).concat(
         Push(all_pgs_variants.matched_by_alleles.one_allele, all_pgs_variants.matched_by_alleles.one_allele.risk)).concat(
         Push(all_pgs_variants.matched_by_alleles.two_allele, all_pgs_variants.matched_by_alleles.two_allele.risk))
-    //console.log("items",items)
 
     plotRiskDiv.style.height = data.pgs.dt.length * 1.1 + 'em'
     plotAllMatchByEffectDiv.style.height = data.pgs.dt.length * 1.1 + 'em'
@@ -660,11 +656,9 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
         })
         .sort((a, b) => parseFloat(a.risk) - parseFloat(b.risk))
 
-    console.log("plotData-------------------------",plotData)
     // TODO------------------------------------------
     // re-order plot legend manually, order conditions list by regex 
     const conditions_arr = Array.from(new Set(plotData.map(a => a.category)))
-    console.log("conditions_arr",conditions_arr)
 
     //const conditions_arr = [' ',  'not matched', 'matched, zero alleles', 'matched, one allele', 'matched, two alleles']
     var rx_not = new RegExp(/\bnot?(?!S)/);
@@ -685,14 +679,11 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     const conditions = conditions_arr.sort(function(x,y){
         return getSortingKey(x) - getSortingKey(y);
     });
-    console.log("conditions",conditions)
     const traces = [];
     conditions.forEach(function (category) {
         var newArray = plotData.filter(function (el) {
             return el.category == category;
         });
-        // console.log("category",category)
-        // console.log("newArray[0]",newArray[0])
         traces.push({
             y: newArray.map(a => a.chrPos),
             x: newArray.map(a => a.risk),
@@ -717,39 +708,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     var y = Object.values(risk_composition)
     var x = Object.keys(risk_composition)
 
-    // var piePlotData = {
-    //     height: 40,
-    //     width: 50,
-    //     values: y,
-    //     labels: x,
-    //     showlegend: false,
-    //     textinfo: "label+percent",
-    //     textposition: "outside",
-    //     type: 'pie',
-    //     //automargin: true,
-    //     marker: {
-    //         colors: ["#2ca02c", "grey"],
-    //         size: 18,
-    //         line: {
-    //             color: 'black'
-    //         }
-    //     },
-    //     textfont: {
-    //         family: 'Lato',
-    //         color: 'black',
-    //         size: 18
-    //     },
-    //     hoverlabel: {
-    //         bgcolor: 'black',
-    //         bordercolor: 'black',
-    //         font: {
-    //             family: 'Lato',
-    //             color: 'white',
-    //             size: 18
-    //         }
-    //     }
-    // }
-    // traces.push(piePlotData)
+   
     //------------------------------------------
     var layout = {
         title: {
@@ -972,105 +931,6 @@ async function getInfoSnps() {
     return info
 }
 
-function plotSummarySnps() {
-    var modata = document.getElementById("PGS23calc").PGS23data
-    if (Object.keys(modata).length != 0) {
-        getInfoSnps().then((value) => {
-            var info = value
-
-            /* Plot consequence */
-            var consequence = {}
-            info.forEach(el => {
-                var col = el.most_severe_consequence
-                if (!Object.keys(consequence).includes(col)) {
-                    consequence[col] = 0
-                }
-                consequence[col] += 1
-            })
-
-            var y = Object.values(consequence)
-            var x = Object.keys(consequence)
-            var data = [{
-                values: y,
-                labels: x,
-                type: 'pie'
-            }];
-
-            var layout = {
-                legend: {
-                    x: -1
-                },
-                title: 'Variant Type',
-                height: 500,
-                width: 500
-            };
-
-            Plotly.newPlot('plotSnpConsequence', data, layout);
-
-            /* Plot distribution by chromosome */
-            var filt = info.filter(el => el['mappings'].length != 0)
-            if (filt.length > 0) {
-                var chr = {}
-                filt.forEach(el => {
-                    var col = 'Chromosome ' + el.mappings[0].seq_region_name
-                    if (!Object.keys(chr).includes(col)) {
-                        chr[col] = 0
-                    }
-                    chr[col] += 1
-                })
-
-                y = Object.values(chr)
-                x = Object.keys(chr)
-                data = [{
-                    values: y,
-                    labels: x,
-                    type: 'pie'
-                }];
-
-                layout = {
-                    title: 'Chromosome',
-                    height: 400,
-                    width: 500
-                };
-
-                Plotly.newPlot('plotSnpChrom', data, layout);
-            }
-
-            /* Plot clinical */
-            var cln = info.filter(el => el['clinical_significance'] != null)
-            if (cln.length > 0) {
-                var clinical = {}
-                cln.forEach(el => {
-                    var col = el.clinical_significance
-                    if (!Object.keys(clinical).includes(col)) {
-                        clinical[col] = 0
-                    }
-                    clinical[col] += 1
-                })
-
-                y = Object.values(clinical)
-                x = Object.keys(clinical)
-                data = [{
-                    values: y,
-                    labels: x,
-                    type: 'pie'
-                }];
-
-                layout = {
-                    title: 'Clinical Significance',
-                    height: 400,
-                    width: 500
-                };
-
-                Plotly.newPlot('plotSnpClinical', data, layout);
-            }
-
-        })
-    } else {
-        alert('No data ready to plot!')
-    }
-
-}
 
 export {
     ui,
