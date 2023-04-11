@@ -536,7 +536,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
         return `Chr${j[indChr]}.${j[indPos]}`
     })
 
-    const allData_risk = allData.map((yi, i) => yi[4])
+    const allData_risk = allData.map((yi, i) => yi[indBeta])
 
     all_pgs_variants['all'] = {}
     all_pgs_variants.all.chrPos = allData_chrPos
@@ -583,9 +583,9 @@ function plotAllMatchByEffect4(data = PGS23.data, dv = document.getElementById('
     all_pgs_variants.matched_by_alleles.zero_allele.dt = zero_allele
     all_pgs_variants.matched_by_alleles.one_allele.dt = one_allele
     all_pgs_variants.matched_by_alleles.two_allele.dt = two_allele
-    all_pgs_variants.matched_by_alleles.zero_allele.risk = zero_allele_idx.map(i => matched[i][4]);
-    all_pgs_variants.matched_by_alleles.one_allele.risk = one_allele_idx.map(i => matched[i][4]);
-    all_pgs_variants.matched_by_alleles.two_allele.risk = two_allele_idx.map(i => matched[i][4]);
+    all_pgs_variants.matched_by_alleles.zero_allele.risk = zero_allele_idx.map(i => matched[i][indBeta]);
+    all_pgs_variants.matched_by_alleles.one_allele.risk = one_allele_idx.map(i => matched[i][indBeta]);
+    all_pgs_variants.matched_by_alleles.two_allele.risk = two_allele_idx.map(i => matched[i][indBeta]);
     all_pgs_variants.matched_by_alleles.zero_allele.category = Array(zero_allele.length).fill(`${zero_allele.length } matched, zero alleles`)
     all_pgs_variants.matched_by_alleles.one_allele.category = Array(one_allele.length).fill(`${one_allele.length } matched, one allele`)
     all_pgs_variants.matched_by_alleles.two_allele.category = Array(two_allele.length).fill(`${two_allele.length } matched, two alleles`)
