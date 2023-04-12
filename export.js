@@ -488,20 +488,23 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
         dv2 = document.createElement('div')
         document.body.appendChild(dv2)
     }
+    dv2.innerHTML = ''
+    let duplicate = ''
+    
     const matched = data.pgsMatchMy23.map(function (v) {
         if(v.length==2){
-        return v[1]
+            return v[1]
 
         } else if(v.length==3){
-            console.log(dv2)
-            dv2.innerHTML = `<span style="font-size:small; color: red">Warning : two 23andMe variants mapped to pgs variant : chr.position ${v[2][indChr]+"."+v[2][indPos]}<br>Only the first 23andMe variant is used: ${v[0]}</span>`
+            console.log("two 23andme SNPS mapped to one pgs variant",v)
+            duplicate += `<span style="font-size:small; color: red">Warning : two 23andMe variants mapped to pgs variant : chr.position ${v[2][indChr]+"."+v[2][indPos]}<br>Only the first 23andMe variant is used: ${v[0]}</span><br>`
+            dv2.innerHTML = duplicate
             return v[2]
-
         }else if(v.length>3){
-        dv2.innerHTML = `<span style="font-size:small; color: red">Warning : more than two 23andMe variants mapped to a pgs variant<br>please check 23andMe file for duplicate chromosome.position</span>`
-        console.log(dv2)
-
-        return v[2]
+            duplicate += `<span style="font-size:small; color: red">Warning : more than two 23andMe variants mapped to a pgs variant<br>please check 23andMe file for duplicate chromosome.position</span><br>`
+            dv2.innerHTML = duplicate
+            console.log("more than 2 23andme SNPS mapped to one pgs variant",v)
+            return v[2]
     }
     }) // " matched" data
 
