@@ -307,14 +307,38 @@ PGS23.Match2 = function (data, progressReport) {
             })
             data.alleles = alleles
             data.calcRiskScore = calcRiskScore
-
-            if (calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
+            //console.log("calcRiskScore.reduce((a, b) => Math.min(a, b))",calcRiskScore.reduce((a, b) => Math.min(a, b)))
+            //console.log("calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0: ",calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0)
+            
+            // warning: no matches found!
+            if (calcRiskScore.length == 0) { 
+                console.log('there are no matches :-(')
+                document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
+                //document.getElementById('my23CalcTextArea').value += ` However, these don't look like betas. I am going to assume they are hazard ratios ... You could also look for another entry for the same trait where betas were calculated, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
+                //document.getElementById('my23CalcTextArea').value += ` However, these don't look right, QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
+                document.getElementById('plotRiskDiv').hidden = true
+                document.getElementById('hidenCalc').hidden = false
+                plotAllMatchByEffect4()
+                pieChart()
+            // zero betas
+            } else if (calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
                 console.log('these are not betas :-(')
                 document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
                 //document.getElementById('my23CalcTextArea').value += ` However, these don't look like betas. I am going to assume they are hazard ratios ... You could also look for another entry for the same trait where betas were calculated, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
-                document.getElementById('my23CalcTextArea').value += ` However, these don't look right, QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
+                document.getElementById('my23CalcTextArea').value += ` However, these don't look right (betas=0), QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
                 document.getElementById('plotRiskDiv').hidden = true
                 document.getElementById('hidenCalc').hidden = false
+                plotAllMatchByEffect4()
+                pieChart()
+            // large betas over 1
+            }else if (calcRiskScore.reduce((a, b) => Math.max(a, b)) > 1) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
+                console.log('these are large betas :-(')
+                document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
+                //document.getElementById('my23CalcTextArea').value += ` However, these don't look like betas. I am going to assume they are hazard ratios ... You could also look for another entry for the same trait where betas were calculated, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
+                document.getElementById('my23CalcTextArea').value += ` However, these don't look right (betas>1), QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
+                document.getElementById('plotRiskDiv').hidden = true
+                document.getElementById('hidenCalc').hidden = false
+                data.PRS = Math.exp(calcRiskScore.reduce((a, b) => a + b))
                 plotAllMatchByEffect4()
                 pieChart()
             } else {
@@ -649,8 +673,8 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
         Push(all_pgs_variants.matched_by_alleles.one_allele, all_pgs_variants.matched_by_alleles.one_allele.risk)).concat(
         Push(all_pgs_variants.matched_by_alleles.two_allele, all_pgs_variants.matched_by_alleles.two_allele.risk))
 
-    plotRiskDiv.style.height = data.pgs.dt.length * 1.1 + 'em'
-    plotAllMatchByEffectDiv.style.height = data.pgs.dt.length * 1.1 + 'em'
+    plotRiskDiv.style.height = 20 + data.pgs.dt.length * 1.1 + 'em'
+    plotAllMatchByEffectDiv.style.height = 20 + data.pgs.dt.length * 1.1 + 'em'
 
     // make new objects with id, all mapped to one condition sorted by value
     //https://stackoverflow.com/questions/979256/sorting-an-array-of-objects-by-property-values
@@ -714,16 +738,9 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
             }
         })
     })
-    const risk_composition = {}
-    const risk1 = all_pgs_variants.matched.risk.reduce((partialSum, a) => partialSum + a, 0);
-    const risk2 = all_pgs_variants.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
-    risk_composition[`${all_pgs_variants.matched.risk.length} matched variants`] = risk1
-    risk_composition[`${all_pgs_variants.not_matched.risk.length} unmatched variants`] = risk2
-    var y = Object.values(risk_composition)
-    var x = Object.keys(risk_composition)
-
-   
+      
     //------------------------------------------
+
     var layout = {
         title: {
             text: `<span >PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
@@ -830,7 +847,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     const indEffect_weight = data.pgs.cols.indexOf('effect_weight')
 
     let n = jj.length
- 
+    
     jj.forEach((ind, i) => {
         //let jnd=n-ind
         
@@ -855,8 +872,8 @@ function pieChart(data = PGS23.data) {
     const risk_composition = {}
     const risk1 = data.plot.matched.risk.reduce((partialSum, a) => partialSum + a, 0);
     const risk2 = data.plot.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
-    risk_composition[`${data.plot.matched.risk.length} matched<br>variants`] = risk1
-    risk_composition[`${data.plot.not_matched.risk.length} unmatched<br>variants`] = risk2
+    risk_composition[`total β for ${data.plot.matched.risk.length} <br>matched variants`] = risk1
+    risk_composition[`total β for ${data.plot.not_matched.risk.length} <br>unmatched variants`] = risk2
 
     var y = Object.values(risk_composition)
     var x = Object.keys(risk_composition)
