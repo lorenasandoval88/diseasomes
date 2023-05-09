@@ -749,6 +749,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
                 size: 19
             }
         },
+        width:'20em',
         //autosize: true,
          margin: {
         //     r: 10,
@@ -922,6 +923,7 @@ function pieChart(data = PGS23.data) {
      },// x: 50, y: 60},
         // height: 410,
         // width: 750,
+        width:'20em',
         legend: {
            xanchor:"right",
            // x:-0.02, y:0.7,  // play with it
