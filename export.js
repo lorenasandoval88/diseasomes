@@ -253,6 +253,7 @@ PGS23.Match2 = function (data, progressReport) {
         if (i < n) {
             let r = data.pgs.dt[i]
 
+            //also filter 23 and me variants if they don't match pgs alt or effect allele 
             let regexPattern = new RegExp([r[indEffect_allele], r[indOther_allele]].join('|'))
 
             if (dtMatch.length > 0) {
@@ -261,7 +262,7 @@ PGS23.Match2 = function (data, progressReport) {
             }
             let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos]))
                 .filter(myr => (myr[1] == r[indChr]))
-                .filter(myr => regexPattern.test(myr[indGenotype])) //also filter by pgs alt or effect allele match
+                .filter(myr => regexPattern.test(myr[indGenotype])) 
             //let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
 
 
@@ -383,7 +384,7 @@ function ui(targetDiv = document.body) {
     div.id = 'prsCalcUI'
     div.innerHTML = `
     <p>
-	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targeted by the PGS entry based on <br>PRS  =  exp( ∑ N  𝛽 * z ). Where N is the number of SNPs in PGS catalog entry, β is the effect size (or beta) of one variant and z is the number of copies of the alternate allele in that 23andme individual.
+	Below you can select, and inspect, <b style="color:maroon">A)</b> the <a href='https://www.pgscatalog.org' target="_blank">PGS Catalog</a> entries with risk scores for a list of genomic variations; and <b style="color:maroon">B)</b> <a href="https://you.23andme.com/tools/data/download" target="_blank">Your 23andMe data download</a>. Once you have both (A) and (B), you can proceed to <b style="color:maroon">C)</b> to calculate your raw polygenic risk score for the trait targeted by the PGS entry based on <br>PRS  =  ∑ ( 𝛽 * z ). Where β is the effect size (or beta) of one variant and z is the number of copies of the effect allele in that 23andme individual.
     </p>
     <hr>
     `
@@ -740,7 +741,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     })
       
     //------------------------------------------
-
+console.log("hi", traces)
     var layout = {
         title: {
             text: `<span >PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
@@ -749,14 +750,9 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
                 size: 19
             }
         },
-        //autosize: true,
-         margin: {
-        //     r: 10,
-        l: 100,
-        //     t: 50,
-        //     b: 35
-        },
-        showlegend: true,
+        margin: {
+            l: 140,
+          },
         legend: {
             orientation: 'v',
            // x: 0.02,
@@ -766,33 +762,33 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
             }
         },
         yaxis: {
-            // style:{
-            // },
-            linewidth: 1,
+            
             mirror: true,
-            //automargin: true,
-            title: {
-                title: '<span style="font-size:large">Chromosome and Position</span>',
+             title: {
+                text: '<span style="font-size:large">Chromosome and Position</span>',
+                font: {
+                   // family: 'Courier New, monospace',
+                    size: 24
+                  },
                 standoff: 10
-            },
+             },
             rangemode: "tozero",
-            type: 'category',
+            //type: 'category',
             showline: true,
-            tickangle: 0,
+           // tickangle: 0,
             tickfont: {
                 size: 10.5
             },
-            // title: '<span style="font-size:medium">variants , sorted by <span style="font-size:large">β</span></span>',
-
         },
         xaxis: {
+            autorange: true,
             font: {
                 size: 16
             },
             title: '<span style="font-size:large">β</span>',
             linewidth: 1,
             mirror: true,
-            rangemode: "tozero",
+            //rangemode: "tozero",
         }
     }
 
@@ -818,7 +814,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
         div = document.createElement('div')
         document.body.appendChild(div)
     }
-    div.innerHTML = `<span style="font-size:x-large">PRS = exp(∑ 𝛽*z) = ${Math.round(data.PRS*1000)/1000}</span><br><hr><div>Table for ${data.plot.matched_by_alleles.one_allele.dt.length + data.plot.matched_by_alleles.two_allele.dt.length} matched PGS variants (dosage = 1 or 2)</div><hr>`
+    div.innerHTML = `<span style="font-size:x-large">PRS = ∑ (𝛽*z) = ${Math.round(data.PRS*1000)/1000}</span><br><hr><div>Table for ${data.plot.matched_by_alleles.one_allele.dt.length + data.plot.matched_by_alleles.two_allele.dt.length} matched PGS variants (dosage = 1 or 2)</div><hr>`
     // sort by absolute value
     let jj = [...Array(data.calcRiskScore.length)].map((_, i) => i) // match indexes
     // remove zero effect
