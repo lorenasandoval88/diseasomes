@@ -339,10 +339,12 @@ PGS23.Match2 = function (data, progressReport) {
                 document.getElementById('my23CalcTextArea').value += ` However, these don't look right (betas>1), QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
                 document.getElementById('plotRiskDiv').hidden = true
                 document.getElementById('hidenCalc').hidden = false
+                //data.PRS = calcRiskScore.reduce((a, b) => a + b)
                 data.PRS = Math.exp(calcRiskScore.reduce((a, b) => a + b))
                 plotAllMatchByEffect4()
                 pieChart()
             } else {
+                //data.PRS = calcRiskScore.reduce((a, b) => a + b)
                 data.PRS = Math.exp(calcRiskScore.reduce((a, b) => a + b))
                 document.getElementById('my23CalcTextArea').value += ` Polygenic Risk Score, PRS=${Math.round(data.PRS * 1000) / 1000}, calculated from ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
                 //my23CalcTextArea.value+=` ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
@@ -740,8 +742,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
         })
     })
       
-    //------------------------------------------
-console.log("hi", traces)
+
     var layout = {
         title: {
             text: `<span >PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
@@ -753,42 +754,46 @@ console.log("hi", traces)
         margin: {
             l: 140,
           },
+       // width:'20em',
+ 
+        showlegend: true,
         legend: {
             orientation: 'v',
-           // x: 0.02,
-            //y: 0.98,
             font: {
                 size: 16
             }
         },
         yaxis: {
-            
-            mirror: true,
+            // remove white space at top and bottom of y axis caused by using "markers"
+            range: [-1, data.pgs.dt.length],
+            showgrid: true,
+            showline: true,
+            mirror: 'ticks',
+            gridcolor: '#bdbdbd',
+            gridwidth: 1,
+            linecolor: '#636363',
+            //mirror: true,
              title: {
                 text: '<span style="font-size:large">Chromosome and Position</span>',
                 font: {
-                   // family: 'Courier New, monospace',
                     size: 24
                   },
                 standoff: 10
              },
-            rangemode: "tozero",
-            //type: 'category',
-            showline: true,
-           // tickangle: 0,
             tickfont: {
                 size: 10.5
             },
         },
         xaxis: {
-            autorange: true,
             font: {
+                size: 18
+            },
+            tickfont: {
                 size: 16
             },
             title: '<span style="font-size:large">β</span>',
             linewidth: 1,
             mirror: true,
-            //rangemode: "tozero",
         }
     }
 
@@ -918,6 +923,7 @@ function pieChart(data = PGS23.data) {
      },// x: 50, y: 60},
         // height: 410,
         // width: 750,
+        width:'20em',
         legend: {
            xanchor:"right",
            // x:-0.02, y:0.7,  // play with it

@@ -103,7 +103,7 @@ var title2 = `${x_nonmatches.length}`+" not matched"
       };
       var tr = [trace0,trace1]
     div.innerHTML = ''
-    Plotly.newPlot(div, tr, {
+	Plotly.newPlot(div, tr, {
         //title:`${data.pgs.meta.trait_mapped}, PRS ${Math.round(data.PRS*1000)/1000}`
         //<br><a href="${'https://doi.org/' + PGS23.pgsObj.meta.citation.match(/doi\:.*$/)[0]}" target="_blank"style="font-size:x-small">${data.pgs.meta.citation}</a>
         title: `<i style="color:navy">Effect Sizes for All PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')} Variants</i>`,
