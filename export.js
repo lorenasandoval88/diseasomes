@@ -873,7 +873,6 @@ function pieChart(data = PGS23.data) {
     const risk2 = data.plot.not_matched.risk.reduce((partialSum, a) => partialSum + a, 0);
     risk_composition[`total β for ${data.plot.matched.risk.length} <br>matched variants`] = risk1
     risk_composition[`total β for ${data.plot.not_matched.risk.length} <br>unmatched variants`] = risk2
-
     var y = Object.values(risk_composition)
     var x = Object.keys(risk_composition)
     var piePlotData = [{
@@ -913,7 +912,7 @@ function pieChart(data = PGS23.data) {
     var layout = {
         //legend: { x: -1 },
         title: {
-        text:` PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants`,
+        text:` PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution for ${data.pgsMatchMy23.length} matched <br>and ${data.pgs.dt.length-data.pgsMatchMy23.length} unmatched variants`,
         font: {
             //family: 'Lato',
             size: 19
