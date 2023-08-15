@@ -3,7 +3,7 @@
 # PRScalc
 Calculation polygenic risk for individual 23andme mutation reports using PGS catalog. Live at https://episphere.github.io/prs !
 
-# Public 23andme sample files: 
+# 23andme files: 
 
 The participants in the Personal Genome Project (PGP) have volunteered to share their DNA sequences, medical information, and other personal information with the research community and the general public.
 
