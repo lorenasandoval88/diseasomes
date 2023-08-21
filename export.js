@@ -153,9 +153,6 @@ PGS23.load23 = async () => {
             }
         }
 
-
-
-
         readZip.onload = ev => {
             let zip = new JSZip()
             zip.loadAsync(ev.target.result).then(zip => {
