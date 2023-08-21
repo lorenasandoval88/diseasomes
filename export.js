@@ -41,11 +41,9 @@ PGS23.loadPGS = async (i = 1) => {
         if (evt.keyCode == 13) {
             // on key up reload pgs data
             div.querySelector('#btLoadPgs').click()
-
         }
     })
  
-
     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
     div.querySelector('#btLoadPgs').onclick = async (evt) => {
         document.querySelector('#summarySpan').hidden = true
@@ -76,7 +74,6 @@ PGS23.loadPGS = async (i = 1) => {
                 div.querySelector('#showLargeFile').style.color = ''
                 //div.querySelector('#summarySpan').hidden = true
             }, 2000)
-            //debugger
         } else {
             if (div.querySelector('#checkLargeFile').checked) {
                 PGS23.pgsTextArea.value = `... processing large file (this may not work, feature under development). If the wait gets too long, remember you can always reset by reloading the page.`
@@ -92,7 +89,6 @@ PGS23.loadPGS = async (i = 1) => {
             } else {
                 PGS23.pgsTextArea.value = PGS23.pgsObj.txt.slice(0, 100000) + `...\n... (${PGS23.pgsObj.dt.length} variants) ...`
             }
-            //PGS23.data.pgs=pgsObj
             const cleanObj = structuredClone(PGS23.pgsObj)
             cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
             delete cleanObj.txt
@@ -101,7 +97,6 @@ PGS23.loadPGS = async (i = 1) => {
         }
     };
     div.querySelector("#objJSON").onclick = evt => {
-        //console.log(Date())
         let cleanObj = structuredClone(PGS23.pgsObj)
         cleanObj.info = cleanObj.txt.match(/^[^\n]*/)[0]
         delete cleanObj.txt
@@ -134,38 +129,48 @@ PGS23.load23 = async () => {
         let readTxt = new FileReader()
         let readZip = new FileReader()
         readTxt.onload = ev => {
+
             let txt = ev.target.result;
-            div.querySelector("#my23TextArea").value = txt.slice(0, 10000).replace(/[^\r\n]+$/, '') + '\n\n .................. \n\n' + txt.slice(-300).replace(/^[^\r\n]+/, '')
-            //let my23 = parse23(txt,evt.target.files[0].name)
-            UI23(parse23(txt, evt.target.files[0].name))
+
+            // Check for build 37 on 23andMe file
+            let build37 = []
+            let otherBuild = []
+            let rows = txt.split(/[\r\n]+/g)
+            let n = rows.filter(r => (r[0] == '#')).length
+            for (var i = 0; i < n; i++) {
+                if (rows[i].match(/(?:build 37)(.*)/)) {
+                    build37.push(rows[i]);
+                } else if(rows[i].match(/(?:build )(.*)/)){
+                    otherBuild.push(rows[i]);
+                }
+            }
+            console.log(build37)
+            if(build37.length > 0){
+                div.querySelector("#my23TextArea").value = txt.slice(0, 10000).replace(/[^\r\n]+$/, '') + '\n\n .................. \n\n' + txt.slice(-300).replace(/^[^\r\n]+/, '')
+                UI23(parse23(txt, evt.target.files[0].name))
+            }else{
+                div.querySelector("#my23TextArea").value = `ERROR: please load 23andMe file with reference build 37 \nFrom file: "${otherBuild}"`
+            }
         }
-        // readZip.readAsArrayBuffer=async ev=>{
+
+
+
+
         readZip.onload = ev => {
             let zip = new JSZip()
             zip.loadAsync(ev.target.result).then(zip => {
-                //txtFname=Object.keys(zip.files)[0]
-                //console.log(zip.files,Date())
-                //console.log(Object.getOwnPropertyNames(zip.files)[0])
                 let fnametxt = Object.getOwnPropertyNames(zip.files)[0]
                 zip.file(fnametxt).async('string').then(txt => {
                     div.querySelector("#my23TextArea").value = txt.slice(0, 10000).replace(/[^\r\n]+$/, '') + '\n\n .................. \n\n' + txt.slice(-300).replace(/^[^\r\n]+/, '')
                     UI23(parse23(txt, evt.target.files[0].name))
                 })
-                //debugger
             })
-            //debugger
-            //await ev.arrayBuffer(x=>{
-            //	debugger
-            //})
-            //let txt=await pako.inflate(ev.arrayBuffer(), { to: 'string' })
-            //debugger
         }
 
         if (evt.target.files[0].name.match(/\.txt$/)) {
             readTxt.readAsText(evt.target.files[0])
         } else if (evt.target.files[0].name.match(/\.zip$/)) {
             readZip.readAsArrayBuffer(evt.target.files[0])
-            //debugger
         } else {
             console.error(`wrong file type, neither .txt nor .zip: "${evt.target.files[0].name}"`)
         }
