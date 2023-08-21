@@ -9,7 +9,7 @@ Calculation polygenic risk for individual 23andme mutation reports using PGS cat
 # Scope/Limitations 
 It should be noted that this calculator was devised as a proof of concept and it has a number of important limitations for research or clinical use. First, the current tool uses pre-imputation genotype data and thus results in a low number of SNP matches, making interpretation of PRS difficult. Second, the tool only provides the raw PRS and does not calculate relative or absolute risk of disease. Future work enabling the use of imputed or sequencing data (of much larger size) covering variation across the whole genome, and integration of raw PRS into risk models, is needed. Further considerations are also required prior to clinical use of PRS  (Hao et al 2022).
 
-# 23andme files: 
+# 23andme files
 The participants in the Personal Genome Project (PGP) have volunteered to share their DNA sequences, medical information, and other personal information with the research community and the general public.
 
 https://my.pgp-hms.org/public_genetic_data?data_type=23andMe
