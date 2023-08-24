@@ -28,21 +28,20 @@ let PGS23 = {
 }
 // in case someone wants to see it in the console
 
-PGS23.loadPGS = async (i = 1) => {
-    // startng with a default pgs
-    let div = PGS23.divPGS
-    div.innerHTML = `<b style="color:maroon">A)</b> PGS # <input id="pgsID" value=${i} size=5>
-    <button id='btLoadPgs' class="btn btn-primary btn__first" data-toggle="collapse1" data-target=".collapse.first">load</button>
-    <span id="showLargeFile" hidden=true><input id="checkLargeFile"type="checkbox">large file (under development)</span>
-    
-    <span id="summarySpan" hidden=true>[<a id="urlPGS" href='' target="_blank">FTP</a>][<a id="catalogEntry" href="https://www.pgscatalog.org/score/${"PGS000000".slice(0, -JSON.stringify(i).length) + JSON.stringify(i)}" target="_blank">catalog</a>]<span id="largeFile"></span><br><span id="trait_mapped">...</span>, <span id="dataRows">...</span> variants, [<a id="pubDOI" target="_blank">Reference</a>], [<a href="#" id="objJSON">JSON</a>].</span>
-    <p><textarea id="pgsTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`;
-    div.querySelector('#pgsID').onkeyup = (evt => {
-        if (evt.keyCode == 13) {
-            // on key up reload pgs data
-            div.querySelector('#btLoadPgs').click()
-        }
-    })
+PGS23.loadPGS = async (i=1) => {
+   // startng with a default pgs 
+   let div = PGS23.divPGS
+   div.innerHTML = `<b style="color:maroon">A)</b> PGS # <input id="pgsID" value=${i} size=5 > <button id='btLoadPgs'>load</button><span id="showLargeFile" hidden=true><input id="checkLargeFile"type="checkbox">large file (under development)</span> 
+   <span id="summarySpan" hidden=true>[<a id="urlPGS" href='' target="_blank">FTP</a>][<a id="catalogEntry" href="https://www.pgscatalog.org/score/${"PGS000000".slice(0, -JSON.stringify(i).length) + JSON.stringify(i)}" target="_blank">catalog</a>]<span id="largeFile"></span><br><span id="trait_mapped">...</span>, <span id="dataRows">...</span> variants, [<a id="pubDOI" target="_blank">Reference</a>], [<a href="#" id="objJSON">JSON</a>].</span>
+   <p><textarea id="pgsTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`;
+  
+   div.querySelector('#pgsID').onkeyup = (evt=>{
+    document.getElementById("catalogEntry").href = `https://www.pgscatalog.org/score/${"PGS000000".slice(0, -pgsID.value.length) + pgsID.value}`
+
+       if (evt.keyCode == 13) {
+           div.querySelector('#btLoadPgs').click()
+       }
+   })
  
     PGS23.pgsTextArea = div.querySelector('#pgsTextArea')
     div.querySelector('#btLoadPgs').onclick = async (evt) => {
@@ -144,7 +143,6 @@ PGS23.load23 = async () => {
                     otherBuild.push(rows[i]);
                 }
             }
-            console.log(build37)
             if(build37.length > 0){
                 div.querySelector("#my23TextArea").value = txt.slice(0, 10000).replace(/[^\r\n]+$/, '') + '\n\n .................. \n\n' + txt.slice(-300).replace(/^[^\r\n]+/, '')
                 UI23(parse23(txt, evt.target.files[0].name))
@@ -264,7 +262,8 @@ PGS23.Match2 = function (data, progressReport) {
             }
             let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos]))
                 .filter(myr => (myr[1] == r[indChr]))
-                .filter(myr => regexPattern.test(myr[indGenotype])) 
+            // remove 23 variants that don't match pgs effect or other allele    
+                //.filter(myr => regexPattern.test(myr[indGenotype])) 
             //let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
 
 
@@ -310,35 +309,29 @@ PGS23.Match2 = function (data, progressReport) {
             })
             data.alleles = alleles
             data.calcRiskScore = calcRiskScore
-            //console.log("calcRiskScore.reduce((a, b) => Math.min(a, b))",calcRiskScore.reduce((a, b) => Math.min(a, b)))
-            //console.log("calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0: ",calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0)
-            
+         
             // warning: no matches found!
             if (calcRiskScore.length == 0) { 
                 console.log('there are no matches :-(')
                 document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
-                //document.getElementById('my23CalcTextArea').value += ` However, these don't look like betas. I am going to assume they are hazard ratios ... You could also look for another entry for the same trait where betas were calculated, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
-                //document.getElementById('my23CalcTextArea').value += ` However, these don't look right, QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
                 document.getElementById('plotRiskDiv').hidden = true
                 document.getElementById('hidenCalc').hidden = false
                 plotAllMatchByEffect4()
                 pieChart()
-            // zero betas
+            // all betas greater than zero
             } else if (calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
-                console.log('these are not betas :-(')
+                console.log('these are not betas :-(',calcRiskScore.map((a) => a))
                 document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
-                //document.getElementById('my23CalcTextArea').value += ` However, these don't look like betas. I am going to assume they are hazard ratios ... You could also look for another entry for the same trait where betas were calculated, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
-                document.getElementById('my23CalcTextArea').value += ` However, these don't look right (betas=0), QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
+                document.getElementById('my23CalcTextArea').value += ` However, these don't look right (betas = false), QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
                 document.getElementById('plotRiskDiv').hidden = true
                 document.getElementById('hidenCalc').hidden = false
                 plotAllMatchByEffect4()
                 pieChart()
             // large betas over 1
-            }else if (calcRiskScore.reduce((a, b) => Math.max(a, b)) > 1) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
+            }else if (calcRiskScore.reduce((a, b) => Math.max(a, b)) > 100) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
                 console.log('these are large betas :-(')
                 document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
-                //document.getElementById('my23CalcTextArea').value += ` However, these don't look like betas. I am going to assume they are hazard ratios ... You could also look for another entry for the same trait where betas were calculated, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
-                document.getElementById('my23CalcTextArea').value += ` However, these don't look right (betas>1), QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
+                document.getElementById('my23CalcTextArea').value += ` However, these don't look right (betas = false), QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
                 document.getElementById('plotRiskDiv').hidden = true
                 document.getElementById('hidenCalc').hidden = false
                 data.PRS = Math.exp(calcRiskScore.reduce((a, b) => a + b))
@@ -415,7 +408,7 @@ function ui(targetDiv = document.body) {
     PGS23.loadCalc()
 }
 
-async function parsePGS(i = 4) {
+async function parsePGS(i = 1) {
     let obj = {
         id: i
     }
