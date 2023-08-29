@@ -229,9 +229,7 @@ PGS23.loadCalc = async () => {
 
 }
 
-// MATCH 23andme chromosome and position TO PGS chromosome and position *******
-//var regexPattern = new RegExp([r[2],r[3]].join('|'))
-
+// MATCH 23andme chromosome and position TO PGS chromosome and position 
 PGS23.Match2 = function (data, progressReport) {
     // extract harmonized data from PGS entry first
     const indChr = data.pgs.cols.indexOf('hm_chr')
@@ -415,7 +413,6 @@ async function parsePGS(i = 1) {
         obj.dt.pop(-1)
     }
     // parse numerical types
-    //const indInt=obj.cols.map((c,i)=>c.match(/_pos/g)?i:null).filter(x=>x)
     const indInt = [obj.cols.indexOf('chr_position'), obj.cols.indexOf('hm_pos')]
     const indFloat = [obj.cols.indexOf('effect_weight'), obj.cols.indexOf('allelefrequency_effect')]
     const indBol = [obj.cols.indexOf('hm_match_chr'), obj.cols.indexOf('hm_match_pos')]
@@ -560,10 +557,8 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     obj.not_matched.opacity = Array(not_matched.length).fill("0.5")
     obj.not_matched.symbol = Array(not_matched.length).fill("x")
     obj.not_matched.hoverinfo = Array(not_matched.length).fill("all")
-    //     // ALL VARIANTS -------------------------------------------------------------------------------------
-    //const allData = matchData2.concat(notMatchData)
+    // ALL VARIANTS -------------------------------------------------------------------------------------
     const allData = data.pgs.dt
-    //const allData = data.pgs.dt
 
     let allData_idx = [...Array(allData.length)].map((_, i) => i).sort((a, b) => (allData[a][4] - allData[b][4])) //match indexes
     const allData_sorted = allData_idx.map(j => {
@@ -589,12 +584,10 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     // MATCHED BY alleles---------------------------
     // separate data.pgsMatchMy23 into 3 (dosage #) arrays
 
-    // 43 matched variants (betas from pgs for now)
     //https://stackoverflow.com/questions/40415231/how-to-get-an-array-of-values-based-on-an-array-of-indexes
     const zero_allele = matched.filter((ele, idx) => data.alleles[idx] == 0);
     const zero_allele_idx = data.alleles.map((elm, idx) => elm == 0 ? idx : '')
         .filter(String);
-    //zero_alleles.forEach(function(arr){arr.push("matched, no effect allele")});  // add trace name here   
     const one_allele = matched.filter((ele, idx) => data.alleles[idx] == 1);
     const one_allele_idx = data.alleles.map((elm, idx) => elm == 1 ? idx : '')
         .filter(String);
@@ -602,10 +595,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     const two_allele_idx = data.alleles.map((elm, idx) => elm == 2 ? idx : '')
         .filter(String);
 
-
-    //const zero_alleles_risk = (dt.matches).map(function(v) { return v[1]}).filter((ele, idx) => dt.alleles[idx] == 0).map(function(v) { return v[4]})
-
-    // x (chr pos)  y (betas or betas*dosage) data
+    // x (chr pos)  y (betas or betas*dosage) plot data
     const zero_allele_chrpos = zero_allele_idx.map(i => `Chr${matched[i][indChr]}.${matched[i][indPos]}`)
     const one_allele_chrpos = one_allele_idx.map(i => `Chr${matched[i][indChr]}.${matched[i][indPos]}`)
     const two_allele_chrpos = two_allele_idx.map(i => `Chr${matched[i][indChr]}.${matched[i][indPos]}`)
@@ -664,10 +654,6 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     plotAllMatchByEffectDiv.style.height = 20 + data.pgs.dt.length * 1.1 + 'em'
 
     // make new objects with id, all mapped to one condition sorted by value
-    //https://stackoverflow.com/questions/979256/sorting-an-array-of-objects-by-property-values
-    // subset data depending on the plot
-    //https://stackoverflow.com/questions/4894142/making-a-subset-of-an-array-of-javascript-objects-based-on-one-of-their-properti
-
     const cache = []
     const chooseData = [" ", `${zero_allele.length } matched, zero alleles`, `${one_allele.length } matched, one allele`, `${two_allele.length } matched, two alleles`, `${not_matched.length} not matched`]
 
@@ -682,11 +668,9 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
         })
         .sort((a, b) => parseFloat(a.risk) - parseFloat(b.risk))
 
-    // TODO------------------------------------------
     // re-order plot legend manually, order conditions list by regex 
     const conditions_arr = Array.from(new Set(plotData.map(a => a.category)))
 
-    //const conditions_arr = [' ',  'not matched', 'matched, zero alleles', 'matched, one allele', 'matched, two alleles']
     var rx_not = new RegExp(/\bnot?(?!S)/);
     var rx_zero = new RegExp(/\bzero?(?!S)/);
     var rx_one = new RegExp(/\bone?(?!S)/);
@@ -731,14 +715,12 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
         title: {
             text: `<span >PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: β's for ${data.pgs.dt.length} ${data.pgs.meta.trait_mapped} variants, PRS ${Math.round(data.PRS*1000)/1000}</span>`,
             font: {
-                //family: 'Lato',
                 size: 19
             }
         },
         margin: {
             l: 140,
           },
-       // width:'20em',
  
         showlegend: true,
         legend: {
@@ -756,7 +738,6 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
             gridcolor: '#bdbdbd',
             gridwidth: 1,
             linecolor: '#636363',
-            //mirror: true,
              title: {
                 text: '<span style="font-size:large">Chromosome and Position</span>',
                 font: {
@@ -782,8 +763,6 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     }
 
     dv.innerHTML = ''
-    // auto resize plot height, width is responsive, but not height
-    // FIX Plot https://github.com/plotly/angular-plotly.js/issues/48
 
     var config = {
         responsive: true
@@ -806,10 +785,7 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
     // sort by absolute value
     let jj = [...Array(data.calcRiskScore.length)].map((_, i) => i) // match indexes
     // remove zero effect
-    // jj = jj.filter(x=>abs[x]>0)
     jj = jj.filter(x => data.calcRiskScore[x] != 0)
-    // let abs = data.calcRiskScore.map(x => Math.abs(x))
-    // jj.sort((a, b) => (abs[b] - abs[a])) // indexes sorted by absolute value
     jj.sort((a, b) => (data.calcRiskScore[b] - data.calcRiskScore[a])) // indexes sorted by absolute value
 
     // tabulate
@@ -874,28 +850,23 @@ function pieChart(data = PGS23.data) {
             }
         },
         textfont: {
-            //family: 'Lato',
             color: 'black',
             size: 19
         },
-        //insidetextfont: {size:30},
 
         hoverlabel: {
             bgcolor: 'black',
             bordercolor: 'black',
             font: {
-               // family: 'Lato',
                 color: 'white',
                 size: 18
             }
         }
     }]
     var layout = {
-        //legend: { x: -1 },
         title: {
         text:` PGS#${data.pgs.meta.pgs_id.replace(/^.*0+/,'')}: total β contribution for ${data.pgsMatchMy23.length} matched <br>and ${data.pgs.dt.length-data.pgsMatchMy23.length} unmatched variants`,
         font: {
-            //family: 'Lato',
             size: 19
         }
      },
@@ -903,7 +874,6 @@ function pieChart(data = PGS23.data) {
         legend: {
            xanchor:"right",
             font: {
-                //family: 'Lato',
                 size: 16
             }
         },
