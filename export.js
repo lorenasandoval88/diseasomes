@@ -263,7 +263,7 @@ PGS23.Match2 = function (data, progressReport) {
             let dtMatch_i = data.my23.dt.filter(myr => (myr[2] == r[indPos]))
                 .filter(myr => (myr[1] == r[indChr]))
             // remove 23 variants that don't match pgs effect or other allele    
-                //.filter(myr => regexPattern.test(myr[indGenotype])) 
+                .filter(myr => regexPattern.test(myr[indGenotype])) 
             //let dtMatch_i = data.my23.dt.slice(matchFloor).filter(myr=>(myr[2] == r[indPos])).filter(myr=>(myr[1] == r[indChr]))
 
 
@@ -304,12 +304,12 @@ PGS23.Match2 = function (data, progressReport) {
                         calcRiskScore[i] = L * pi[ind_effect_weight]
                         alleles[i] = L
                     }
-                    //debugger
                 }
             })
             data.alleles = alleles
             data.calcRiskScore = calcRiskScore
-         
+            let weight_idx = data.pgs.cols.indexOf('effect_weight')
+            let weights = data.pgs.dt.map(row => row[weight_idx])
             // warning: no matches found!
             if (calcRiskScore.length == 0) { 
                 console.log('there are no matches :-(')
@@ -318,18 +318,20 @@ PGS23.Match2 = function (data, progressReport) {
                 document.getElementById('hidenCalc').hidden = false
                 plotAllMatchByEffect4()
                 pieChart()
-            // all betas greater than zero
-            } else if (calcRiskScore.reduce((a, b) => Math.min(a, b)) == 0) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
-                console.log('these are not betas :-(',calcRiskScore.map((a) => a))
+        // all betas greater than zero
+        //} else if (data.pgs.dt[weight_idx].reduce((a, b) => Math.min(a, b)) > -0.00002 ) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
+            } else if (weights.reduce((a, b) => Math.min(a, b)) > -0.00002 ) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
+                console.log('these are not betas :-(',weights) 
+                //console.log('these are not betas :-(',calcRiskScore.map((a) => a)) weights
                 document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
                 document.getElementById('my23CalcTextArea').value += ` However, these don't look right (betas = false), QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
                 document.getElementById('plotRiskDiv').hidden = true
                 document.getElementById('hidenCalc').hidden = false
                 plotAllMatchByEffect4()
                 pieChart()
-            // large betas over 1
-            }else if (calcRiskScore.reduce((a, b) => Math.max(a, b)) > 100) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
-                console.log('these are large betas :-(')
+            // large betas over 100
+           // }else if (calcRiskScore.reduce((a, b) => Math.max(a, b)) > 100) { //&&(calcRiskScore.reduce((a,b)=>Math.max(a,b))<=1)){ // hazard ratios?
+                console.log('these are large betas :-(',weights)
                 document.getElementById('my23CalcTextArea').value += ` Found ${data.pgsMatchMy23.length} PGS matches to the 23andme report.`
                 document.getElementById('my23CalcTextArea').value += ` However, these don't look right (betas = false), QAQC FAILED ! ... You could look for another entry for the same trait where betas pass QAQC, maybe give it a try at https://www.pgscatalog.org/search/?q=${data.pgs.meta.trait_mapped.replace(' ','+')}.`
                 document.getElementById('plotRiskDiv').hidden = true
@@ -353,17 +355,6 @@ PGS23.Match2 = function (data, progressReport) {
 
     }
     funMatch()
-
-    /*
-    data.pgs.dt.forEach((r,i)=>{
-        let dtMatch_i=data.my23.dt.filter(myr=>(myr[2]==r[indPos])).filter(myr=>(myr[1]==r[indChr]))
-        if(dtMatch_i.length>0){
-            dtMatch.push(dtMatch_i.concat([r]))
-        }
-        //console.log(i/n)
-    })
-     */
-
 }
 
 
@@ -444,12 +435,10 @@ async function parsePGS(i = 1) {
         return r
     })
 
-    // */
     // parse metadata
     obj.meta.txt.filter(r => (r[1] != '#')).forEach(aa => {
         aa = aa.slice(1).split('=')
         obj.meta[aa[0]] = aa[1]
-        //debugger
     })
     return obj
 }
@@ -497,13 +486,12 @@ function saveFile(x, fileName) {
 function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById('errorDiv'),dv = document.getElementById('plotAllMatchByEffectDiv')) {
     //https://community.plotly.com/t/fill-shade-a-chart-above-a-specific-y-value-in-plotlyjs/5133
 
-    const all_pgs_variants = {}
+    const obj = {}
     const indChr = data.pgs.cols.indexOf('hm_chr')
     const indPos = data.pgs.cols.indexOf('hm_pos')
     const indBeta = data.pgs.cols.indexOf('effect_weight')
 
-    // MATCHED ---------------------------
-    // separate pgs.dt into 2 (matches and non matches) arrays and then sort by effect  
+    // QC to check when two or more 23andMe variants mapped to pgs variant
     if (!dv2) {
         dv2 = document.createElement('div')
         document.body.appendChild(dv2)
@@ -512,6 +500,7 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     let duplicate = ''
     
     const matched = data.pgsMatchMy23.map(function (v) {
+        //console.log("data.pgsMatchMy23",v)
         if(v.length==2){
             return v[1]
 
@@ -526,7 +515,9 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
             console.log("more than 2 23andme SNPS mapped to one pgs variant",v)
             return v[2]
     }
-    }) // " matched" data
+    }) 
+     // separate pgs.dt into 2 (matches and non matches) arrays and then sort by effect  
+    // " matched" data
 
     const matched_risk = matched.map((j) => {
         return j[indBeta]
@@ -535,12 +526,12 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     const matched_chrPos = matched.map(j => {
         return `Chr${j[indChr]}.${j[indPos]}`
     })
-    all_pgs_variants['matched'] = {}
-    all_pgs_variants.matched.chrPos = matched_chrPos
-    all_pgs_variants.matched.dt = matched
-    all_pgs_variants.matched.alleles = data.alleles
-    all_pgs_variants.matched.risk = matched_risk
-    all_pgs_variants.matched.category = Array(matched.length).fill("matched")
+    obj['matched'] = {}
+    obj.matched.chrPos = matched_chrPos
+    obj.matched.dt = matched
+    obj.matched.alleles = data.alleles
+    obj.matched.risk = matched_risk
+    obj.matched.category = Array(matched.length).fill("matched")
 
     //     // NON-MATCHED --------------------------------------------------------------------------------------------
     const notMatchData = data.pgs.dt.filter(element => !matched.includes(element)); // "not matched" data
@@ -558,17 +549,17 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
 
     const not_matched_risk = not_matched.map((yi, i) => yi[indBeta])
 
-    all_pgs_variants['not_matched'] = {}
-    all_pgs_variants.not_matched.chrPos = not_matched_chrPos
-    all_pgs_variants.not_matched.dt = not_matched
-    all_pgs_variants.not_matched.risk = not_matched_risk
+    obj['not_matched'] = {}
+    obj.not_matched.chrPos = not_matched_chrPos
+    obj.not_matched.dt = not_matched
+    obj.not_matched.risk = not_matched_risk
     const fill_no_match = `${not_matched.length} not matched`
-    all_pgs_variants.not_matched.category = Array(not_matched.length).fill(fill_no_match)
-    all_pgs_variants.not_matched.size = Array(not_matched.length).fill("9")
-    all_pgs_variants.not_matched.color = Array(not_matched.length).fill("rgb(140, 140, 140)")
-    all_pgs_variants.not_matched.opacity = Array(not_matched.length).fill("0.5")
-    all_pgs_variants.not_matched.symbol = Array(not_matched.length).fill("x")
-    all_pgs_variants.not_matched.hoverinfo = Array(not_matched.length).fill("all")
+    obj.not_matched.category = Array(not_matched.length).fill(fill_no_match)
+    obj.not_matched.size = Array(not_matched.length).fill("9")
+    obj.not_matched.color = Array(not_matched.length).fill("rgb(140, 140, 140)")
+    obj.not_matched.opacity = Array(not_matched.length).fill("0.5")
+    obj.not_matched.symbol = Array(not_matched.length).fill("x")
+    obj.not_matched.hoverinfo = Array(not_matched.length).fill("all")
     //     // ALL VARIANTS -------------------------------------------------------------------------------------
     //const allData = matchData2.concat(notMatchData)
     const allData = data.pgs.dt
@@ -585,16 +576,16 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
 
     const allData_risk = allData.map((yi, i) => yi[indBeta])
 
-    all_pgs_variants['all'] = {}
-    all_pgs_variants.all.chrPos = allData_chrPos
-    all_pgs_variants.all.dt = allData_sorted
-    all_pgs_variants.all.risk = allData_risk
-    all_pgs_variants.all.category = Array(allData_sorted.length).fill(" ")
-    all_pgs_variants.all.size = Array(allData_sorted.length).fill("10")
-    all_pgs_variants.all.color = Array(allData_sorted.length).fill("green")
-    all_pgs_variants.all.opacity = Array(allData_sorted.length).fill("0")
-    all_pgs_variants.all.symbol = Array(allData_sorted.length).fill("square")
-    all_pgs_variants.all.hoverinfo = Array(allData_sorted.length).fill("none")
+    obj['all'] = {}
+    obj.all.chrPos = allData_chrPos
+    obj.all.dt = allData_sorted
+    obj.all.risk = allData_risk
+    obj.all.category = Array(allData_sorted.length).fill(" ")
+    obj.all.size = Array(allData_sorted.length).fill("10")
+    obj.all.color = Array(allData_sorted.length).fill("green")
+    obj.all.opacity = Array(allData_sorted.length).fill("0")
+    obj.all.symbol = Array(allData_sorted.length).fill("square")
+    obj.all.hoverinfo = Array(allData_sorted.length).fill("none")
     // MATCHED BY alleles---------------------------
     // separate data.pgsMatchMy23 into 3 (dosage #) arrays
 
@@ -619,41 +610,41 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     const one_allele_chrpos = one_allele_idx.map(i => `Chr${matched[i][indChr]}.${matched[i][indPos]}`)
     const two_allele_chrpos = two_allele_idx.map(i => `Chr${matched[i][indChr]}.${matched[i][indPos]}`)
 
-    all_pgs_variants['matched_by_alleles'] = {}
-    all_pgs_variants.matched_by_alleles.zero_allele = {}
-    all_pgs_variants.matched_by_alleles.one_allele = {}
-    all_pgs_variants.matched_by_alleles.two_allele = {}
+    obj['matched_by_alleles'] = {}
+    obj.matched_by_alleles.zero_allele = {}
+    obj.matched_by_alleles.one_allele = {}
+    obj.matched_by_alleles.two_allele = {}
 
-    all_pgs_variants.matched_by_alleles.zero_allele.chrPos = zero_allele_chrpos
-    all_pgs_variants.matched_by_alleles.one_allele.chrPos = one_allele_chrpos
-    all_pgs_variants.matched_by_alleles.two_allele.chrPos = two_allele_chrpos
-    all_pgs_variants.matched_by_alleles.zero_allele.dt = zero_allele
-    all_pgs_variants.matched_by_alleles.one_allele.dt = one_allele
-    all_pgs_variants.matched_by_alleles.two_allele.dt = two_allele
-    all_pgs_variants.matched_by_alleles.zero_allele.risk = zero_allele_idx.map(i => matched[i][indBeta]);
-    all_pgs_variants.matched_by_alleles.one_allele.risk = one_allele_idx.map(i => matched[i][indBeta]);
-    all_pgs_variants.matched_by_alleles.two_allele.risk = two_allele_idx.map(i => matched[i][indBeta]);
-    all_pgs_variants.matched_by_alleles.zero_allele.category = Array(zero_allele.length).fill(`${zero_allele.length } matched, zero alleles`)
-    all_pgs_variants.matched_by_alleles.one_allele.category = Array(one_allele.length).fill(`${one_allele.length } matched, one allele`)
-    all_pgs_variants.matched_by_alleles.two_allele.category = Array(two_allele.length).fill(`${two_allele.length } matched, two alleles`)
-    all_pgs_variants.matched_by_alleles.zero_allele.size = Array(zero_allele.length).fill("8")
-    all_pgs_variants.matched_by_alleles.one_allele.size = Array(one_allele.length).fill("8")
-    all_pgs_variants.matched_by_alleles.two_allele.size = Array(two_allele.length).fill("10")
-    all_pgs_variants.matched_by_alleles.zero_allele.color = Array(zero_allele.length).fill("#17becf")
-    all_pgs_variants.matched_by_alleles.one_allele.color = Array(one_allele.length).fill("navy")
-    all_pgs_variants.matched_by_alleles.two_allele.color = Array(two_allele.length).fill("#d62728")
-    all_pgs_variants.matched_by_alleles.zero_allele.opacity = Array(zero_allele.length).fill("1")
-    all_pgs_variants.matched_by_alleles.one_allele.opacity = Array(one_allele.length).fill("1")
-    all_pgs_variants.matched_by_alleles.two_allele.opacity = Array(two_allele.length).fill("1")
-    all_pgs_variants.matched_by_alleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
-    all_pgs_variants.matched_by_alleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
-    all_pgs_variants.matched_by_alleles.two_allele.symbol = Array(two_allele.length).fill("square")
-    all_pgs_variants.matched_by_alleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
-    all_pgs_variants.matched_by_alleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
-    all_pgs_variants.matched_by_alleles.two_allele.symbol = Array(two_allele.length).fill("square")
-    all_pgs_variants.matched_by_alleles.zero_allele.hoverinfo = Array(zero_allele.length).fill("all")
-    all_pgs_variants.matched_by_alleles.one_allele.hoverinfo = Array(one_allele.length).fill("all")
-    all_pgs_variants.matched_by_alleles.two_allele.hoverinfo = Array(two_allele.length).fill("all")
+    obj.matched_by_alleles.zero_allele.chrPos = zero_allele_chrpos
+    obj.matched_by_alleles.one_allele.chrPos = one_allele_chrpos
+    obj.matched_by_alleles.two_allele.chrPos = two_allele_chrpos
+    obj.matched_by_alleles.zero_allele.dt = zero_allele
+    obj.matched_by_alleles.one_allele.dt = one_allele
+    obj.matched_by_alleles.two_allele.dt = two_allele
+    obj.matched_by_alleles.zero_allele.risk = zero_allele_idx.map(i => matched[i][indBeta]);
+    obj.matched_by_alleles.one_allele.risk = one_allele_idx.map(i => matched[i][indBeta]);
+    obj.matched_by_alleles.two_allele.risk = two_allele_idx.map(i => matched[i][indBeta]);
+    obj.matched_by_alleles.zero_allele.category = Array(zero_allele.length).fill(`${zero_allele.length } matched, zero alleles`)
+    obj.matched_by_alleles.one_allele.category = Array(one_allele.length).fill(`${one_allele.length } matched, one allele`)
+    obj.matched_by_alleles.two_allele.category = Array(two_allele.length).fill(`${two_allele.length } matched, two alleles`)
+    obj.matched_by_alleles.zero_allele.size = Array(zero_allele.length).fill("8")
+    obj.matched_by_alleles.one_allele.size = Array(one_allele.length).fill("8")
+    obj.matched_by_alleles.two_allele.size = Array(two_allele.length).fill("10")
+    obj.matched_by_alleles.zero_allele.color = Array(zero_allele.length).fill("#17becf")
+    obj.matched_by_alleles.one_allele.color = Array(one_allele.length).fill("navy")
+    obj.matched_by_alleles.two_allele.color = Array(two_allele.length).fill("#d62728")
+    obj.matched_by_alleles.zero_allele.opacity = Array(zero_allele.length).fill("1")
+    obj.matched_by_alleles.one_allele.opacity = Array(one_allele.length).fill("1")
+    obj.matched_by_alleles.two_allele.opacity = Array(two_allele.length).fill("1")
+    obj.matched_by_alleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
+    obj.matched_by_alleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
+    obj.matched_by_alleles.two_allele.symbol = Array(two_allele.length).fill("square")
+    obj.matched_by_alleles.zero_allele.symbol = Array(zero_allele.length).fill("0")
+    obj.matched_by_alleles.one_allele.symbol = Array(one_allele.length).fill("diamond")
+    obj.matched_by_alleles.two_allele.symbol = Array(two_allele.length).fill("square")
+    obj.matched_by_alleles.zero_allele.hoverinfo = Array(zero_allele.length).fill("all")
+    obj.matched_by_alleles.one_allele.hoverinfo = Array(one_allele.length).fill("all")
+    obj.matched_by_alleles.two_allele.hoverinfo = Array(two_allele.length).fill("all")
 
 
     // add matched,all, zero, one and two allele into new array
@@ -663,11 +654,11 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
             return Object.entries(data).reduce((a, [k, arr]) => (a[k] = arr[i], a), {})
         })
     }
-    const items = Push(all_pgs_variants.all, all_pgs_variants.all.risk).concat(
-        Push(all_pgs_variants.not_matched, all_pgs_variants.not_matched.risk)).concat(
-        Push(all_pgs_variants.matched_by_alleles.zero_allele, all_pgs_variants.matched_by_alleles.zero_allele.risk)).concat(
-        Push(all_pgs_variants.matched_by_alleles.one_allele, all_pgs_variants.matched_by_alleles.one_allele.risk)).concat(
-        Push(all_pgs_variants.matched_by_alleles.two_allele, all_pgs_variants.matched_by_alleles.two_allele.risk))
+    const items = Push(obj.all, obj.all.risk).concat(
+        Push(obj.not_matched, obj.not_matched.risk)).concat(
+        Push(obj.matched_by_alleles.zero_allele, obj.matched_by_alleles.zero_allele.risk)).concat(
+        Push(obj.matched_by_alleles.one_allele, obj.matched_by_alleles.one_allele.risk)).concat(
+        Push(obj.matched_by_alleles.two_allele, obj.matched_by_alleles.two_allele.risk))
 
     plotRiskDiv.style.height = 20 + data.pgs.dt.length * 1.1 + 'em'
     plotAllMatchByEffectDiv.style.height = 20 + data.pgs.dt.length * 1.1 + 'em'
@@ -797,15 +788,14 @@ function plotAllMatchByEffect4(data = PGS23.data, dv2 = document.getElementById(
     var config = {
         responsive: true
     }
-    data.plot = all_pgs_variants
+    data.plot = obj
     data.plot.traces = traces
 
     Plotly.newPlot(dv, traces, layout, config)
     tabulateAllMatchByEffect()
 }
+
 /* Plot percent of matched and not matched betas */
-
-
 function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementById('tabulateAllMatchByEffectDiv')) {
 
     if (!div) {
@@ -853,10 +843,6 @@ function tabulateAllMatchByEffect(data = PGS23.data, div = document.getElementBy
          if(xi.length>2){my_23idx = 2} 
         row.innerHTML = `<tr><td align="left">${i+1})</td><td align="center">${Math.round(xi[my_23idx][indEffect_weight]*1000)/1000}</td><td align="center">${data.alleles[ind]}</td><td align="left">${Math.round(data.calcRiskScore[ind]*1000)/1000}</td><td align="left" style="font-size:small;color:darkgreen"><a href="https://myvariant.info/v1/variant/chr${xi.at(-1)[indChr]}:g.${xi.at(-1)[indPos]}${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}" target="_blank">Chr${xi.at(-1)[indChr]}.${xi.at(-1)[indPos]}:g.${xi.at(-1)[indOther_allele]}>${xi.at(-1)[indEffect_allele]}</a></td><td align="left"><a href="https://www.ncbi.nlm.nih.gov/snp/${xi[0][0]}" target="_blank">${xi[0][0]}</a><td align="left"><a href="https://www.snpedia.com/index.php/${xi[0][0]}" target="_blank">  wiki   </a></td></tr>`
     })
-
-    // <div id='plotSnpConsequence' style='display: inline-block;' ></div>
- 
-    //debugger
 }
 
 function pieChart(data = PGS23.data) {
@@ -912,19 +898,15 @@ function pieChart(data = PGS23.data) {
             //family: 'Lato',
             size: 19
         }
-     },// x: 50, y: 60},
-        // height: 410,
-        // width: 750,
+     },
         width:'20em',
         legend: {
            xanchor:"right",
-           // x:-0.02, y:0.7,  // play with it
             font: {
                 //family: 'Lato',
                 size: 16
             }
         },
-       //margin: { r:4}//l: 50, t:40,b:100 }
     };
     var config = {
         responsive: true
@@ -933,39 +915,6 @@ function pieChart(data = PGS23.data) {
     Plotly.newPlot('pieChartDiv', piePlotData, layout, config);
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-async function getInfoSnps() {
-    var data = document.getElementById("PGS23calc").PGS23data
-    var rs = data.calcRiskScore
-    var i = 0
-    var ide = []
-    rs.forEach(risk => {
-        if (risk > 0 || risk < 0) {
-            ide.push(data.pgsMatchMy23[i][0][0])
-        }
-        i += 1
-    })
-
-    i = 0
-    var info = []
-    while (i < ide.length) {
-        var end = ((i + 15) <= ide.length) ? i + 15 : ide.length
-        var temp = ide.slice(i, end)
-        info = info.concat(await Promise.all(temp.map(async rsid => {
-            var url = `https://rest.ensembl.org/variation/human/${rsid}?content-type=application/json`
-            var enrich = await (await fetch(url)).json()
-            await sleep(300)
-            return enrich
-        })))
-
-        i += 15
-        if (i >= ide.length) {
-            break
-        }
-    }
-
-    return info
-}
 
 
 export {
