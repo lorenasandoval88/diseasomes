@@ -5,7 +5,7 @@
 // Specifically the pgs library is a dependency satisfied by script tag loading
 if (typeof (pgs) == 'undefined') {
     let s = document.createElement('script')
-    s.src = 'https://episphere.github.io/pgs/pgs.js'
+    s.src = 'https://github.com/lorenasandoval88/diseasomes/pgs.js'
     document.head.appendChild(s)
 }
 if (typeof (JSZip) == 'undefined') {
@@ -32,7 +32,7 @@ PGS23.loadPGS = async (i=1) => {
    // startng with a default pgs 
    let div = PGS23.divPGS
    div.innerHTML = `<b style="color:maroon">A)</b> PGS # <input id="pgsID" value=${i} size=5 > <button id='btLoadPgs'>load</button><span id="showLargeFile" hidden=true><input id="checkLargeFile"type="checkbox">large file (under development)</span> 
-   <span id="summarySpan" hidden=true>[<a id="urlPGS" href='' target="_blank">FTP</a>][<a id="catalogEntry" href="https://www.pgscatalog.org/score/${"PGS000000".slice(0, -JSON.stringify(i).length) + JSON.stringify(i)}" target="_blank">catalog</a>][<a id="pgsBuild" href="https://episphere.github.io/pgs/?id=4" target="_blank">build</a>]<span id="largeFile"></span><br><span id="trait_mapped">...</span>, <span id="dataRows">...</span> variants, [<a id="pubDOI" target="_blank">Reference</a>], [<a href="#" id="objJSON">JSON</a>].</span>
+   <span id="summarySpan" hidden=true>[<a id="urlPGS" href='' target="_blank">FTP</a>][<a id="catalogEntry" href="https://www.pgscatalog.org/score/${"PGS000000".slice(0, -JSON.stringify(i).length) + JSON.stringify(i)}" target="_blank">catalog</a>][<a id="pgsBuild" href="https://github.com/lorenasandoval88/diseasomes/pgs/?id=4" target="_blank">build</a>]<span id="largeFile"></span><br><span id="trait_mapped">...</span>, <span id="dataRows">...</span> variants, [<a id="pubDOI" target="_blank">Reference</a>], [<a href="#" id="objJSON">JSON</a>].</span>
    <p><textarea id="pgsTextArea" style="background-color:black;color:lime" cols=60 rows=5>...</textarea></p>`;
   
    div.querySelector('#pgsID').onkeyup = (evt=>{
@@ -47,7 +47,7 @@ PGS23.loadPGS = async (i=1) => {
         document.querySelector('#summarySpan').hidden = true
         PGS23.pgsTextArea.value = '... loading'
         i = parseInt(div.querySelector('#pgsID').value)
-        document.getElementById("pgsBuild").href = `https://episphere.github.io/pgs/?id=${i}`
+        document.getElementById("pgsBuild").href = `https://github.com/lorenasandoval88/diseasomes/?id=${i}`
         let PGSstr = i.toString()
         PGSstr = "PGS000000".slice(0, -PGSstr.length) + PGSstr
         div.querySelector('#urlPGS').href = `https://ftp.ebi.ac.uk/pub/databases/spot/pgs/scores/${PGSstr}/ScoringFiles/Harmonized/`
